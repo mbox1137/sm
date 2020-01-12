@@ -20,6 +20,7 @@ FunctionTable fnt[]={	{"sin",&sin},
 int main()
 {
     char str[80];
+    unsigned long n;
     while (!feof(stdin))
     {
         if (fgets(str, 80, stdin) == NULL)
@@ -32,6 +33,8 @@ int main()
 
     printf("%e\n",fnt[0].fptr(0.5));
     printf("%e\n",sin(0.5));
+    n=sizeof(fnt)/sizeof(FunctionTable);
+    printf("%lu\n",n);
 
     return 0;
 }
