@@ -1,6 +1,6 @@
 #!/bin/bash
-echo 123
-gcc -lm -o main main.c
+echo ----
+#gcc -lm -o main main.c
 ./main <main.dat
-echo 456
+echo ----
 
