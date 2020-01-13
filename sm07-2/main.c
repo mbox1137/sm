@@ -12,7 +12,21 @@ const int n=5;
 int r[n];
 
 int vproc(size_t count, int *data, int *order, int *verification) {
-    return(-1);
+    int k, res;
+    char ch;
+    res=0;
+    for (k=0; k<count; k++) {
+        if(order[k]==verification[k]) {
+            ch=' ';
+        } else {
+            ch='*';
+            res=-1;
+        }
+        printf("%c %d: %d -> %d (%d)\n",
+            ch,k,data[k],order[k],verification[k]);
+    }
+    printf("\n");
+    return(res);
 }
 
 int main()
