@@ -8,6 +8,7 @@ OBJS	= main.o process.o
 LDFLAGS	= -lm
 AFLAGS	=
 CFLAGS	= -fverbose-asm -O3
+# -std=gnu99
 #-Os
 
 ALL : $(EXEC)

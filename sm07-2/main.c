@@ -6,10 +6,10 @@
 
 void process(size_t count, int *data, int *order);
 
-int a1[]={5,4,3,2,1}; int r1[]={4,3,2,1,0};
-int a2[]={5,3,3,2,1}; int r2[]={4,3,1,2,0};
-const int n=5;
-int r[n];
+static int a1[]={5,4,3,2,1}; static int r1[]={4,3,2,1,0};
+static int a2[]={5,3,3,2,1}; static int r2[]={4,3,1,2,0};
+static const int n=5;
+static int r[n];
 
 int vproc(size_t count, int *data, int *order, int *verification) {
     int k, res;
