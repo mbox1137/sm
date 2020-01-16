@@ -1,42 +1,48 @@
-;https://forum.nasm.us/index.php?topic=1514.msg6228#msg6228
-;
-; Compiling this code for 32-bit use:
-;    nasm -f elf file.asm
-;    gcc -m32 -o file file.o
-;
-;~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.
+/*
+https://ru.wikibooks.org/wiki/%D0%90%D1%81%D1%81%D0%B5%D0%BC%D0%B1%D0%BB%D0%B5%D1%80_%D0%B2_Linux_%D0%B4%D0%BB%D1%8F_%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B8%D1%81%D1%82%D0%BE%D0%B2_C
+https://forum.nasm.us/index.php?topic=1514.msg6228#msg6228
+$ gcc -m32 -c -o aplusb.o aplusb.s
+$ gcc -m32 -o aplusb aplusb.o
+$ echo 123|./aplusb
+The number+1 is 124
+*/
 
-SECTION .data
-output_format: db "The number is "
-input_format: db "%d" ; <~~ this is a bit of memory trickery, we reuse this part
-end_of_format: db 0, 0 ; <~~ and change the first byte to a newline before output.
+		.code32
 
-;~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.
+.data
+output_format:	.ascii "The number+1 is "
+input_format:	.ascii "%d"
+end_of_format:	.ascii "\0\0"
+//dprintf:	.long	$printf
 
-SECTION .bss
-input: resd 1 ; <~~ scanf handles conversion for us
+.bss
+num1:
+	.space	4
 
-;~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.
+.text
+.globl  main
+.type   main, @function
 
-SECTION .text
-extern printf
-extern scanf
-global main
 main:
 	nop
+
 GetInput:
-	;; Read input with scanf() function.
-	push dword input
-	push dword input_format
-	call scanf
-	add ESP, 8
+	pushl	$num1
+	pushl	$input_format
+	call	scanf
+	addl	$8, %ESP
+
 Calculate:
-	;; No need to calculate anything, scanf() handles input conversion.
+
 Display:
-	;; Display results using printf().
-	mov byte [end_of_format], 10 ; <~~ add a newline for printf()
-        push dword [input] ; <~~ here we pass the contents of our input variable.
-        push output_format
-        call printf
-        add ESP, 8
+	movb	$10, (end_of_format)
+	movl	(num1), %eax
+	incl	%eax
+        pushl	%eax
+        pushl	$output_format
+        call	printf
+//	call	(dprintf)
+	addl	$8, %ESP
         ret
+
+        .size   main, . - main    /* размер функции main */
