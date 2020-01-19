@@ -11,13 +11,13 @@ The number+1 is 124
 		.code64
 
 .data
-output_format:	.ascii "The number+1 is "
-input_format:	.ascii "%d"
-end_of_format:	.ascii "\0\0"
+input_format:	.ascii "%ld %ld\n\0"
+output_format:	.ascii "The sum is %ld\n\0"
 
 .bss
-num1:
-	.space	8
+num1:	.space	8
+num2:	.space	8
+sumnum:	.space	8
 
 .text
 .globl  main
@@ -29,16 +29,17 @@ main:
 GetInput:
 	lea	input_format(%rip), %rdi
 	lea	num1(%rip), %rsi
-//	lea	num2(%rip), %rdx
+	lea	num2(%rip), %rdx
 	call	scanf
 
 Calculate:
+	movq	(num1), %rax
+	addq	(num2), %rax
+	movq	%rax, (sumnum)
 
 Display:
-	movb	$10, (end_of_format)
 	lea	output_format(%rip), %rdi
-	movq	(num1), %rsi
-	incq	%rsi
+	movq	(sumnum), %rsi
         call	printf
 
 Return:
