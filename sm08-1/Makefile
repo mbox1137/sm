@@ -7,10 +7,11 @@ ASM	= nasm
 AFLAGS	= -f elf32 -g
 
 AS	= gcc
-ASFLAGS	= -m32 -c
+ASFLAGS	= -c
+# -fPIC
 
 LD	= gcc
-LDFLAGS	= -m32 -no-pie
+LDFLAGS	= -no-pie
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
 EXEC	= aplusb
