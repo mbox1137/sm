@@ -18,8 +18,25 @@ output_format:	.ascii "The sum is %ld\n\0"
 num1:	.space	8
 num2:	.space	8
 sumnum:	.space	8
+a:	.space	4
+b:	.space	4
+c:	.space	4
+d:	.space	4
+r:	.space	4
 
 .text
+
+process:
+	push	%rbx
+	movl	a(%rip), %eax
+	mull	b(%rip)
+	movl	%eax, %ebx
+	movl	c(%rip), %eax
+	mull	d(%rip)
+	addl	%ebx, %eax
+	pop	%rbx
+        ret
+
 .globl  main
 .type   main, @function
 
