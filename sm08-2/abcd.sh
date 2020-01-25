@@ -1,6 +1,6 @@
 #!/bin/bash
 echo ----
-cmd="echo 123 456 | ./abcd"
+cmd="echo -2 3 4 5 | ./abcd"
 echo $cmd
 bash -c "$cmd"
 echo ----

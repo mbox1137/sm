@@ -11,13 +11,10 @@ The number+1 is 124
 		.code64
 
 .data
-input_format:	.ascii "%ld %ld\n\0"
-output_format:	.ascii "The sum is %ld\n\0"
+input_format:	.ascii "%d %d %d %d\0"
+output_format:	.ascii "%ld*%ld + %ld*%ld = %ld\n\0"
 
 .bss
-num1:	.space	8
-num2:	.space	8
-sumnum:	.space	8
 a:	.space	4
 b:	.space	4
 c:	.space	4
@@ -40,23 +37,49 @@ process:
 .globl  main
 .type   main, @function
 
+/*
+https://en.wikipedia.org/wiki/X86_calling_conventions
+RDI, RSI, RDX, RCX, R8, R9
+*/
+
 main:
 	push	%rbx
 
 GetInput:
 	lea	input_format(%rip), %rdi
-	lea	num1(%rip), %rsi
-	lea	num2(%rip), %rdx
+	lea	a(%rip), %rsi
+	lea	b(%rip), %rdx
+	lea	c(%rip), %rcx
+	lea	d(%rip), %R8
 	call	scanf
 
 Calculate:
-	movq	(num1), %rax
-	addq	(num2), %rax
-	movq	%rax, (sumnum)
+	call	process
+	movl	%eax, (r)
 
-Display:
+Display:	//http://www.cyberforum.ru/post12481559.html
 	lea	output_format(%rip), %rdi
-	movq	(sumnum), %rsi
+
+	movl	(a), %eax
+	CDQE
+	movq	%rax, %rsi
+
+	movl	(b), %eax
+	CDQE
+	movq	%rax, %rdx
+
+	movl	(c), %eax
+	CDQE
+	movq	%rax, %rcx
+
+	movl	(d), %eax
+	CDQE
+	movq	%rax, %R8
+
+	movl	(r), %eax
+	CDQE
+	movq	%rax, %R9
+
         call	printf
 
 Return:
