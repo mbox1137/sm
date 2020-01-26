@@ -26,17 +26,6 @@ r:	.space	4
 
 .text
 
-process:
-	push	%rbx
-	movl	a(%rip), %eax
-	mull	b(%rip)
-	movl	%eax, %ebx
-	movl	c(%rip), %eax
-	mull	d(%rip)
-	addl	%ebx, %eax
-	pop	%rbx
-        ret
-
 .globl  main
 .type   main, @function
 
@@ -57,8 +46,12 @@ GetInput:
 	call	scanf
 
 Calculate:
+	mover	a(%rip), %rdi
+	mover	b(%rip), %rsi
+	mover	c(%rip), %rdx
+	mover	d(%rip), %rcx
 	call	process
-	movl	%eax, (r)
+	movre	%rax, (r)
 
 Display:	//http://www.cyberforum.ru/post12481559.html
 	lea	output_format(%rip), %rdi
