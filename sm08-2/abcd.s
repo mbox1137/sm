@@ -10,12 +10,8 @@ The number+1 is 124
 */
 
 		.code64
-//Dirty %RAX !!!
-	.macro	mover src, dst
-	movl	\src, %eax
-	CDQE
-	movq	%rax, \dst
-	.endm
+
+	.include "abcd.inc"
 
 .data
 input_format:	.ascii "%d %d %d %d\0"
