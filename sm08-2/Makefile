@@ -16,7 +16,7 @@ LDFLAGS	= -no-pie
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
 EXEC	= abcd
-OBJS	= abcd.o
+OBJS	= abcd.o process.o
 # hw.o
 
 ALL : $(EXEC)
