@@ -7,7 +7,7 @@ CFLAGS	=
 ASM	= nasm
 AFLAGS	= -f elf32 -g
 
-AS	= gcc
+AS	= as
 ASFLAGS	= -c
 # -fPIC
 
@@ -34,7 +34,7 @@ $(EXEC) : $(OBJS) Makefile
 #	$(ASM) $(AFLAGS) -o $@ -l $@.lst $<
 
 %.o: %.s Makefile
-	$(AS) $(ASFLAGS) -o $@ $<
+	$(AS) $(ASFLAGS) -a=$@.lst -o $@ $<
 
 clean:
 	rm -f $(EXEC) $(OBJS) *~ *.lst .[^.]*~

@@ -2,6 +2,7 @@
 https://ru.wikibooks.org/wiki/%D0%90%D1%81%D1%81%D0%B5%D0%BC%D0%B1%D0%BB%D0%B5%D1%80_%D0%B2_Linux_%D0%B4%D0%BB%D1%8F_%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B8%D1%81%D1%82%D0%BE%D0%B2_C
 https://forum.nasm.us/index.php?topic=1514.msg6228#msg6228
 https://stackoverflow.com/questions/38335212/calling-printf-in-x86-64-using-gnu-assembler
+https://www.opennet.ru/docs/RUS/gas/gas-7.html
 $ gcc -m32 -c -o aplusb.o aplusb.s
 $ gcc -m32 -o aplusb aplusb.o
 $ echo 123|./aplusb
@@ -9,6 +10,12 @@ The number+1 is 124
 */
 
 		.code64
+//Dirty %RAX !!!
+	.macro	mover src, dst
+	movl	\src, %eax
+	CDQE
+	movq	%rax, \dst
+	.endm
 
 .data
 input_format:	.ascii "%d %d %d %d\0"
@@ -59,27 +66,11 @@ Calculate:
 
 Display:	//http://www.cyberforum.ru/post12481559.html
 	lea	output_format(%rip), %rdi
-
-	movl	(a), %eax
-	CDQE
-	movq	%rax, %rsi
-
-	movl	(b), %eax
-	CDQE
-	movq	%rax, %rdx
-
-	movl	(c), %eax
-	CDQE
-	movq	%rax, %rcx
-
-	movl	(d), %eax
-	CDQE
-	movq	%rax, %R8
-
-	movl	(r), %eax
-	CDQE
-	movq	%rax, %R9
-
+	mover	(a), %rsi
+	mover	(b), %rdx
+	mover	(c), %rcx
+	mover	(d), %R8
+	mover	(r), %R9
         call	printf
 
 Return:
