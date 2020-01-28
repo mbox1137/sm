@@ -2,41 +2,40 @@
 
 CC	= gcc
 CFLAGS	=
-# -m32
 
 ASM	= nasm
 AFLAGS	= -f elf32 -g
 
 AS	= as
 ASFLAGS	= -c
-# -fPIC
 
-LD	= gcc
+LD	= ld
 LDFLAGS	= -no-pie
-#LDFLAGS	= -m elf_i386_fbsd	#-m32
 
-EXEC	= abcd
-OBJS	= abcd.o process.o
-# hw.o
+EXEC	= tb abcd
+OBJS	= process.o
+EOBJS	= tb.o abcd.o
 
 ALL : $(EXEC)
 
-hw : hw.o Makefile
-	$(LD) $(LDFLAGS) -o hw hw.o
+#%.o: %.c Makefile
+#	$(CC) $(CFLAGS) -S -o $@.lst $<
+#	$(CC) $(CFLAGS) -c -o $@ $<
 
-$(EXEC) : $(OBJS) Makefile
-	$(LD) $(LDFLAGS) -o $@ $(OBJS)
+%.s: %.c Makefile
+	$(CC) $(CFLAGS) -S -o $@ $<
 
-%.o: %.c Makefile
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-#%.o: %.asm Makefile
-#	$(ASM) $(AFLAGS) -o $@ -l $@.lst $<
-
-%.o: %.s Makefile
+%.o: %.s abcd.inc Makefile
 	$(AS) $(ASFLAGS) -a=$@.lst -o $@ $<
 
-clean:
-	rm -f $(EXEC) $(OBJS) *~ *.lst .[^.]*~
+abcd : abcd.o $(OBJS) Makefile
+	$(CC) $(LDFLAGS) -o $@ abcd.o $(OBJS)
 
-all: $(EXEC)
+tb : tb.o $(OBJS) Makefile
+	$(CC) $(LDFLAGS) -o $@ tb.o $(OBJS)
+
+%.o: %.asm Makefile
+	$(ASM) $(AFLAGS) -o $@ -l $@.lst $<
+
+clean:
+	rm -f $(EXEC) $(EOBJS) $(OBJS) *~ *.lst .[^.]*~
