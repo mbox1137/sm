@@ -14,8 +14,8 @@ LD	= gcc
 LDFLAGS	= -no-pie
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
-EXEC	= aplusb
-OBJS	= aplusb.o
+EXEC	= print-rev-n-1
+OBJS	= print-rev-n-1.o
 # hw.o
 
 ALL : $(EXEC)
