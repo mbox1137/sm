@@ -6,32 +6,33 @@ CFLAGS	= -m32
 ASM	= nasm
 AFLAGS	= -f elf32 -g
 
-AS	= gcc
-ASFLAGS	= -m32 -c
+AS	= as
+ASFLAGS	= -c --32
+# -fPIC
 
 LD	= gcc
-LDFLAGS	= -m32 -no-pie
+LDFLAGS	= -no-pie -m32
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
-EXEC	= aplusb
-OBJS	= aplusb.o
+EXEC	= aplusb_32
+OBJS	= aplusb_32.o
 # hw.o
 
 ALL : $(EXEC)
 
-hw : hw.o Makefile
+hw : hw.o Makefile_32
 	$(LD) $(LDFLAGS) -o hw hw.o
 
-$(EXEC) : $(OBJS) Makefile
+$(EXEC) : $(OBJS) Makefile_32
 	$(LD) $(LDFLAGS) -o $@ $(OBJS)
 
-%.o: %.c Makefile
+%.o: %.c Makefile_32
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-#%.o: %.asm Makefile
+#%.o: %.asm Makefile_32
 #	$(ASM) $(AFLAGS) -o $@ -l $@.lst $<
 
-%.o: %.s Makefile
+%.o: %.s Makefile_32
 	$(AS) $(ASFLAGS) -o $@ $<
 
 clean:
