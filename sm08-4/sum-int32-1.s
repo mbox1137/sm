@@ -1,14 +1,12 @@
 /*
+ $ cat sum-int32-1.txt ;echo
+1 2 3 4 5
  $ make
-as -c --32 -o print-rev-n-1.o print-rev-n-1.s
-gcc -m32 -no-pie -o print-rev-n-1 print-rev-n-1.o
- $ echo 5 |./print-rev-n-1
-5
-4
-3
-2
-1
-0
+as -c --32 -o sum-int32-1.o sum-int32-1.s
+gcc -m32 -no-pie -o sum-int32-1 sum-int32-1.o
+ $ ./sum-int32-1.sh
+./sum-int32-1 <sum-int32-1.txt
+15
 */
 
 		.code32
@@ -19,6 +17,7 @@ output_format:	.string "%d\n"
 
 .bss
 num:	.space	4
+sum:	.space	4
 
 .text
 
@@ -26,38 +25,31 @@ num:	.space	4
 .type   main, @function
 
 main:
-
-GetInput:
+	xor	%eax, %eax
+	movl	%eax, (sum)
+m1:
 	pushl	$num
 	pushl	$input_format
 	call	scanf
-	addl	$8, %esp
-
-Calculate:
-	movl	(num), %ecx
-
-Display:
-//	cmpl	$0s, %ecx
-	xorl	%eax, %eax
-	cmpl	%eax, %ecx
-	jl	m2
-m1:
-	pushl	%ecx
-	pushl	$output_format
-	call	printf
-	popl	%eax
-	popl	%ecx
-
-	loopl	m1
-
-	pushl	%ecx
-	pushl	$output_format
-	call	printf
-	popl	%eax
-	popl	%ecx
+	add	$8, %esp
+	cmp	$1, %eax
+	mov	(sum), %eax
+	jne	m2
+	add	(num), %eax
+	mov	%eax, (sum)
+	jno	m1
+	cmc
+	rcr	$1, %eax
+	sar	$16, %eax
+	sar	$16, %eax
+	cmc
+	rcr	$1, %eax
 m2:
-
-Return:
+	pushl	%eax
+	pushl	$output_format
+	call	printf
+	popl	%eax
+	popl	%ecx
 	ret
 
         .size   main, . - main    /* размер функции main */
