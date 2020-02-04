@@ -38,10 +38,9 @@ m1:
 	add	(num), %eax
 	mov	%eax, (sum)
 	jno	m1
-	cmc
-	rcr	$1, %eax
 	sar	$16, %eax
 	sar	$16, %eax
+	sar	$1, %eax
 	cmc
 	rcr	$1, %eax
 m2:
