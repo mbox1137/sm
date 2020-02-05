@@ -1,11 +1,4 @@
 /*
- $ make
-as -c --32 -o sum-even-odd-1.o sum-even-odd-1.s
-gcc -m32 -no-pie -o sum-even-odd-1 sum-even-odd-1.o
- $ ./sum-even-odd-1.sh
-echo "1 2 3 4 5 6 7" |./sum-even-odd-1
-12
-16
 */
 
 		.code32
@@ -13,7 +6,6 @@ echo "1 2 3 4 5 6 7" |./sum-even-odd-1
 .data
 input_format:	.string "%d"
 output_format:	.string "%d\n%d\n"
-//output_format:	.string "%d %d\n"
 
 .bss
 num:	.space	4
@@ -36,11 +28,14 @@ m1:
 	add	$4*2, %esp
 	cmp	$1, %eax
 	jne	m2
-
 	mov	(num), %eax
-	mov	%eax, %ebx
-	and	$1, %ebx
-	add	%eax, esum(,%ebx,4)
+	test	$1, %eax
+	jnz	m3
+	add	%eax, (esum)
+	jmp	m4
+m3:
+	add	%eax, (osum)
+m4:
 	jmp	m1
 m2:
 	pushl	(osum)
