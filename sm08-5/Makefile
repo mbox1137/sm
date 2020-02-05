@@ -14,8 +14,8 @@ LD	= gcc
 LDFLAGS	= -m32 -no-pie
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
-EXEC	= sum-int32-1
-OBJS	= sum-int32-1.o
+EXEC	= sum-even-odd-1
+OBJS	= sum-even-odd-1.o
 # hw.o
 
 ALL : $(EXEC)
