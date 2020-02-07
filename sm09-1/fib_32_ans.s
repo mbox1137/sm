@@ -10,8 +10,8 @@ output_format:
 
 print_fib:
         pushl   %ebp
-
         movl    %esp, %ebp
+
         movl    (A), %eax
         addl    (B), %eax
         movl    %eax, %ecx
