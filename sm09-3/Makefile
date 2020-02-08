@@ -6,16 +6,16 @@ CFLAGS	= -m32
 ASM	= nasm
 AFLAGS	= -f elf32 -g
 
-AS	= gcc
-ASFLAGS	= -c
+AS	= as
+ASFLAGS	= -c --32
 # -fPIC
 
 LD	= gcc
-LDFLAGS	= -no-pie
+LDFLAGS	= -no-pie -m32
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
-EXEC	= aplusb
-OBJS	= aplusb.o
+EXEC	= mystrcmp_tb
+OBJS	= mystrcmp.o mystrcmp_tb.o
 # hw.o
 
 ALL : $(EXEC)
@@ -33,7 +33,7 @@ $(EXEC) : $(OBJS) Makefile
 #	$(ASM) $(AFLAGS) -o $@ -l $@.lst $<
 
 %.o: %.s Makefile
-	$(AS) $(ASFLAGS) -o $@ $<
+	$(AS) $(ASFLAGS) -a=$@.lst -o $@ $<
 
 clean:
 	rm -f $(EXEC) $(OBJS) *~ *.lst .[^.]*~

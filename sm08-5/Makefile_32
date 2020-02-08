@@ -6,15 +6,16 @@ CFLAGS	= -m32
 ASM	= nasm
 AFLAGS	= -f elf32 -g
 
-AS	= gcc
-ASFLAGS	= -m32 -c
+AS	= as
+ASFLAGS	= -c --32
+# -fPIC
 
 LD	= gcc
 LDFLAGS	= -m32 -no-pie
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
-EXEC	= aplusb
-OBJS	= aplusb.o
+EXEC	= odd_ev_32
+OBJS	= odd_ev_32.o
 # hw.o
 
 ALL : $(EXEC)
