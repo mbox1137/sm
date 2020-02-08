@@ -2,7 +2,7 @@
 
 function myrun {
 	cmd="./mystrcmp_tb $1 $2"
-	echo $cmd: $(bash -c "$cmd")
+	echo -e "$cmd: \t $(bash -c "$cmd")"
 }
 
 myrun aaa aaa
