@@ -14,8 +14,8 @@ LD	= gcc
 LDFLAGS	= -no-pie -m32
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
-EXEC	= satsum_tb
-OBJS	= satsum.o satsum_tb.o
+EXEC	= mystrcmp_tb
+OBJS	= mystrcmp.o mystrcmp_tb.o
 # hw.o
 
 ALL : $(EXEC)
