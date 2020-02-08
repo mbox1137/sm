@@ -14,8 +14,10 @@ satsum:
 
 	mov	A1(%ebp), %eax
 	add	A2(%ebp), %eax
-//	xor	%eax, %eax
-
+	jnc	m9
+	xor	%eax, %eax
+	dec	%eax
+m9:
 	mov	%ebp, %esp
 	pop	%ebp
 	ret

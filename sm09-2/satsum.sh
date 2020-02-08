@@ -1,4 +1,4 @@
 #!/bin/bash
-cmd="echo 7 8 |./satsum_tb"
+cmd="echo 4000000000 3000000000 |./satsum_tb"
 echo $cmd
 bash -c "$cmd"
