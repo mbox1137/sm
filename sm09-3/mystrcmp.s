@@ -18,14 +18,27 @@ mystrcmp:
 
 	cld	/* ++ */
 
+	xor	%eax, %eax
+
 	mov	$MAXLEN, %ecx
 	mov	str1(%ebp), %edi
-	xor	%al, %al
 repnz	scasb
-	sub	str1(%ebp), %edi
-	mov	%edi, %ecx
+	sub	$MAXLEN, %ecx
+	neg	%ecx
 
-	xor	%eax, %eax
+	mov	%ecx, %edx
+
+	mov	$MAXLEN, %ecx
+	mov	str2(%ebp), %edi
+repnz	scasb
+	sub	$MAXLEN, %ecx
+	neg	%ecx
+
+	cmp	%ecx, %edx
+	jge	m2
+	mov	%edx, %ecx
+m2:
+
 	mov	str1(%ebp), %esi
 	mov	str2(%ebp), %edi
 repz	cmpsb
