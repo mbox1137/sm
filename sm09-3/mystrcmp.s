@@ -7,6 +7,8 @@
 	.equ	str1, 4*2
 	.equ	str2, 4*3
 
+	.equ	MAXLEN, 1000
+
 //int mystrcmp(const char *str1, const char *str2);
 mystrcmp:
 	push	%ebp
@@ -14,19 +16,25 @@ mystrcmp:
 	push	%esi
 	push	%edi
 
+	cld	/* ++ */
+
+	mov	$MAXLEN, %ecx
+	mov	str1(%ebp), %edi
+	xor	%al, %al
+repnz	scasb
+	sub	str1(%ebp), %edi
+	mov	%edi, %ecx
+
+	xor	%eax, %eax
 	mov	str1(%ebp), %esi
 	mov	str2(%ebp), %edi
-	cld	/* ++ */
+repz	cmpsb
+
+	jz	m1
+	mov	$1, %eax
+	jg	m1
+	neg	%eax
 m1:
-	lodsb	/* al=(%esi++) */
-	sub	(%edi), %al
-	jne	m2
-	scasb	/* al == (%edi++) ???; al==0 */
-	jne	m1
-m2:
-	cbw	/* al -> ax */
-	cwde	/* ax -> eax */
-m9:
 	pop	%edi
 	pop	%esi
 	mov	%ebp, %esp
