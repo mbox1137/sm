@@ -1,3 +1,5 @@
+//https://stackoverflow.com/questions/53934718/strcmp-in-intel-x86-with-cmpsb
+
 	.code32
 
 	.text
