@@ -10,12 +10,13 @@ new_line:	.string "\n"
 	.type	process, @function
 
 	.equ	N, -4
+	.equ	ncx, -8
 
 //void process(void);
 process:
 	push	%ebp
 	mov	%esp, %ebp
-	sub	$4, %esp
+	sub	$4*2, %esp	/* N, ncx */
 
 	mov	%ebp, %eax
 	add	$N, %eax
@@ -24,10 +25,26 @@ process:
 	call	scanf
 	add	$4*2, %esp
 
-	push	N(%ebp)
+	mov	N(%ebp), %ecx
+m1:
+	sub	$4, %esp
+	mov	%esp, (%esp)
+	push	$inp_format
+	mov	%ecx, ncx(%ebp)
+	call	scanf
+	mov	ncx(%ebp), %ecx
+	add	$4*1, %esp
+	loop	m1
+
+
+	mov	N(%ebp), %ecx
+m2:
 	push	$out_format
+	mov	%ecx, ncx(%ebp)
 	call	printf
+	mov	ncx(%ebp), %ecx
 	add	$4*2, %esp
+	loop	m2
 
 	push	$new_line
 	call	printf
