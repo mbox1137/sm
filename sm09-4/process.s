@@ -1,4 +1,5 @@
-//https://stackoverflow.com/questions/53934718/strcmp-in-intel-x86-with-cmpsb
+//https://protocoder.ru/alg/datescrossing
+//MAX(-MAX(a.min,b.min)+MIN (a.max,b.max),0)
 
 	.code32
 
