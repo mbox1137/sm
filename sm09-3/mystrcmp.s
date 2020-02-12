@@ -1,5 +1,3 @@
-//https://stackoverflow.com/questions/53934718/strcmp-in-intel-x86-with-cmpsb
-
 	.code32
 
 	.text
@@ -13,30 +11,46 @@
 
 //int mystrcmp(const char *str1, const char *str2);
 mystrcmp:
-	push	%ebp
-	mov	%esp, %ebp
-	push	%esi
-	push	%edi
+	pushl	%ebp
+	movl	%esp, %ebp
+	pushl	%esi
+	pushl	%edi
 
-	cld	/* ++ */
-	xor	%eax, %eax
+	movl	str1(%ebp), %esi
+	movl	str2(%ebp), %edi
 
-	mov	str2(%ebp), %edi
-	mov	$MAXLEN, %ecx
-repnz	scasb
-	sub	$MAXLEN, %ecx
-	neg	%ecx
+loop1:
+	cmpb	$0, (%esi)
+	je	m2
+	cmpb	$0, (%edi)
+	je	m3
 
-	mov	str1(%ebp), %esi
-	mov	str2(%ebp), %edi
-repz	cmpsb
-//https://c9x.me/x86/html/file_module_x86_id_288.html
-	setnz	%al
-	jge	m3
-	neg	%eax
+	movb	(%esi), %al
+	cmp	(%edi), %al
+	jnz	calc
+	incl	%esi
+	incl	%edi
+	jmp	loop1
+
+m2:
+	cmpb	$0, (%edi)
+	xorl	%eax, %eax
+	je	return
+	jmp	calc
+
 m3:
-	pop	%edi
-	pop	%esi
-	mov	%ebp, %esp
-	pop	%ebp
+	movb	$1, %al
+	jmp	return
+
+calc:
+	mov	(%esi), %al
+	sub	(%edi), %al
+
+return:
+	cbw
+	cwde
+	popl	%edi
+	popl	%esi
+	movl	%ebp, %esp
+	popl	%ebp
 	ret
