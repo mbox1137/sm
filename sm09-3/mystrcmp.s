@@ -33,8 +33,8 @@ loop1:
 	jmp	loop1
 
 m2:
-	cmpb	$0, (%edi)
 	xorl	%eax, %eax
+	cmpb	$0, (%edi)
 	je	return
 	jmp	calc
 
