@@ -11,11 +11,11 @@ ASFLAGS	= -c --32
 # -fPIC
 
 LD	= gcc
-LDFLAGS	= -no-pie -m32
+LDFLAGS	= -no-pie -m32 -lm
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
 EXEC	= main
-OBJS	= main.o tree_find.o
+OBJS	= main.o tree_findc.o
 # hw.o
 
 ALL : $(EXEC)

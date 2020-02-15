@@ -1,15 +1,30 @@
 #include <stdio.h>
-//echo 5 12 |./main
+#include <stdlib.h>
+#include "tree_find.h"
 
-double tree_find(double x, double y);
+static struct Node tmp[]={
+    {1.2, NULL, NULL, "one"},
+    {2.3, NULL, NULL, "two"},
+    {3.4, NULL, NULL, "three"}
+};
+static struct Node *root;
 
 int main(int argc, char **argv) {
-    double x, y, r;
-    if(scanf("%lf%lf",&x, &y)!=2) {
-        x=4.0;
-        y=3.0;
+    int res,k,n;
+    double key;
+    char *str;
+    n=sizeof(tmp)/sizeof(struct Node);
+    for(k=0; k<n; k++) {
+        if(k>0) {
+            tmp[k].left=&tmp[k-1];
+        }
+        if(k<n-1) {
+            tmp[k].right=&tmp[k+1];
+        }
     }
-    r=tree_find(x, y);
-    printf("vlen(%lf,%lf)=%lf\n",x,y,r);
+    root=&tmp[0];
+    key=2.3;
+//    res=tree_findc(root, key, &str);
+    printf("key=%lf res=%d str=%s\n",key,res,str);
     return(0);
 }
