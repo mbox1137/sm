@@ -10,11 +10,14 @@ static struct Node tmp[]={
 static struct Node *root;
 
 int main(int argc, char **argv) {
+    struct Node *node;
     int res,k,n;
     double key;
-    char *str;
+    char *str="Noting";
     n=sizeof(tmp)/sizeof(struct Node);
+//    printf("n=%d\n",n);
     for(k=0; k<n; k++) {
+//        printf("k=%d\n",k);
         if(k>0) {
             tmp[k].left=&tmp[k-1];
         }
@@ -24,7 +27,15 @@ int main(int argc, char **argv) {
     }
     root=&tmp[0];
     key=2.3;
-//    res=tree_findc(root, key, &str);
+/*
+    node=root;
+    printf("%lf %p %p %s\n",
+        node->key,node->left,node->right,node->str);
+    node=node->right;
+    printf("%lf %p %p %s\n",
+        node->key,node->left,node->right,node->str);
+*/
+    res=tree_findc(root, key, &str);
     printf("key=%lf res=%d str=%s\n",key,res,str);
     return(0);
 }

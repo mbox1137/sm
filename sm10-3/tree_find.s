@@ -1,3 +1,5 @@
+//https://ru.bmstu.wiki/SSE2_(Streaming_SIMD_Extensions_2)
+
 	.code32
 
 	.data
