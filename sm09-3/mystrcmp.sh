@@ -16,6 +16,10 @@ myrun aaa baa
 myrun aaa caa
 myrun baa aaa
 myrun caa aaa
-myrun '' aaa
-myrun aaa ''
-myrun '' ''
+#myrun ' ' 'aaa'
+#myrun aaa ''
+#myrun '' ''
+myrun aaa aaab
+myrun aaa aaac
+myrun aaab aaa
+myrun aaac aaa

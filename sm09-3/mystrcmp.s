@@ -34,6 +34,7 @@ m2:
 	xorb	%al, %al
 	cmpb	$0, (%edi)
 	je	return
+m4:
 	movb	$-1, %al
 	jmp	return
 
@@ -44,8 +45,8 @@ m3:
 calc:
 	mov	(%esi), %al
 	sub	(%edi), %al
-	cmp	$0, %al
-	jl	m2
+//	cmp	$0, %al
+	jl	m4
 	jg	m3
 
 return:
