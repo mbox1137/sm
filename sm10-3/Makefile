@@ -15,13 +15,9 @@ LDFLAGS	= -no-pie -m32 -lm
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
 EXEC	= main
-OBJS	= main.o tree_findc.o
-# hw.o
+OBJS	= main.o tree_findc.o tree_find.o
 
 ALL : $(EXEC)
-
-hw : hw.o Makefile
-	$(LD) $(LDFLAGS) -o hw hw.o
 
 $(EXEC) : $(OBJS) Makefile
 	$(LD) $(LDFLAGS) -o $@ $(OBJS)
