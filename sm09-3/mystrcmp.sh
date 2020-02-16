@@ -16,3 +16,6 @@ myrun aaa baa
 myrun aaa caa
 myrun baa aaa
 myrun caa aaa
+myrun '' aaa
+myrun aaa ''
+myrun '' ''

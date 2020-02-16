@@ -19,23 +19,16 @@ mystrcmp:
 
 loop1:
 	cmpb	$0, (%esi)
-	je	m2
+	je	calc
 	cmpb	$0, (%edi)
 	je	m3
 
 	movb	(%esi), %al
-	cmpb	(%edi), %al
+	cmp	(%edi), %al
 	jnz	calc
 	incl	%esi
 	incl	%edi
 	jmp	loop1
-
-m2:
-	xorb	%al, %al
-	cmpb	$0, (%edi)
-	je	return
-	movb	$-1, %al
-	jmp	return
 
 m3:
 	movb	$1, %al
@@ -44,9 +37,6 @@ m3:
 calc:
 	mov	(%esi), %al
 	sub	(%edi), %al
-	cmp	$0, %al
-	jl	m2
-	jg	m3
 
 return:
 	cbw
