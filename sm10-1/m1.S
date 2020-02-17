@@ -1,4 +1,3 @@
-// код написан совместными усилиями на семинаре
 	.code32
 
 	.text
@@ -9,50 +8,39 @@ format_string:
 	.string "%llu\n"
 
 process:
-	pushl	%ebp
-	movl	%esp, %ebp
+	push	%ebp
+	mov	%esp, %ebp
 
-	pushl	%esi
-	pushl	%edi
+	push	%esi
+	push	%edi
 
-	//# right 32 bits
-	movl	(A), %esi
-	movl	(B), %edi
-
-	//# left 32 bits, bigger address bigger bits
-	movl	(A + 4), %eax
-	movl	(B + 4), %edx
-
-	//# A * 2
+//A -> edi:esi
+	mov	(A), %esi
+	mov	(A+4), %edi 
+// A*2 -> edi:esi
 	shl	$1, %esi
-	rcl	$1, %eax
+	rcl	$1, %edi
 
-	//# B / 2
-	clc
-	shr	$1, %edi
-	rcr	$1, %edx
+//B -> edx:eax
+	mov	(B), %eax
+	mov	(B+4), %edx 
+// B/2 -> edx:eax
+	sar	$1, %edx
+	rcr	$1, %eax
 
-	sub	%edi, %esi
-	sbbl	%edx, %eax
+// edi:esi - edx:eax -> edi:esi
+	sub	%eax, %esi
+	sbb	%edx, %edi
 
-	pushl	%eax
-	pushl	%esi
-	pushl	$format_string
-	//# or use: lea   format_string   %ecx
+	push	%edi
+	push	%esi
+	push	$format_string
 	call	printf
+	add	$12, %esp
+m9:
+	pop	%edi
+	pop	%esi
 
-	//# 12 bytes were reserved and we
-	//# need to move them back
-
-	addl	$12, %esp
-	//# addl	$4, %esp
-	/*popl	%eax
-	popl	%edx*/
-
-	//# pop in reverse order
-	popl	%edi
-	popl	%esi
-
-	movl	%ebp, %esp
-	popl	%ebp
+	mov	%ebp, %esp
+	pop	%ebp
 	ret
