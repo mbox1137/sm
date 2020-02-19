@@ -3,6 +3,8 @@
 	.code32
 
 	.data
+epsilon:
+	.double	1.0e-8
 
 	.text
 	.globl	tree_find
@@ -23,53 +25,45 @@
 	.equ	node_str, node_right + 4
 //int tree_find(struct Node *root, double key, char **pstr);
 tree_find:
-	push	%ebp
-	mov	%esp, %ebp
-	push	%esi
-	push	%edi
-	mov	root(%ebp), %esi
-	mov	pstr(%ebp), %edi
-	movsd	key(%ebp), %xmm7
+	pushl	%ebp
+	movl	%esp, %ebp
+	pushl	%esi
+	pushl	%edi
+	movl	root(%ebp), %esi
+	movl	pstr(%ebp), %edi
 m1:
-	xor	%eax, %eax
-	test	$-1, %esi
+	xorl	%eax, %eax
+	cmp	$0, %esi
 	je	m9
-	movsd	node_key(%esi), %xmm0
 /*
 if(fabs((node->key) - key)<1E-8)
-	jg	m2
+//https://stackoverflow.com/questions/32408665/fastest-way-to-compute-absolute-value-using-sse
+XORPS  xmm1, xmm1   # not on the critical path, and doesn't even take an execution unit on SnB and later
+SUBPS  xmm1, xmm0
+MAXPS  xmm0, xmm1
 */
-	jmp	m2
-	test	$-1, %edi
+	movsd	node_key(%esi), %xmm0
+	subsd	key(%ebp), %xmm0
+	XORPD	%xmm1, %xmm1
+	SUBPD	%xmm0, %xmm1
+	MAXPD	%xmm1, %xmm0
+	comisd	(epsilon), %xmm0 
+//http://osinavi.ru/asm/SSEexpansion/4.php
+	ja	m2
+	cmp	$0, %edi
 	je	m3
-	mov	node_str(%esi), %eax
-	mov	%eax, (%edi)
+	movl	node_str(%esi), %eax
+	movl	%eax, (%edi)
 m3:
-	xor	%eax, %eax
-	inc	%eax
+	xorl	%eax, %eax
+	incl	%eax
 	jmp	m9
 m2:
-/*
-	sub	$8*1, %esp
-
-	movsd	X(%ebp), %xmm0
-
-	movsd	%xmm0, %xmm1
-	mulsd	%xmm1, %xmm0
-
-	movsd	Y(%ebp), %xmm2
-	movsd	%xmm2, %xmm3
-	mulsd	%xmm3, %xmm2
-
-	addsd	%xmm0, %xmm2
-	sqrtsd	%xmm2, %xmm0
-
-	movsd	%xmm0, TMP(%ebp)
-	fldl	TMP(%ebp)
-*/
+	movl	node_right(%esi), %esi
+	jmp	m1
 m9:
-	pop	%edi
-	pop	%esi
-	mov	%ebp, %esp
-	pop	%ebp
+	popl	%edi
+	popl	%esi
+	movl	%ebp, %esp
+	popl	%ebp
 	ret

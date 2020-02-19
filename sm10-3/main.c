@@ -3,9 +3,18 @@
 #include "tree_find.h"
 
 static struct Node tmp[]={
-    {1.2, NULL, NULL, "one"},
-    {2.3, NULL, NULL, "two"},
-    {3.4, NULL, NULL, "three"}
+    {1.1, NULL, NULL, "one"},
+    {2.2, NULL, NULL, "two"},
+    {3.3, NULL, NULL, "three"},
+    {4.4, NULL, NULL, "four"},
+    {5.5, NULL, NULL, "five"},
+    {6.6, NULL, NULL, "six"},
+    {7.7, NULL, NULL, "seven"},
+    {8.8, NULL, NULL, "eight"},
+    {9.9, NULL, NULL, "nine"},
+    {10.0, NULL, NULL, "ten"},
+    {11.1, NULL, NULL, "eleven"},
+    {12.2, NULL, NULL, "twelve"}
 };
 static struct Node *root;
 
@@ -24,15 +33,18 @@ int main(int argc, char **argv) {
         }
     }
     root=&tmp[0];
-    key=2.3;
+    if((argc == 2) && (sscanf(argv[1],"%lf",&key)==1)) {
+    } else {
+        key=11.1;
+    }
 
     str=nt;
     res=tree_findc(root, key, &str);
-    printf("c: key=%lf res=%d str=%s\n",key,res,str);
+    printf("c: key=%lg res=%d str=%s\n",key,res,str);
 
     str=nt;
     res=tree_find(root, key, &str);
-    printf("s: key=%lf res=%d str=%s\n",key,res,str);
+    printf("s: key=%lg res=%d str=%s\n",key,res,str);
 
     return(0);
 }
