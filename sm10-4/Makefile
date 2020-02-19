@@ -1,14 +1,13 @@
 .PHONY:	all clean
 
 CC	= gcc
-CFLAGS	= -m32
+CFLAGS	= -m32 -fverbose-asm
 
 ASM	= nasm
 AFLAGS	= -f elf32 -g
 
 AS	= as
 ASFLAGS	= -c --32
-# -fPIC
 
 LD	= gcc
 LDFLAGS	= -no-pie -m32
@@ -16,8 +15,9 @@ LDFLAGS	= -no-pie -m32
 
 EXEC	= main
 OBJS	= main.o dotProduct.o
-# hw.o
+SCDRY	= main.s
 
+.SECONDARY: $(SCDRY)
 ALL : $(EXEC)
 
 hw : hw.o Makefile
@@ -26,16 +26,19 @@ hw : hw.o Makefile
 $(EXEC) : $(OBJS) Makefile
 	$(LD) $(LDFLAGS) -o $@ $(OBJS)
 
-%.o: %.c Makefile
-	$(CC) $(CFLAGS) -c -o $@ $<
+%.o: %.c
+#	$(CC) $(CFLAGS) -c -o $@ $<
 
-#%.o: %.asm Makefile
-#	$(ASM) $(AFLAGS) -o $@ -l $@.lst $<
+%.s: %.c Makefile
+	$(CC) $(CFLAGS) -S -o $@ $<
+
+%.o: %.asm Makefile
+	$(ASM) $(AFLAGS) -o $@ -l $@.lst $<
 
 %.o: %.s Makefile
 	$(AS) $(ASFLAGS) -a=$@.lst -o $@ $<
 
 clean:
-	rm -f $(EXEC) $(OBJS) *~ *.lst .[^.]*~
+	rm -f $(EXEC) $(OBJS) $(SCDRY) *~ *.lst .[^.]*~
 
 all: $(EXEC)
