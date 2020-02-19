@@ -6,27 +6,7 @@ float dotProduct(int n, float *x, float *y);
 
 int main(int argc, char **argv) {
     int k, n;
-    float *x, *y, dp;
-    float xx[]={1.1, 2.2, 3.3, 4.4};
-    float yy[]={5.5, 6.6, 7.7, 8.8};
-
-    n=sizeof(xx)/sizeof(float);
-    for(k=0; k<n; k++) {
-        printf(" %g",xx[k]);
-    }
-    printf("\n");
-    dp=dotProduct(n, xx, yy);
-    n=sizeof(xx)/sizeof(float);
-    for(k=0; k<n; k++) {
-        printf(" %g",xx[k]);
-    }
-    printf("\n");
-    n=sizeof(yy)/sizeof(float);
-    for(k=0; k<n; k++) {
-        printf(" %g",yy[k]);
-    }
-    printf("\n");
-    return(0);
+    float *x, *y, dp, dp0;
 
     if(scanf("%d",&n)!=1) {
         fprintf(stderr,"Invalid n\n");
@@ -38,7 +18,7 @@ int main(int argc, char **argv) {
         return(-1);
     }
     y=(float*)calloc(n, sizeof(float));
-    if(x==NULL) {
+    if(y==NULL) {
         fprintf(stderr,"ivalid y=(float*)calloc(%d, %d)",n,sizeof(float));
         return(-1);
     }
@@ -54,8 +34,12 @@ int main(int argc, char **argv) {
             return(-1);
         }
     }
-//    dp=dotProduct(x, y);
-    printf("dotProduct=%f\n",dp);
+    dp0=0.0;
+    for(k=0; k<n; k++) {
+        dp0+=x[k]*y[k];
+    }
+    dp=dotProduct(n, x, y);
+    printf("dp0=%g dp=%g\n",dp0,dp);
     free(y);
     free(x);
     return(0);

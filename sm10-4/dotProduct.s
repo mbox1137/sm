@@ -25,33 +25,17 @@ dotProduct:
 	mov	Y(%ebp), %edi
 
 	movups	(%esi), %xmm0
+	movups	(%edi), %xmm1
+	mulps	%xmm1, %xmm0
 //01 00 11 10
 	shufps	$0x4E, %xmm0, %xmm1
-/*
- 1.1 2.2 3.3 4.4
- 1.1 2.2 3.3 4.4
- 0 0 1.1 2.2
-*/
 	addps	%xmm1, %xmm0
-/*
- 1.1 2.2 3.3 4.4
- 1.1 2.2 4.4 6.6
- 0 0 1.1 2.2
-*/
-//01 00 00 01
-	shufps	$0x41, %xmm0, %xmm1
-
-/*
-//1101 1100
-	shufps	$0xDC, %xmm1, %xmm0
-	addps	%xmm0, %xmm1
-*/
-	movups	%xmm0, (%esi)
-	movups	%xmm1, (%edi)
+//10 00 01 01
+	shufps	$0x85, %xmm0, %xmm1
+	addps	%xmm1, %xmm0
 
 	movss   %xmm0, TMP(%ebp)
 	fld	TMP(%ebp)
-
 m9:
 	pop	%edi
 	pop	%esi
