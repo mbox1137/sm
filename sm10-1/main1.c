@@ -7,7 +7,8 @@ void process(void);
 
 int main()
 {
-    if (scanf("%" SCNu64 "%" SCNu64, &A, &B) != 2)
+//    if (scanf("%" SCNu64 "%" SCNu64, &A, &B) != 2)
+    if (scanf("%lli%lli", &A, &B) != 2)
     {
         fprintf(stderr, "not valid input!\n");
         return 1;

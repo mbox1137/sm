@@ -1,11 +1,14 @@
 	.code32
 
 	.text
+	.global A, B
 	.global process
 	.type	process, @function
 
+f_string:
+	.string "%lld "
 format_string:
-	.string "%llu\n"
+	.string "%llx\n"
 
 process:
 	push	%ebp
@@ -17,26 +20,80 @@ process:
 //A -> edi:esi
 	mov	(A), %esi
 	mov	(A+4), %edi 
-// A*2 -> edi:esi
-	shl	$1, %esi
-	rcl	$1, %edi
-
-//B -> edx:eax
-	mov	(B), %eax
-	mov	(B+4), %edx 
-// B/2 -> edx:eax
-	sar	$1, %edx
-	rcr	$1, %eax
-
-// edi:esi - edx:eax -> edi:esi
-	sub	%eax, %esi
-	sbb	%edx, %edi
-
+/*
 	push	%edi
 	push	%esi
 	push	$format_string
 	call	printf
-	add	$12, %esp
+	add	$4, %esp
+	pop	%esi
+	pop	%edi
+*/
+// A*2 -> edi:esi
+	shl	%esi
+	rcl	%edi
+/*
+	push	%edi
+	push	%esi
+	push	$format_string
+	call	printf
+	add	$4, %esp
+	pop	%esi
+	pop	%edi
+*/
+//B -> edx:eax
+	mov	(B), %eax
+	mov	(B+4), %edx 
+/*
+	push	%edi
+	push	%esi
+	push	%edx
+	push	%eax
+	push	$format_string
+	call	printf
+	add	$4, %esp
+	pop	%eax
+	pop	%edx
+	pop	%esi
+	pop	%edi
+*/
+// B/2 -> edx:eax
+	shr	%edx
+	rcr	%eax
+/*
+	push	%edi
+	push	%esi
+	push	%edx
+	push	%eax
+	push	$format_string
+	call	printf
+	add	$4, %esp
+	pop	%eax
+	pop	%edx
+	pop	%esi
+	pop	%edi
+*/
+// edi:esi - edx:eax -> edi:esi
+	sub	%eax, %esi
+	sbb	%edx, %edi
+
+//Печать десятичная
+	push	%edi
+	push	%esi
+	push	$f_string
+	call	printf
+	add	$4, %esp
+	pop	%esi
+	pop	%edi
+
+//Печать шестнадцатиричная
+	push	%edi
+	push	%esi
+	push	$format_string
+	call	printf
+	add	$4, %esp
+	pop	%esi
+	pop	%edi
 m9:
 	pop	%edi
 	pop	%esi

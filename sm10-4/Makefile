@@ -1,10 +1,12 @@
 .PHONY:	all clean
 
+GDB	= -g
+
 CC	= gcc
-CFLAGS	= -m32 -fverbose-asm
+CFLAGS	= -m32 -fverbose-asm -g
 
 ASM	= nasm
-AFLAGS	= -f elf32 -g
+AFLAGS	= -f elf32
 
 AS	= as
 ASFLAGS	= -c --32
@@ -24,19 +26,19 @@ hw : hw.o Makefile
 	$(LD) $(LDFLAGS) -o hw hw.o
 
 $(EXEC) : $(OBJS) Makefile
-	$(LD) $(LDFLAGS) -o $@ $(OBJS)
+	$(LD) $(LDFLAGS) $(GDB) -o $@ $(OBJS)
 
 %.o: %.c
-#	$(CC) $(CFLAGS) -c -o $@ $<
+#	$(CC) $(CFLAGS) $(GDB) -c -o $@ $<
 
 %.s: %.c Makefile
-	$(CC) $(CFLAGS) -S -o $@ $<
+	$(CC) $(CFLAGS) $(GDB) -S -o $@ $<
 
 %.o: %.asm Makefile
-	$(ASM) $(AFLAGS) -o $@ -l $@.lst $<
+	$(ASM) $(AFLAGS) $(GDB) -o $@ -l $@.lst $<
 
 %.o: %.s Makefile
-	$(AS) $(ASFLAGS) -a=$@.lst -o $@ $<
+	$(AS) $(ASFLAGS) $(GDB) -a=$@.lst -o $@ $<
 
 clean:
 	rm -f $(EXEC) $(OBJS) $(SCDRY) *~ *.lst .[^.]*~

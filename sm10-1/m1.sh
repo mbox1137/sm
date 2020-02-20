@@ -7,3 +7,4 @@ function myrun {
 
 myrun "10 15"
 myrun "6000000000 10000000000"
+myrun "0x7FFFFFFFFFFFFFFF -1"
