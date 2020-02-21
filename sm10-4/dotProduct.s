@@ -26,9 +26,14 @@ dp:
 	push	%esi
 	push	%edi
 
+	mov	N(%ebp), %ecx
 	mov	X(%ebp), %esi
 	mov	Y(%ebp), %edi
 
+	xorps	%xmm2, %xmm2	/* sum */
+m2:
+	cmp	$4 ,%ecx
+	jl	m8
 	movups	(%esi), %xmm0
 	movups	(%edi), %xmm1
 	mulps	%xmm1, %xmm0
@@ -41,9 +46,24 @@ dp:
 
 //00 01 10 11 : xmm0.{3,2,1,0} == xmm0.{0,1,2,3}
 	shufps	$0x1B, %xmm0, %xmm0
-
+	addss	%xmm0, %xmm2
+	add	$4*4, %esi
+	add	$4*4, %edi
+	sub	$4, %ecx
+	jmp	m2
+m8:
+	cmp	$0, %ecx
+	jle	m7
+m1:
+	movss	(%esi), %xmm0
+	mulss	(%edi), %xmm0
+	addss	%xmm0, %xmm2
+	add	$4, %esi
+	add	$4, %edi
+	loop	m1
+m7:
 //single(%xmm0)=%xmm0.3 !!!
-	movss   %xmm0, TMP(%ebp)
+	movss   %xmm2, TMP(%ebp)
 	fld	TMP(%ebp)
 m9:
 	pop	%edi
