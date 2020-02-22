@@ -17,7 +17,7 @@ LDFLAGS	= -no-pie -m32
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
 EXEC	= main
-OBJS	= main.o mul64p.o
+OBJS	= main.o mul64p.o mul64r.o
 SCDRY	= main.s
 
 .SECONDARY: $(SCDRY)

@@ -3,8 +3,8 @@
 
 	.text
 
-	.globl  mul64p
-	.type   mul64p, @function
+	.globl  mul64r
+	.type   mul64r, @function
 	.globl  dp
 	.type   dp, @function
 
@@ -12,7 +12,7 @@
 	.equ    B, A+8
 
 //__m128 mul64p(u_int64_t a, u_int64_t b);
-mul64p:
+mul64r:
 	push    %ebp
 	mov     %esp, %ebp
 
