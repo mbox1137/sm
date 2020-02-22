@@ -18,6 +18,11 @@ mul64p:
 
 	movq	A(%ebp), %xmm0
 	movq	B(%ebp), %xmm1
+//00 01 10 11 : xmm0.{3,2,1,0} == xmm0.{0,1,2,3}
+//11 01 10 00 : xmm0.{3,2,1,0} == xmm0.{3,1,2,0}
+	shufps	$0xD8, %xmm0, %xmm0
+	shufps	$0xD8, %xmm1, %xmm1
+	PMULUDQ	%xmm1, %xmm0
 /*
 //01 00 11 10
 	shufps	$0x4E, %xmm0, %xmm1

@@ -6,6 +6,8 @@ function myrun {
 	echo
 }
 
-myrun "echo 1.1 2.2 3.3 4.4 5.5 6.6 7.7 8.8 |./main 4"
+myrun "./main 2 3"
+myrun "./main 0xCAFEBABE 0xDEADBEEF"
 myrun "./main"
-myrun "./main -9"
+myrun "./main 0xCAFEBABECAFEBABE 0xDEADBEEFDEADBEEF"
+myrun "./main 0x10000000000 0x10000000000"

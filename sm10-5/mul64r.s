@@ -3,37 +3,27 @@
 
 	.text
 
-	.globl  mul64r
-	.type   mul64r, @function
-	.globl  dp
-	.type   dp, @function
+	.globl	mul64r
+	.type	mul64r, @function
 
-	.equ    A, 4*2
-	.equ    B, A+8
+	.equ	A, 4*2
+	.equ	B, A+8
+	.equ	T, -16
 
-//__m128 mul64p(u_int64_t a, u_int64_t b);
+//__m128 mul64r(u_int64_t a, u_int64_t b);
 mul64r:
-	push    %ebp
-	mov     %esp, %ebp
-
-	movq	A(%ebp), %xmm0
-	movq	B(%ebp), %xmm1
+	push	%ebp
+	mov	%esp, %ebp
+	sub	16, %esp
 /*
-//01 00 11 10
-	shufps	$0x4E, %xmm0, %xmm1
-//10 00 01 01
-	shufps	$0x85, %xmm0, %xmm1
+	mov	A(%ebp), %rax
+	mulq	B(%ebp)
 
-//00 01 10 11 : xmm0.{3,2,1,0} == xmm0.{0,1,2,3}
-	shufps	$0x1B, %xmm0, %xmm0
-*/
-/*
-	movss	(%esi), %xmm0
-	mulss	(%edi), %xmm0
-	movss   %xmm2, TMP(%ebp)
-	fld	TMP(%ebp)
+	mov	%rax, T(%ebp)
+	mov	%rdx, T+8(%ebp)
+	MOVDQU	T(%ebp), %xmm0
 */
 m9:
-	mov     %ebp, %esp
-	pop     %ebp
+	mov	%ebp, %esp
+	pop	%ebp
 	ret

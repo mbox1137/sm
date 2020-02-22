@@ -2,7 +2,7 @@
 #include <malloc.h>
 #include <stdlib.h>
 #include <stdio.h>
-
+#include <inttypes.h>
 
 __m128 mul64p(u_int64_t a, u_int64_t b);
 __m128 mul64r(u_int64_t a, u_int64_t b);
@@ -18,21 +18,32 @@ int main(int argc, char **argv) {
     u_int64_t a,b;
     __m128 c;
     U u;
-    a=0xCAFEBABE;
-    b=0xDEADBEEF;
-    printf(" %llx",a);
-    printf(" %llx",b);
-    printf("\n");
-    printf("a=%lld b=%lld\n",a,b);
+    if( (argc==3) && 
+        (sscanf(argv[1],"%lli",&a)==1) && 
+        (sscanf(argv[2],"%lli",&b)==1) ) {
+    } else {
+        a=0xCAFEBABE; b=0xDEADBEEF;
+    }
+
+//    a=0xCAFEBABECAFEBABE; b=0xDEADBEEFDEADBEEF;
+//    a=0x10000000000; b=0x10000000000;
+    printf("a=%llx b=%llx\n",a,b);
     u.v=mul64p(a,b);
     for(k=0; k<16; k++) {
-        printf(" %x",u.c[k]);
+        if(u.c[15-k]!=0) {
+            break;
+        }
+    }
+    for(; k<16; k++) {
+        printf("%02x",u.c[15-k]);
     }
     printf("\n");
+/*
     u.v=mul64r(a,b);
     for(k=0; k<16; k++) {
         printf(" %x",u.c[k]);
     }
     printf("\n");
+*/
     return(0);
 }
