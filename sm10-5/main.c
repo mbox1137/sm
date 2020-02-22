@@ -14,6 +14,7 @@ typedef union {
 } U;
 
 int main(int argc, char **argv) {
+    unsigned char cc;
     int k;
     u_int64_t a,b;
     __m128 c;
@@ -24,9 +25,6 @@ int main(int argc, char **argv) {
     } else {
         a=0xCAFEBABE; b=0xDEADBEEF;
     }
-
-//    a=0xCAFEBABECAFEBABE; b=0xDEADBEEFDEADBEEF;
-//    a=0x10000000000; b=0x10000000000;
     printf("a=%llx b=%llx\n",a,b);
     u.v=mul64p(a,b);
     for(k=0; k<16; k++) {
@@ -34,16 +32,15 @@ int main(int argc, char **argv) {
             break;
         }
     }
+    cc=u.c[15-k++];
+    if((cc&0xf0) == 0) {
+        printf("%x",cc);
+    } else {
+        printf("%02x",cc);
+    }
     for(; k<16; k++) {
         printf("%02x",u.c[15-k]);
     }
     printf("\n");
-/*
-    u.v=mul64r(a,b);
-    for(k=0; k<16; k++) {
-        printf(" %x",u.c[k]);
-    }
-    printf("\n");
-*/
     return(0);
 }
