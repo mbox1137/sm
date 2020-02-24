@@ -3,7 +3,7 @@
 GDB	= -g
 
 CC	= gcc
-CFLAGS	= -m32 -fverbose-asm
+CFLAGS	= -m32 -fverbose-asm -msse3
 # -std=c99
 
 ASM	= nasm

@@ -1,7 +1,7 @@
 .PHONY:	all clean
 
 CC	= gcc
-CFLAGS	= -m32
+CFLAGS	= -m32 -msse3
 
 ASM	= nasm
 AFLAGS	= -f elf32 -g

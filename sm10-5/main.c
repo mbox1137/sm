@@ -16,7 +16,7 @@ typedef union {
 int main(int argc, char **argv) {
     unsigned char cc;
     int k;
-    u_int64_t a,b;
+    u_int64_t a,b,ab;
     __m128 c;
     U u;
     if( (argc==3) && 
@@ -25,7 +25,8 @@ int main(int argc, char **argv) {
     } else {
         a=0xCAFEBABE; b=0xDEADBEEF;
     }
-    printf("a=%llx b=%llx\n",a,b);
+    ab=a*b;
+    printf("%lld(%llx) * %lld(%llx) = %lld(%llx)\n",a,a,b,b,ab,ab);
     u.v=mul64p(a,b);
     for(k=0; k<16; k++) {
         if(u.c[15-k]!=0) {
