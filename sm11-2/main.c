@@ -5,19 +5,20 @@
 int mygetchar(void);
 
 int mygetchar(void) {
-    int ic, *ica;
-    ica=&ic;
-__asm__ volatile (
-	"movl	$3, %eax\n\t"	//# номер сист. вызова read
-	"movl	$0, %ebx\n\t"	//# параметр 1: дескриптор стандартного ввода
-	"movl	%ica, %ecx\n\t" //# параметр 2: адрес буфера
-	"movl	$1, %edx\n\t"	//# параметр 3: количество байтов для чтения
-	"int	$0x80\n\t"	//# выполнить системный вызов
-	"cmp	$-1, %eax\n\t"
-	"jne	m1\n\t"
-	"mov	%eax, %ic\n\t"
-"m1:\n\t"
-);
+    int ic, *ica=&ic;
+asm(
+"	movl	$3, %%eax	\n\t"
+"	movl	$0, %%ebx	\n\t"
+"	movl	%1, %%ecx	\n\t"
+"	movl	$1, %%edx	\n\t"
+"	int	$0x80		\n\t"
+"	cmp	$-1, %%eax	\n\t"
+"	jne	m1		\n\t"
+"	mov	%%eax, %0	\n\t"
+"m1:				    "
+    :"=m"(ic)
+    :"m"(ica)
+    :"eax","ebx","ecx","edx");
     return(ic);
 }
 
