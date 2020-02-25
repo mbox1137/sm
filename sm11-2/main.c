@@ -5,25 +5,30 @@
 int mygetchar(void);
 
 int mygetchar(void) {
-    int ic;
-    register int ecx asm ("ecx");
+    int ic, *ica;
+    ica=&ic;
+__asm__ volatile (
+	"movl	$3, %eax\n\t"	//# номер сист. вызова read
+	"movl	$0, %ebx\n\t"	//# параметр 1: дескриптор стандартного ввода
+);
+__asm__ volatile (
+	"movl	%ica, %out\n\t" : [out] "c" () : [ica] "m" (ica) : "%ecx"
+	                        //# параметр 2: адрес буфера
+);
+__asm__ volatile (
+	"movl	$1, %edx\n\t"	//# параметр 3: количество байтов для чтения
+	"int	$0x80\n\t"	//# выполнить системный вызов
+	"cmp	$-1, %eax\n\t"
+);
+__asm__ volatile (
+	"jne	m1\n\t"
+);
 /*
-	movl	$3, %eax	//# номер сист. вызова read
-	movl	$0, %ebx	//# параметр 1: дескриптор стандартного ввода
-	movl	$ic, %ecx	//# параметр 2: адрес буфера (он же - фактический 
-	     			//# параметр макровызова)
-	movl	$1, %edx	//# параметр 3: количество байтов для чтения
-	int	$0x80		//# выполнить системный вызов
-
-	cmp	-1, %eax"
-	jne	m1"
 	mov	%eax, %ic"
-m1:
 */
-    ic=0;
-    __asm__ volatile ( "movl	%1, %0" : "=r" (ecx) : "m" (ic) );
-    ic--;
-    __asm__ volatile ( "movl	%1, %0" : "=m" (ic)   : "r" (ecx) );
+__asm__ volatile (
+"m1:\n\t"
+);
     return(ic);
 }
 
