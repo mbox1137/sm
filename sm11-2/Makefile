@@ -3,7 +3,8 @@
 GDB	= -g
 
 CC	= gcc
-CFLAGS	= -m32 -fverbose-asm -msse3
+#CFLAGS	= -m32 -fverbose-asm -msse3
+CFLAGS	= -m32 -fverbose-asm -msse3 -nostdlib
 # -std=c99
 
 ASM	= nasm
@@ -12,8 +13,10 @@ AFLAGS	= -f elf32
 AS	= as
 ASFLAGS	= -c --32
 
-LD	= gcc
-LDFLAGS	= -no-pie -m32
+#LD	= gcc
+#LDFLAGS	= -no-pie -m32
+LD	= ld
+LDFLAGS	= -m elf_i386
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
 EXEC	= main

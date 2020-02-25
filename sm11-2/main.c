@@ -5,13 +5,12 @@
 int mygetchar(void);
 
 int mygetchar(void) {
-    int ic, *ica=&ic;
-    ic=0;
+    int ic=0;
 asm(
-"	movl	$3, %%eax	\n\t"
-"	movl	$0, %%ebx	\n\t"
-"	movl	%1, %%ecx	\n\t"
-"	movl	$1, %%edx	\n\t"
+"	mov	$3, %%eax	\n\t"
+"	mov	$0, %%ebx	\n\t"
+"	lea	%1, %%ecx	\n\t"
+"	mov	$1, %%edx	\n\t"
 "	int	$0x80		\n\t"
 "	cmp	$1, %%eax	\n\t"
 "	je	m1		\n\t"
@@ -20,9 +19,33 @@ asm(
 "	mov	%%eax, %0	\n\t"
 "m1:				    "
     :"=m"(ic)
-    :"m"(ica)
+    :"m"(ic)
     :"eax","ebx","ecx","edx");
     return(ic);
+}
+
+void myputchar(int ic) {
+asm(
+"	mov	$4, %%eax	\n\t"
+"	mov	$1, %%ebx	\n\t"
+"	lea	%1, %%ecx	\n\t"
+"	mov	$1, %%edx	\n\t"
+"	int	$0x80		    "
+    :"=m"(ic)
+    :"m"(ic)
+    :"eax","ebx","ecx","edx");
+    return;
+}
+
+void myexit(int ret_val) {
+asm(
+"	movl	$1, %%eax	\n\t"
+"	movl	%1, %%ebx	\n\t"
+"	int	$0x80		    "
+    :"=m"(ret_val)
+    :"m"(ret_val)
+    :"eax","ebx");
+    return;
 }
 
 int main(int argc, char **argv) {
@@ -39,7 +62,19 @@ int main(int argc, char **argv) {
         }
         if(ic>='a' && ic<='z')
             ic&=~cm;
+#if C
         putchar(ic);
+#else
+        myputchar(ic);
+#endif
     }
     return(0);
+}
+
+void _start(void) {
+    main(0,0);
+#if C
+#else
+    myexit(0);
+#endif
 }
