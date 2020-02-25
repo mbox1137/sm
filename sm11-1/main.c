@@ -1,0 +1,77 @@
+#include <stdio.h>
+
+#define C 0
+
+int mygetchar(void) {
+    int ic=0;
+asm(
+"	mov	$3, %%eax	\n\t"
+"	mov	$0, %%ebx	\n\t"
+"	lea	%1, %%ecx	\n\t"
+"	mov	$1, %%edx	\n\t"
+"	int	$0x80		\n\t"
+"	cmp	$1, %%eax	\n\t"
+"	je	m1		\n\t"
+"	xor	%%eax, %%eax	\n\t"
+"	dec	%%eax		\n\t"
+"	mov	%%eax, %0	\n\t"
+"m1:				    "
+    :"=m"(ic)
+    :"m"(ic)
+    :"eax","ebx","ecx","edx");
+    return(ic);
+}
+
+void myputchar(int ic) {
+asm(
+"	mov	$4, %%eax	\n\t"
+"	mov	$1, %%ebx	\n\t"
+"	lea	%1, %%ecx	\n\t"
+"	mov	$1, %%edx	\n\t"
+"	int	$0x80		    "
+    :"=m"(ic)
+    :"m"(ic)
+    :"eax","ebx","ecx","edx");
+    return;
+}
+
+void myexit(int ret_val) {
+asm(
+"	movl	$1, %%eax	\n\t"
+"	movl	%1, %%ebx	\n\t"
+"	int	$0x80		    "
+    :"=m"(ret_val)
+    :"m"(ret_val)
+    :"eax","ebx");
+    return;
+}
+
+int main(int argc, char **argv) {
+    int ic;
+    while(1) {
+#if C
+        ic=getchar();
+#else
+        ic=mygetchar();
+#endif
+        if(ic==EOF) {
+            break;
+        }
+        if(ic>='0' && ic<='9')
+            ic='0';
+#if C
+        putchar(ic);
+#else
+        myputchar(ic);
+#endif
+    }
+    return(0);
+}
+
+void _start(void) {
+    main(0,0);
+#if C
+#else
+    myexit(0);
+#endif
+}
