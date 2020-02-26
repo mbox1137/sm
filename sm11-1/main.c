@@ -1,7 +1,5 @@
 #include <stdio.h>
 
-#define C 0
-
 int mygetchar(void) {
     int ic=0;
 asm(
@@ -49,29 +47,19 @@ asm(
 int main(int argc, char **argv) {
     int ic;
     while(1) {
-#if C
-        ic=getchar();
-#else
         ic=mygetchar();
-#endif
         if(ic==EOF) {
             break;
         }
         if(ic>='0' && ic<='9')
             ic='0';
-#if C
-        putchar(ic);
-#else
         myputchar(ic);
-#endif
     }
     return(0);
 }
 
 void _start(void) {
-    main(0,0);
-#if C
-#else
-    myexit(0);
-#endif
+    int retval;
+    retval=main(0,0);
+    myexit(retval);
 }

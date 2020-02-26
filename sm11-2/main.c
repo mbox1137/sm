@@ -1,7 +1,5 @@
 #include <stdio.h>
 
-#define C 0
-
 int mygetchar(void);
 
 int mygetchar(void) {
@@ -52,29 +50,19 @@ int main(int argc, char **argv) {
     int ic;
     unsigned char cm = 'A' ^ 'a';
     while(1) {
-#if C
-        ic=getchar();
-#else
         ic=mygetchar();
-#endif
         if(ic==EOF) {
             break;
         }
         if(ic>='a' && ic<='z')
             ic&=~cm;
-#if C
-        putchar(ic);
-#else
         myputchar(ic);
-#endif
     }
     return(0);
 }
 
 void _start(void) {
-    main(0,0);
-#if C
-#else
-    myexit(0);
-#endif
+    int retval;
+    retval=main(0,0);
+    myexit(retval);
 }
