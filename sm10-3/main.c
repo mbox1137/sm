@@ -16,6 +16,7 @@ static struct Node tmp[]={
     {10.0, NULL, NULL, "ten"},
     {11.1, NULL, NULL, "eleven"},
     {12.2, NULL, NULL, "twelve"},
+    {2E8, NULL, NULL, "200M"},
     {NAN, NULL, NULL, "NaN"}
 };
 static struct Node *root;
