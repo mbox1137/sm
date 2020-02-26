@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "tree_find.h"
+#include <math.h>
 
 static struct Node tmp[]={
     {1.1, NULL, NULL, "one"},
@@ -14,7 +15,8 @@ static struct Node tmp[]={
     {9.9, NULL, NULL, "nine"},
     {10.0, NULL, NULL, "ten"},
     {11.1, NULL, NULL, "eleven"},
-    {12.2, NULL, NULL, "twelve"}
+    {12.2, NULL, NULL, "twelve"},
+    {NAN, NULL, NULL, "NaN"}
 };
 static struct Node *root;
 
@@ -32,7 +34,7 @@ int main(int argc, char **argv) {
             tmp[k].right=&tmp[k+1];
         }
     }
-    root=&tmp[0];
+    root=&tmp[5];
     if((argc == 2) && (sscanf(argv[1],"%lf",&key)==1)) {
     } else {
         key=11.1;
