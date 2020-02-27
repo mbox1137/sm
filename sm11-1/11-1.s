@@ -3,10 +3,11 @@
 
         .text
         .global _start
+
 _start:
-        subl    $1, %esp
+        subl    $4, %esp
 cycle:
-        movl    $__NR_read, %eax
+        movl    $3, %eax
         movl    $0, %ebx
         movl    %esp, %ecx
         movl    $1, %edx
@@ -20,13 +21,13 @@ cycle:
         ja      next
         movl    $'0', (%esp)
 next:
-        movl    $__NR_write, %eax
+        movl    $4, %eax
         movl    $1, %ebx
         int     $0x80
 
         jmp     cycle
 ending:
-        addl    $2, %esp
-        movl    $__NR_exit, %eax
+        addl    $4, %esp
+        movl    $1, %eax
         movl    $0, %ebx
         int     $0x80
