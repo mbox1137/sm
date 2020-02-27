@@ -23,14 +23,36 @@ mul64p:
 	andl	$0xfffffff0, %esp
 	subl	$0x10, %esp
 	movl	%esp, %esi
-
-	movq	A(%ebp), %xmm0
-	movq	B(%ebp), %xmm1
-//00 01 10 11 : xmm0.{3,2,1,0} == xmm0.{0,1,2,3}
+//https://stackoverflow.com/questions/17863411/sse-multiplication-of-2-64-bit-integers
+//ab * cd
+	movq	A(%ebp), %xmm1	/* .. ab */
+	movq	B(%ebp), %xmm2	/* .. cd */
+	movdqa	%xmm1, %xmm3	/* .. ab */
+	movdqa	%xmm2, %xmm4	/* .. cd */
 //11 01 10 00 : xmm0.{3,2,1,0} == xmm0.{3,1,2,0}
-	shufps	$0xD8, %xmm0, %xmm0
-	shufps	$0xD8, %xmm1, %xmm1
-	PMULUDQ	%xmm1, %xmm0
+	shufps	$0xD8, %xmm3, %xmm3	/* .a.b */
+	shufps	$0xD8, %xmm4, %xmm4	/* .c.d */
+//a*c b*d
+	PMULUDQ	%xmm3, %xmm4	/* a*c b*d */
+	movdqa	%xmm4, %xmm6	/* a*c b*d */
+
+	movdqa	%xmm1, %xmm3	/*..ab*/
+	movdqa	%xmm2, %xmm4	/*..cd*/
+//11 01 10 00 : xmm0.{3,2,1,0} == xmm0.{3,1,2,0}
+	shufps	$0xD8, %xmm3, %xmm3	/*.a.b*/
+//11 00 10 01 : xmm0.{3,2,1,0} == xmm0.{3,0,2,1}
+	shufps	$0xC9, %xmm4, %xmm4	/*.d.c*/
+//
+	PMULUDQ	%xmm3, %xmm4	/* a*d b*c */
+	movdqa	%xmm4, %xmm5
+	PSRLDQ	$8, %xmm5	/* 00 a*d */
+	PSLLDQ	$8, %xmm4	/* b*c 00 */
+	PSRLDQ	$8, %xmm4	/* 00 b*c */
+	PADDQ	%xmm4, %xmm5	/* 00 a*d+b*c ????????????????*/
+	PSLLDQ	$4, %xmm5	/* 0 a*d+b*c 0 */
+
+	
+
 	xor	%ecx, %ecx
 	movdqa	%xmm0, %xmm1
 m1:

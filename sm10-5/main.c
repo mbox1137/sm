@@ -3,37 +3,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <inttypes.h>
+#include "u.h"
 
-__m128 mul64p(u_int64_t a, u_int64_t b);
-__m128 mul64r(u_int64_t a, u_int64_t b);
-
-typedef union {
-    __m128 v;    // SSE 4 x float vector
-    float a[4];  // scalar array of 4 floats
-    unsigned char c[16];
-} U;
-
-int main(int argc, char **argv) {
+void print_xmm(U u) {
     unsigned char cc;
     int k;
-    u_int64_t a,b,ab;
-    __m128 c;
-    U u;
-    if( (argc==3) && 
-        (sscanf(argv[1],"%lli",&a)==1) && 
-        (sscanf(argv[2],"%lli",&b)==1) ) {
-    } else {
-        a=0xCAFEBABE; b=0xDEADBEEF;
-    }
-    ab=a*b;
-    printf("%lld(%llx) * %lld(%llx) = %lld(%llx)\n",a,a,b,b,ab,ab);
-    u.v=mul64p(a,b);
     for(k=0; k<16; k++) {
         if(u.c[15-k]!=0) {
             break;
         }
     }
     cc=u.c[15-k++];
+    printf("0x");
     if((cc&0xf0) == 0) {
         printf("%x",cc);
     } else {
@@ -43,5 +24,21 @@ int main(int argc, char **argv) {
         printf("%02x",u.c[15-k]);
     }
     printf("\n");
+    return;
+}
+
+int main(int argc, char **argv) {
+    u_int64_t a,b;
+    U u, ab;
+    if( (argc==3) && 
+        (sscanf(argv[1],"%lli",&a)==1) && 
+        (sscanf(argv[2],"%lli",&b)==1) ) {
+    } else {
+        a=0xCAFEBABE; b=0xDEADBEEF;
+    }
+    ab.v=mul64x64(a,b);
+    u.v=mul64p(a,b);
+    printf("%lld(%llx) * %lld(%llx)\n",a,a,b,b);
+    print_xmm(u);
     return(0);
 }
