@@ -48,5 +48,11 @@ __m128i mul_64x64(__m128i ab, __m128i cd)
     return _mm_add_epi64(high, ac);
 }
 
-__m128i mul64x64(u_int64_t a, u_int64_t b) {
+__m128i mul64x64(int64_t x, int64_t y) {
+    __m128i ab, cd;
+/*
+    ab=_mm_cvtsi64_si128(x);
+    cd=_mm_cvtsi64_si128(y);
+*/
+    return(mul_64x64(ab, cd));
 }

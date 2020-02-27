@@ -4,6 +4,7 @@ GDB	= -g
 
 CC	= gcc
 CFLAGS	= -m32 -fverbose-asm
+# -march=prescott
 # -std=c99
 
 ASM	= nasm
