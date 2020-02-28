@@ -10,7 +10,6 @@ nl_format:	.asciz	"\n"
 
 	.globl  mul64p
 	.type   mul64p, @function
-	.globl  qq
 
 	.equ    A, 4*2
 	.equ    B, A+8
@@ -33,49 +32,56 @@ mul64p:
 //11 01 10 00 : xmm0.{3,2,1,0} == xmm0.{3,1,2,0}
 	shufps	$0xD8, %xmm3, %xmm3	/* .a.b */
 	shufps	$0xD8, %xmm4, %xmm4	/* .c.d */
-
+/*
 	movdqa	%xmm3, %xmm0
 	call	printxmm0
 	movdqa	%xmm4, %xmm0
 	call	printxmm0
+*/
 //a*c b*d
 	PMULUDQ	%xmm3, %xmm4	/* a*c b*d */
+/*
 	movdqa	%xmm4, %xmm0
 	call	printxmm0
+*/
 	movdqa	%xmm4, %xmm6	/* a*c b*d */
 
 	movq	A(%ebp), %xmm3	/* .. ab */
 	movq	B(%ebp), %xmm4	/* .. cd */
-
+/*
 	movdqa	%xmm3, %xmm0
 	call	printxmm0
 	movdqa	%xmm4, %xmm0
 	call	printxmm0
+*/
 //11 01 10 00 : xmm0.{3,2,1,0} == xmm0.{3,1,2,0}
 	shufps	$0xD8, %xmm3, %xmm3	/*.a.b*/
 //11 00 10 01 : xmm0.{3,2,1,0} == xmm0.{3,0,2,1}
 	shufps	$0xC9, %xmm4, %xmm4	/*.d.c*/
+/*
 	movdqa	%xmm3, %xmm0
 	call	printxmm0
 	movdqa	%xmm4, %xmm0
 	call	printxmm0
-//
+*/
 	PMULUDQ	%xmm3, %xmm4	/* a*d b*c */
 	movdqa	%xmm4, %xmm3	/* a*d b*c */
 	movdqa	%xmm4, %xmm5
+/*
 	movdqa	%xmm4, %xmm0
 	call	printxmm0
-
+*/
 	PSRLDQ	$8, %xmm5	/* 00 a*d */
 	PSLLDQ	$4, %xmm5	/* 0 a*d 0	*/
 	PSLLDQ	$8, %xmm4	/* b*c 00 */
 	PSRLDQ	$8, %xmm4	/* 00 b*c */
 	PSLLDQ	$4, %xmm4	/* 0 b*c 0	*/
+/*
 	movdqa	%xmm5, %xmm0
 	call	printxmm0
 	movdqa	%xmm4, %xmm0
 	call	printxmm0
-qq:
+*/
 	MOVDQA  %xmm6, (%esi)
 	MOVDQA  %xmm5, (%edi)
 	mov	(%edi), %eax
@@ -103,6 +109,7 @@ qq:
 	MOVDQA  (%esi), %xmm2
 	movdqa	%xmm2, %xmm0
 	call	printxmm0
+	movdqa	%xmm2, %xmm0
 m9:
 	mov     %ebp, %eax
 	sub	$4*2, %eax

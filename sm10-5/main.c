@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
         (sscanf(argv[1],"%lli",&a)==1) && 
         (sscanf(argv[2],"%lli",&b)==1) ) {
     } else {
-        a=0x0000002200000011; b=0x0000005500000033;
+        a=0xfffffffffffffffe; b=0xfffffffffffffffd;
     }
     ab.v=mul64x64(a,b);
     u.v=mul64p(a,b);
