@@ -17,8 +17,8 @@ static struct Node tmp[]={
     {11.1, NULL, NULL, "eleven"},
     {12.2, NULL, NULL, "twelve"},
     {2E8, NULL, NULL, "200M"},
-    {1E-9, NULL, NULL, "1n"},
-    {NAN, NULL, NULL, "NaN"}
+    {1E-9, NULL, NULL, "1n"}
+//    {NAN, NULL, NULL, "NaN"}
 };
 static struct Node *root;
 
