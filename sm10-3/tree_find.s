@@ -28,9 +28,23 @@ tree_find:
 	pushl	%edi
 	movl	root(%ebp), %esi
 	movl	pstr(%ebp), %edi
+
+	xorl	%eax, %eax
+	cmpl	$0, %esi
+	je	m9
+
+m5:
+	movl	node_left(%esi), %eax
+	cmpl	$0, %eax
+	je	m4
+
+	movl	node_left(%esi), %esi
+	jmp	m5
+m4:
+
 m1:
 	xorl	%eax, %eax
-	cmp	$0, %esi
+	cmpl	$0, %esi
 	je	m9
 
 // if(fabs((node->key) - key)<1E-8)
@@ -39,7 +53,10 @@ m1:
 	xorpd	%xmm1, %xmm1
 	subpd	%xmm0, %xmm1
 	maxpd	%xmm1, %xmm0
-	comisd	(epsilon), %xmm0
+
+	movsd	(epsilon), %xmm2
+	comisd	%xmm2, %xmm0
+//	comisd	(epsilon), %xmm0
 
 	ja	m2
 	cmpl	$0, %edi
