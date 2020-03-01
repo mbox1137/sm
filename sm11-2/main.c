@@ -3,23 +3,18 @@
 int mygetchar(void);
 
 int mygetchar(void) {
-    int ic=0;
+    int ic=0, res=0;
 asm(
 "	mov	$3, %%eax	\n\t"
 "	mov	$0, %%ebx	\n\t"
 "	lea	%1, %%ecx	\n\t"
 "	mov	$1, %%edx	\n\t"
 "	int	$0x80		\n\t"
-"	cmp	$1, %%eax	\n\t"
-"	je	m1		\n\t"
-"	xor	%%eax, %%eax	\n\t"
-"	dec	%%eax		\n\t"
 "	mov	%%eax, %0	\n\t"
-"m1:				    "
-    :"=m"(ic)
+    :"=m"(res)
     :"m"(ic)
     :"eax","ebx","ecx","edx");
-    return(ic);
+    return(res==1?ic:-1);
 }
 
 void myputchar(int ic) {
