@@ -1,25 +1,18 @@
 #include <stdio.h>
 
-int mygetchar(void)
-{
-    int ic=0;
-    asm(
-    "	mov	$3, %%eax	\n\t"
-    "	mov	$0, %%ebx	\n\t"
-    "	lea	%1, %%ecx	\n\t"
-    "	mov	$1, %%edx	\n\t"
-    "	int	$0x80		\n\t"
-    "	cmp	$1, %%eax	\n\t"
-    "	je	mm1		\n\t"
-    "	xor	%%eax, %%eax	\n\t"
-    "	dec	%%eax		\n\t"
-    "	mov	%%eax, %0	\n\t"
-    "mm1:			"
-        :"=m"(ic)
-        :"m"(ic)
-        :"eax","ebx","ecx","edx");
-
-    return(ic);
+int mygetchar(void) {
+    int ic=0, res=0;
+asm(
+"	mov	$3, %%eax	\n\t"
+"	mov	$0, %%ebx	\n\t"
+"	lea	%1, %%ecx	\n\t"
+"	mov	$1, %%edx	\n\t"
+"	int	$0x80		\n\t"
+"	mov	%%eax, %0	\n\t"
+    :"=m"(res)
+    :"m"(ic)
+    :"eax","ebx","ecx","edx");
+    return(res==1?ic:-1);
 }
 
 void myputchar(int ic)
