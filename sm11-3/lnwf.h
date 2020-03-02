@@ -17,6 +17,7 @@ struct FileWriteState
 };
 int nextchar();
 int lastchar();
+void myputchar(int ic);
 void writechar(struct FileWriteState *st, int ic);
 void flush(struct FileWriteState *st);
 void myexit(int ret_val);

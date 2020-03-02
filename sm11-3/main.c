@@ -11,7 +11,8 @@ int main(int argc, char **argv)
         ic=nextchar(stin);
         if(ic==EOF)
             break;
-        writechar(stout, ic);
+//        writechar(stout, ic);
+        myputchar(ic);
     }
     return(0);
 }

@@ -97,6 +97,21 @@ void myputbuff(int ic)
     return;
 }
 
+void myputchar(int ic)
+{
+    asm(
+    "	mov	$4, %%eax	\n\t"
+    "	mov	$1, %%ebx	\n\t"
+    "	lea	%1, %%ecx	\n\t"
+    "	mov	$1, %%edx	\n\t"
+    "	int	$0x80		    "
+        :"=m"(ic)
+        :"m"(ic)
+        :"eax","ebx","ecx","edx");
+
+    return;
+}
+
 //Выход
 
 void myexit(int ret_val)
