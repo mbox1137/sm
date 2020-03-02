@@ -20,8 +20,8 @@ LDFLAGS	= -m elf_i386
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
 EXEC	= main
-OBJS	= main.o
-SCDRY	= main.s
+OBJS	= main.o lnwf.o
+SCDRY	= main.s lnwf.s
 
 .SECONDARY: $(SCDRY)
 ALL : $(EXEC)
