@@ -1,28 +1,29 @@
 #include <stdio.h>
 
-int mygetchar(void) {
+int mygetchar(void)
+{
     int ic=0, res=0;
-asm(
-"	mov	$3, %%eax	\n\t"
-"	mov	$0, %%ebx	\n\t"
-"	lea	%1, %%ecx	\n\t"
-"	mov	$1, %%edx	\n\t"
-"	int	$0x80		\n\t"
-"	mov	%%eax, %0	\n\t"
-    :"=m"(res)
-    :"m"(ic)
-    :"eax","ebx","ecx","edx");
+    asm(
+    "   mov     $3, %%eax       \n\t"
+    "   mov     $0, %%ebx       \n\t"
+    "   lea     %1, %%ecx       \n\t"
+    "   mov     $1, %%edx       \n\t"
+    "   int     $0x80           \n\t"
+    "   mov     %%eax, %0       \n\t"
+        :"=m"(res)
+        :"m"(ic)
+        :"eax","ebx","ecx","edx");
     return(res==1?ic:-1);
 }
 
 void myputchar(int ic)
 {
     asm(
-    "	mov	$4, %%eax	\n\t"
-    "	mov	$1, %%ebx	\n\t"
-    "	lea	%1, %%ecx	\n\t"
-    "	mov	$1, %%edx	\n\t"
-    "	int	$0x80		    "
+    "   mov     $4, %%eax       \n\t"
+    "   mov     $1, %%ebx       \n\t"
+    "   lea     %1, %%ecx       \n\t"
+    "   mov     $1, %%edx       \n\t"
+    "   int     $0x80               "
         :"=m"(ic)
         :"m"(ic)
         :"eax","ebx","ecx","edx");
@@ -33,9 +34,9 @@ void myputchar(int ic)
 void myexit(int ret_val)
 {
     asm(
-    "	movl	$1, %%eax	\n\t"
-    "	movl	%1, %%ebx	\n\t"
-    "	int	$0x80		    "
+    "   movl    $1, %%eax       \n\t"
+    "   movl    %1, %%ebx       \n\t"
+    "   int     $0x80               "
         :"=m"(ret_val)
         :"m"(ret_val)
         :"eax","ebx");
