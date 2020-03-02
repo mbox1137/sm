@@ -5,6 +5,8 @@ struct FileReadState
     int bufsize;         // размер буфера
     int lc;              // последний считанный символ
     // здесь потребуется добавить поля для реализации буферизованного чтения
+    int count;		 //осталось символов в буф
+    int ind;		 //номер символа на выдачу
 };
 struct FileWriteState
 {
@@ -13,8 +15,8 @@ struct FileWriteState
     int bufsize;         // размер буфера
     // здесь потребуется добавить поля для реализации буферизованной записи
 };
-int nextchar(struct FileReadState *st);
-int lastchar(struct FileReadState *st);
+int nextchar();
+int lastchar();
 void writechar(struct FileWriteState *st, int ic);
 void flush(struct FileWriteState *st);
 void myexit(int ret_val);

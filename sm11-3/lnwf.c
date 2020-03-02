@@ -9,30 +9,63 @@ struct FileReadState *stin=&statin;
 
 //Ввод
 
-int nextchar(struct FileReadState *st)
+int mygetbuff(int fd)
 {
-    return(-1);
-}
+    int res=0;
 
-int lastchar(struct FileReadState *st)
-{
-    return(-1);
-}
-
-int mygetbuff(void)
-{
-    int ic=0, res=0;
     asm(
-    "	mov	$3, %%eax	\n\t"
-    "	mov	$0, %%ebx	\n\t"
-    "	lea	%1, %%ecx	\n\t"
-    " 	mov	$1, %%edx	\n\t"
-    "	int	$0x80		\n\t"
-    "	mov	%%eax, %0	\n\t"
+    "   mov     $3, %%eax       \n\t"
+    "   mov     %2, %%ebx       \n\t"
+    "   lea     %1, %%ecx       \n\t"
+    "   mov     $4096, %%edx    \n\t"
+    "   int     $0x80           \n\t"
+    "   mov     %%eax, %0       \n\t"
         :"=m"(res)
-        :"m"(ic)
+        :"m"(bufferin), "m"(fd)
         :"eax","ebx","ecx","edx");
     return(res);
+}
+
+int nextchar_(struct FileReadState *st)
+{
+    int ic;
+    int temp_res;
+    if (st->lc == -1)
+        return -1;
+
+    if (st->count == 0)
+    {
+        //чтение очередных данных
+        temp_res = mygetbuff(st->fd);
+        st->ind = 0;
+        st->count = temp_res;
+    }
+
+    if (st->count == 0)
+    {
+        ic = -1;
+    } else
+    {
+        ic = bufferin[st->ind];
+        st->ind++;
+        st->count--;
+    }
+
+    st->lc = ic;
+    return ic;
+}
+int nextchar()
+{
+    return nextchar_(stin);
+}
+
+int lastchar_(struct FileReadState *st)
+{
+    return st->lc;
+}
+int lastchar()
+{
+    return lastchar_(stin);
 }
 
 //Вывод
