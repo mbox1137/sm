@@ -2,6 +2,8 @@
 #include "lnwf.h"
 
 #define NN 4096
+#define STR(x) #x
+#define XSTR(s) STR(s)
 
 static unsigned char bufferin[NN];
 struct FileReadState statin={0,bufferin,NN,0};
@@ -17,7 +19,8 @@ int mygetbuff(int fd)
     "   mov     $3, %%eax       \n\t"
     "   mov     %2, %%ebx       \n\t"
     "   lea     %1, %%ecx       \n\t"
-    "   mov     $4096, %%edx    \n\t"
+//    "   mov     $4096, %%edx    \n\t"
+    "   mov     $" XSTR(NN) ", %%edx    \n\t"
     "   int     $0x80           \n\t"
     "   mov     %%eax, %0       \n\t"
         :"=m"(res)
