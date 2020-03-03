@@ -14,12 +14,14 @@ struct FileWriteState
     unsigned char *buf;  // указатель на буфер
     int bufsize;         // размер буфера
     // здесь потребуется добавить поля для реализации буферизованной записи
+    int count;		 //осталось символов в буф
+    int ind;		 //номер символа на выдачу
 };
 int nextchar();
 int lastchar();
 void myputchar(int ic);
-void writechar(struct FileWriteState *st, int ic);
-void flush(struct FileWriteState *st);
+void writechar(int ic);
+void flush(void);
 void myexit(int ret_val);
 struct FileReadState *stin;
 struct FileWriteState *stout;

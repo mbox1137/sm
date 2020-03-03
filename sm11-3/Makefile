@@ -35,7 +35,7 @@ $(EXEC) : $(OBJS) Makefile
 %.o: %.c
 #	$(CC) $(CFLAGS) $(GDB) -c -o $@ $<
 
-%.s: %.c Makefile
+%.s: %.c Makefile *.h
 	$(CC) $(CFLAGS) $(GDB) -S -o $@ $<
 
 %.o: %.asm Makefile

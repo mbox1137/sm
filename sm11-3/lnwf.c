@@ -91,15 +91,7 @@ static unsigned char bufferout[NN];
 struct FileWriteState statout={1,bufferout,NN};
 struct FileWriteState *stout=&statout;
 
-void writechar(struct FileWriteState *st, int ic)
-{
-}
-
-void flush(struct FileWriteState *st)
-{
-}
-
-int myputbuff(int fd)
+int myputbuff(int fd, int n)
 {
     int res=0;
 
@@ -107,9 +99,38 @@ int myputbuff(int fd)
     "	mov	$4, %%eax	\n\t"
     "	int	$0x80		    "
         :"=a"(res)
-        :"b"(fd), "c"(bufferout), "d"(NN)
+        :"b"(fd), "c"(bufferout), "d"(n)
     );
     return(res);
+}
+
+void flush_(struct FileWriteState *st)
+{
+    int n;
+    if(st->count>0 && st->count<NN) {
+        n=myputbuff(st->fd, st->count);
+    }
+    st->ind=0;
+    st->count=0;
+}
+
+void writechar_(struct FileWriteState *st, int ic)
+{
+    if(st->count>=NN) {
+        flush_(st);
+    }
+    st->buf[st->ind++]=ic;
+    st->count++;
+}
+
+void writechar(int ic)
+{
+    writechar_(stout, ic);
+}
+
+void flush(void)
+{
+    flush_(stout);
 }
 
 void myputchar(int ic)
