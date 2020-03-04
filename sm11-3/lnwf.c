@@ -35,10 +35,9 @@ int mygetbuff(int fd)
     int res=0;
 
     asm(
-    "   mov     $3, %%eax       \n\t"
     "   int     $0x80           \n\t"
         :"=a"(res)
-        :"b"(fd), "c"(bufferin), "d"(NN)
+        :"a"(3), "b"(fd), "c"(bufferin), "d"(NN)
     );
     return(res);
 }
@@ -96,10 +95,9 @@ int myputbuff(int fd, int n)
     int res=0;
 
     asm(
-    "	mov	$4, %%eax	\n\t"
     "	int	$0x80		    "
         :"=a"(res)
-        :"b"(fd), "c"(bufferout), "d"(n)
+        :"a"(4), "b"(fd), "c"(bufferout), "d"(n)
     );
     return(res);
 }
