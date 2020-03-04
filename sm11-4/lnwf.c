@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <unistd.h>
 #include "lnwf.h"
 
 //https://stackoverflow.com/questions/52525630/define-in-inline-assembly-in-gcc
@@ -7,7 +8,7 @@
 #define XSTR(s) STR(s)
 
 static unsigned char bufferin[NN];
-struct FileReadState statin={0,bufferin,NN,0};
+struct FileReadState statin={STDIN_FILENO,bufferin,NN,0};
 struct FileReadState *stin=&statin;
 
 //Ввод
@@ -87,7 +88,7 @@ int lastchar()
 //Вывод
 
 static unsigned char bufferout[NN];
-struct FileWriteState statout={1,bufferout,NN};
+struct FileWriteState statout={STDOUT_FILENO,bufferout,NN};
 struct FileWriteState *stout=&statout;
 
 int myputbuff(int fd, int n)
