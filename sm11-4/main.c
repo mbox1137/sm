@@ -3,18 +3,20 @@
 
 //Проверка
 
+extern struct FileWriteState *stout;
+
 int main(int argc, char **argv)
 {
     int ic;
     while(1)
     {
-        ic=nextchar(stin);
+        ic=nextchar();
         if(ic==EOF)
             break;
-        writechar(ic);
+        writechar(ic, stout);
 //        myputchar(ic);
     }
-    flush();
+    flush(stout);
     return(0);
 }
 

@@ -10,6 +10,8 @@ function myrun {
 	echo "$1 $(if cmp -s in.dat out.dat; then echo Ok ;else echo Fail ;fi): $(wc -c in.dat) $(wc -c out.dat)"
 }
 
+echo "К 4-й лабе относится wf.c"
+
 if [ -x "./main" ]; then
 	myrun "0"
 	myrun "5"

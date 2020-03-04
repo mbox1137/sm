@@ -20,8 +20,8 @@ LDFLAGS	= -m elf_i386
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
 EXEC	= main
-OBJS	= main.o lnwf.o
-SCDRY	= main.s lnwf.s
+OBJS	= main.o ln.o my.o wf.o
+SCDRY	= main.s ln.s my.s wf.s
 
 .SECONDARY: $(SCDRY)
 ALL : $(EXEC)
@@ -45,6 +45,6 @@ $(EXEC) : $(OBJS) Makefile
 	$(AS) $(ASFLAGS) $(GDB) -a=$@.lst -o $@ $<
 
 clean:
-	rm -f $(EXEC) $(OBJS) $(SCDRY) *~ *.lst .[^.]*~
+	rm -f $(EXEC) $(OBJS) $(SCDRY) *~ *.lst .[^.]*~ in.dat out.dat
 
 all: $(EXEC)
