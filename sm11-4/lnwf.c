@@ -1,36 +1,42 @@
 #include <stdio.h>
 #include <unistd.h>
-#include "lnwf.h"
 
-//https://stackoverflow.com/questions/52525630/define-in-inline-assembly-in-gcc
 #define NN 4096
-#define STR(x) #x
-#define XSTR(s) STR(s)
+
+
+struct FileReadState
+{
+    int fd;              // "файловый дескриптор", для чтения со стандартного потока ввода - 0
+    unsigned char *buf;  // указатель на буфер
+    int bufsize;         // размер буфера
+    int lc;              // последний считанный символ
+    int count;           //осталось символов в буф
+    int ind;             //номер символа на выдачу
+};
+
+struct FileWriteState
+{
+    int fd;              // "файловый дескриптор", для вывода на стандартный поток вывода - 1
+    unsigned char *buf;  // указатель на буфер
+    int bufsize;         // размер буфера
+    int count;           //осталось символов в буф
+    int ind;             //номер символа на выдачу
+};
+int nextchar();
+int lastchar();
+void myputchar(int ic);
+void writechar(int ic);
+void flush(void);
+void myexit(int ret_val);
+struct FileReadState *stin;
+struct FileWriteState *stout;
+
 
 static unsigned char bufferin[NN];
 struct FileReadState statin={STDIN_FILENO,bufferin,NN,0};
 struct FileReadState *stin=&statin;
 
 //Ввод
-/*
-int mygetbuff(int fd)
-{
-    int res=0;
-
-    asm(
-    "   mov     $3, %%eax       \n\t"
-    "   mov     %2, %%ebx       \n\t"
-    "   lea     %1, %%ecx       \n\t"
-    "   mov     $" XSTR(NN) ", %%edx    \n\t"
-    "   int     $0x80           \n\t"
-    "   mov     %%eax, %0       \n\t"
-        :"=m"(res)
-        :"m"(bufferin), "m"(fd)
-//        :"b"(fd), "c"(bufferout), "d"(NN)
-        :"eax","ebx","ecx","edx");
-    return(res);
-}
-*/
 int mygetbuff(int fd)
 {
     int res=0;
@@ -106,18 +112,16 @@ int myputbuff(int fd, int n)
 void flush_(struct FileWriteState *st)
 {
     int n;
-    if(st->count>0 && st->count<=NN) {
+    if(st->count>0 && st->count<=NN)
         n=myputbuff(st->fd, st->count);
-    }
     st->ind=0;
     st->count=0;
 }
 
 void writechar_(struct FileWriteState *st, int ic)
 {
-    if(st->count>=NN) {
+    if(st->count>=NN)
         flush_(st);
-    }
     st->buf[st->ind++]=ic;
     st->count++;
 }
@@ -134,7 +138,7 @@ void flush(void)
 
 void myputchar(int ic)
 {
-    asm(
+    asm volatile(
     "	mov	$4, %%eax	\n\t"
     "	mov	$1, %%ebx	\n\t"
     "	lea	%1, %%ecx	\n\t"
@@ -161,3 +165,4 @@ void myexit(int ret_val)
 
     return;
 }
+
