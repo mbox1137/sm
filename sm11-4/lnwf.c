@@ -3,7 +3,7 @@
 
 #define NN 4096
 
-
+/*
 struct FileReadState
 {
     int fd;              // "файловый дескриптор", для чтения со стандартного потока ввода - 0
@@ -13,7 +13,7 @@ struct FileReadState
     int count;           //осталось символов в буф
     int ind;             //номер символа на выдачу
 };
-
+*/
 struct FileWriteState
 {
     int fd;              // "файловый дескриптор", для вывода на стандартный поток вывода - 1
@@ -25,13 +25,13 @@ struct FileWriteState
 int nextchar();
 int lastchar();
 void myputchar(int ic);
-void writechar(int ic);
-void flush(void);
+void writechar(int c, struct FileWriteState *out);
+void flush(struct FileWriteState *out);
 void myexit(int ret_val);
 struct FileReadState *stin;
 struct FileWriteState *stout;
 
-
+/*
 static unsigned char bufferin[NN];
 struct FileReadState statin={STDIN_FILENO,bufferin,NN,0};
 struct FileReadState *stin=&statin;
@@ -90,7 +90,7 @@ int lastchar()
 {
     return lastchar_(stin);
 }
-
+*/
 //Вывод
 
 static unsigned char bufferout[NN];
@@ -102,48 +102,39 @@ int myputbuff(int fd, int n)
     int res=0;
 
     asm(
-    "	int	$0x80		    "
+    "   int     $0x80               "
         :"=a"(res)
         :"a"(4), "b"(fd), "c"(bufferout), "d"(n)
     );
     return(res);
 }
 
-void flush_(struct FileWriteState *st)
+void flush(struct FileWriteState *out)
 {
     int n;
-    if(st->count>0 && st->count<=NN)
-        n=myputbuff(st->fd, st->count);
-    st->ind=0;
-    st->count=0;
+    if(out->count>0 && out->count<=NN)
+        n=myputbuff(out->fd, out->count);
+    out->ind=0;
+    out->count=0;
 }
 
-void writechar_(struct FileWriteState *st, int ic)
+void writechar(int c, struct FileWriteState *out)
 {
-    if(st->count>=NN)
-        flush_(st);
-    st->buf[st->ind++]=ic;
-    st->count++;
+    if(out->count>=NN)
+        flush(out);
+    out->buf[out->ind++]=c;
+    out->count++;
 }
 
-void writechar(int ic)
-{
-    writechar_(stout, ic);
-}
-
-void flush(void)
-{
-    flush_(stout);
-}
-
+/*
 void myputchar(int ic)
 {
     asm volatile(
-    "	mov	$4, %%eax	\n\t"
-    "	mov	$1, %%ebx	\n\t"
-    "	lea	%1, %%ecx	\n\t"
-    "	mov	$1, %%edx	\n\t"
-    "	int	$0x80		    "
+    "   mov     $4, %%eax       \n\t"
+    "   mov     $1, %%ebx       \n\t"
+    "   lea     %1, %%ecx       \n\t"
+    "   mov     $1, %%edx       \n\t"
+    "   int     $0x80               "
         :"=m"(ic)
         :"m"(ic)
         :"eax","ebx","ecx","edx");
@@ -156,13 +147,13 @@ void myputchar(int ic)
 void myexit(int ret_val)
 {
     asm(
-    "	movl	$1, %%eax	\n\t"
-    "	movl	%1, %%ebx	\n\t"
-    "	int	$0x80		    "
+    "   movl    $1, %%eax       \n\t"
+    "   movl    %1, %%ebx       \n\t"
+    "   int     $0x80               "
         :"=m"(ret_val)
         :"m"(ret_val)
         :"eax","ebx");
 
     return;
 }
-
+*/
