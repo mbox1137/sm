@@ -13,10 +13,10 @@ struct FileWriteState
 };
 
 static unsigned char bufferout[NN];
-struct FileWriteState statout={STDOUT_FILENO,bufferout,NN};
+static struct FileWriteState statout={STDOUT_FILENO,bufferout,NN,0,0};
 struct FileWriteState *stout=&statout;
 
-static int myputbuff(int fd, int n)
+int myputbuff(int fd, int n)
 {
     int res=0;
 
@@ -28,19 +28,19 @@ static int myputbuff(int fd, int n)
     return(res);
 }
 
-void flush(struct FileWriteState *st)
+void flush(struct FileWriteState *out)
 {
     int n;
-    if(st->count>0 && st->count<=NN)
-        n=myputbuff(st->fd, st->count);
-    st->ind=0;
-    st->count=0;
+    if(out->count>0 && out->count<=NN)
+        n=myputbuff(out->fd, out->count);
+    out->ind=0;
+    out->count=0;
 }
 
-void writechar(int ic, struct FileWriteState *st)
+void writechar(int c, struct FileWriteState *out)
 {
-    if(st->count>=NN)
-        flush(st);
-    st->buf[st->ind++]=ic;
-    st->count++;
+    if(out->count>=NN)
+        flush(out);
+    out->buf[out->ind++]=c;
+    out->count++;
 }
