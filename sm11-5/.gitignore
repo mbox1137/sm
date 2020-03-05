@@ -1,4 +1,5 @@
 main
 main.s
-*.dat
-lnwf.s
+my.s
+wf.s
+writeu32_.s

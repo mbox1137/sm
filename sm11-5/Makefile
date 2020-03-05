@@ -3,8 +3,8 @@
 GDB	= -g
 
 CC	= gcc
-#CFLAGS	= -m32 -fverbose-asm -msse3
-CFLAGS	= -m32 -fverbose-asm -msse3 -nostdlib
+CFLAGS	= -m32 -fverbose-asm -msse3
+#CFLAGS	= -m32 -fverbose-asm -msse3 -nostdlib
 # -std=c99
 
 ASM	= nasm
@@ -13,15 +13,15 @@ AFLAGS	= -f elf32
 AS	= as
 ASFLAGS	= -c --32
 
-#LD	= gcc
-#LDFLAGS	= -no-pie -m32
-LD	= ld
-LDFLAGS	= -m elf_i386
+LD	= gcc
+LDFLAGS	= -no-pie -m32
+#LD	= ld
+#LDFLAGS	= -m elf_i386
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
 EXEC	= main
-OBJS	= main.o ln.o my.o wf.o
-SCDRY	= main.s ln.s my.s wf.s
+OBJS	= main.o wf.o writeu32_.o writeu32.o
+SCDRY	= main.s wf.s writeu32_.s
 
 .SECONDARY: $(SCDRY)
 ALL : $(EXEC)
@@ -45,6 +45,7 @@ $(EXEC) : $(OBJS) Makefile
 	$(AS) $(ASFLAGS) $(GDB) -a=$@.lst -o $@ $<
 
 clean:
-	rm -f $(EXEC) $(OBJS) $(SCDRY) *~ *.lst .[^.]*~ in.dat out.dat
+	rm -f $(EXEC) $(OBJS) $(SCDRY) *~ *.lst .[^.]*~
 
 all: $(EXEC)
+

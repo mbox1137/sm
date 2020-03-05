@@ -10,9 +10,9 @@ writeu32:
         movl    $9, %ebx
         xorl    %edi, %edi
         cmpl    $0, %ecx
-        jne     .loop
+        jne     loop
 
-        movl    $0, %ebx //
+        movl    $0, %ebx
         movl    $0, %edx
 
         jmp     print
