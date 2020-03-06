@@ -25,3 +25,4 @@ void flush(struct FileWriteState *st);
 void myexit(int ret_val);
 struct FileReadState *stin;
 struct FileWriteState *stout;
+void writeu32_(int n);

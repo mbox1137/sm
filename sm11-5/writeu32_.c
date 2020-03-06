@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
+#include "lnwf.h"
 
 void writeu32_(int n)
 {
