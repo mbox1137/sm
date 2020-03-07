@@ -14,11 +14,11 @@ int main(int argc, char **argv)
         sscanf(argv[1],"%i",&n);
     }
     printf("n=%d\n",n);
-
+/*
     writechar(n, stout);
     writechar('\n', stout);
     flush(stout);
-
+*/
     writeu32_(n);
     writechar('\n', stout);
     flush(stout);
