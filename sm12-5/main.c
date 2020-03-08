@@ -15,8 +15,10 @@ int main(int argc, char **argv)
     int k, n, m;
     int h;  
     m=sizeof(struct Data);
+/*
     printf("sizeof(int16_t)=%d\n",sizeof(int16_t));
     printf("sizeof(struct Data)=%d\n",sizeof(struct Data));
+*/
     fn[0]=0;
     if(argc==3) {
         sscanf(argv[1],"%s",fn);
@@ -27,7 +29,7 @@ int main(int argc, char **argv)
     h=creat(fn, 0644);
     for(k=0; k<n; k++) {
         ledata.x=k;
-        ledata.y=k;
+        ledata.y=k*0x1000+k;
         write(h, &ledata, m);
     }
     close(h);
