@@ -28,7 +28,7 @@ int main(int argc, char **argv)
     h=creat(fn, 0644);
     for(k=0; k<n; k++) {
         ledata.x=k;
-        ledata.y=k*1000+k;
+        ledata.y=k*1000;
         write(h, &ledata, m);
     }
     close(h);

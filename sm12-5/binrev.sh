@@ -9,6 +9,8 @@ then
 	hexdump -C $fn
 	ls -l $fn
 	./binrev $fn $nn
+	ls -l $fn
+	hexdump -C $fn
 else
 	echo "run make"
 fi
