@@ -1,0 +1,58 @@
+#diff cpy_ans.s writeu32.s
+
+1c1
+< 	.text
+---
+>         .text
+2a3,6
+>         .type   writeu32, @function
+>         .global writechar
+>         .type   writechar, @function
+>         .global stout
+3a8
+> //:"c"(n)
+5c10
+<         push    %ebp
+---
+>         pushl   %ebp
+7,9c12,15
+<         push    %ebx
+<         push    %esi
+<         push    %edi
+---
+> 
+>         pushl   %ebx
+>         pushl   %esi
+>         pushl   %edi
+13c19
+<         jne     .loop
+---
+>         jne     loop
+15c21
+<         movl    $0, %ebx //
+---
+>         movl    $0, %ebx
+52,55c58
+<         addl    $0, %edx
+< 
+<         push    %edx
+<         push    %ecx
+---
+>         addl    $'0', %edx
+57,58c60,62
+<         movl    stout, %edx
+<         movl    4(%esp), %ecx
+---
+>         pushl   %ecx
+>         pushl   (stout)
+>         pushl   %edx
+60c64
+< 
+---
+>         addl    $4*2,%esp
+62c66
+<         popl    %edx
+---
+> 
+67a72
+> 
