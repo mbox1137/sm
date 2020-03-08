@@ -20,8 +20,8 @@ LDFLAGS	= -no-pie -m32
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
 EXEC	= main
-OBJS	= main.o wf.o writeu32_.o writeu32.o
-SCDRY	= main.s wf.s writeu32_.s
+OBJS	= main.o
+SCDRY	= main.s
 
 .SECONDARY: $(SCDRY)
 ALL : $(EXEC)
