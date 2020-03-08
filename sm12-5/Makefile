@@ -45,7 +45,7 @@ $(EXEC) : $(OBJS) Makefile
 	$(AS) $(ASFLAGS) $(GDB) -a=$@.lst -o $@ $<
 
 clean:
-	rm -f $(EXEC) $(OBJS) $(SCDRY) *~ *.lst .[^.]*~
+	rm -f $(EXEC) $(OBJS) $(SCDRY) *~ *.lst .[^.]*~ *.dat
 
 all: $(EXEC)
 
