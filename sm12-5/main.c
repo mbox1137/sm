@@ -6,7 +6,6 @@
 #include <fcntl.h>
 #include "binrev.h"
 
-int16_t tmp; // 2 байта,
 static struct Data ledata;
 
 int main(int argc, char **argv)
@@ -29,7 +28,7 @@ int main(int argc, char **argv)
     h=creat(fn, 0644);
     for(k=0; k<n; k++) {
         ledata.x=k;
-        ledata.y=k*0x1000+k;
+        ledata.y=k*1000+k;
         write(h, &ledata, m);
     }
     close(h);

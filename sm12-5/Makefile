@@ -19,18 +19,21 @@ LDFLAGS	= -no-pie -m32
 #LDFLAGS	= -m elf_i386
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
-EXEC	= main
-OBJS	= main.o
-SCDRY	= main.s
+EXEC	= main   binrev
+OBJS	= main.o binrev.o
+SCDRY	= main.s binrev.s
 
 .SECONDARY: $(SCDRY)
 ALL : $(EXEC)
 
-hw : hw.o Makefile
-	$(LD) $(LDFLAGS) -o hw hw.o
+main : main.o Makefile
+	$(LD) $(LDFLAGS) -o main main.o
 
-$(EXEC) : $(OBJS) Makefile
-	$(LD) $(LDFLAGS) $(GDB) -o $@ $(OBJS)
+binrev : binrev.o Makefile
+	$(LD) $(LDFLAGS) -o binrev binrev.o
+
+#$(EXEC) : $(OBJS) Makefile
+#	$(LD) $(LDFLAGS) $(GDB) -o $@ $(OBJS)
 
 %.o: %.c
 #	$(CC) $(CFLAGS) $(GDB) -c -o $@ $<
@@ -46,6 +49,4 @@ $(EXEC) : $(OBJS) Makefile
 
 clean:
 	rm -f $(EXEC) $(OBJS) $(SCDRY) *~ *.lst .[^.]*~ *.dat
-
-all: $(EXEC)
 

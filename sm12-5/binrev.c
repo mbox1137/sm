@@ -4,33 +4,31 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 #include "binrev.h"
 
-int16_t tmp; // 2 байта,
 static struct Data ledata;
 
 int main(int argc, char **argv)
 {
     char fn[80];
-    int k, n, m;
+    int k, a, m, n, fsize;
     int h;  
+    struct stat st;
     m=sizeof(struct Data);
-/*
-    printf("sizeof(int16_t)=%d\n",sizeof(int16_t));
-    printf("sizeof(struct Data)=%d\n",sizeof(struct Data));
-*/
     fn[0]=0;
     if(argc==3) {
         sscanf(argv[1],"%s",fn);
-        sscanf(argv[2],"%d",&n);
+        sscanf(argv[2],"%d",&a);
     }
     printf("%s %d\n",fn,n);
-//    h=open(fn, O_WRONLY|O_CREAT , 0644);
-    h=creat(fn, 0644);
+    stat(fn, &st);
+    fsize = st.st_size;
+    n=fsize/m;
+    h=open(fn, O_RDONLY);
     for(k=0; k<n; k++) {
-        ledata.x=k;
-        ledata.y=k*0x1000+k;
-        write(h, &ledata, m);
+        read(h, &ledata, m);
+        printf("%d %lld\n", ledata.x, ledata.y);
     }
     close(h);
     return(0);
