@@ -23,29 +23,35 @@ int main(int argc, char **argv)
         sscanf(argv[2],"%d",&a);
     }
     printf("%s %d\n",fn,a);
-    stat(fn, &st);
+    if(stat(fn, &st)!=0) goto err2;
     fsize = st.st_size;
     n=fsize/m;
-    h=open(fn, O_RDWR);
+    if((h=open(fn, O_RDWR))==0) goto err2;
     for(k=0; k<n/2; k++) {
-        lseek(h, k*m, SEEK_SET);
-        read(h, dc1, m);
+        if(lseek(h, k*m, SEEK_SET)==-1) goto err2;
+        if(read(h, dc1, m)!=m) goto err2;
         unmarshall(&d1, dc1);
         d1.y+=d1.x*a;	//ovf?
 
-        lseek(h, (n-k-1)*m, SEEK_SET);
-        read(h, dc2, m);
+        if(lseek(h, (n-k-1)*m, SEEK_SET)==-1) goto err2;
+        if(read(h, dc2, m)!=m) goto err2;
         unmarshall(&d2, dc2);
         d2.y+=d2.x*a;	//ovf?
 
         marshall(dc2, &d2);
-        lseek(h, k*m, SEEK_SET);
-        write(h, dc2, m);
+        if(lseek(h, k*m, SEEK_SET)==-1) goto err2;
+        if(write(h, dc2, m)!=m) goto err2;
         marshall(dc1, &d1);
-        lseek(h, (n-k-1)*m, SEEK_SET);
-        write(h, dc1, m);
+        if(lseek(h, (n-k-1)*m, SEEK_SET)==-1) goto err2;
+        if(write(h, dc1, m)!=m) goto err2;
     }
 //        printf("%d %lld\n", ledata.x, ledata.y);
-    close(h);
+    if(close(h)!=0) goto err2;
     return(0);
+err3:
+    fprintf(stdout,"OVF Err");
+    return(3);
+err2:
+    fprintf(stdout,"I/O Err");
+    return(2);
 }

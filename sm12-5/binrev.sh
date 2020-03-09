@@ -2,13 +2,13 @@
 fn=binrev.dat
 main=./main
 n=11
-nn=1
+A=0
 if [ -x $main ]
 then
 	$main $fn $n
 	ls -l $fn
 	hexdump -C $fn
-	./binrev $fn $nn
+	./binrev $fn $A
 	ls -l $fn
 	hexdump -C $fn
 else
