@@ -20,6 +20,7 @@ mul64p:
 	movl	%esp, %ebp
 	push	%esi
 	push	%edi
+
 	and	$0xfffffff0, %esp
 	sub	$0x10, %esp
 	mov	%esp, %esi
@@ -77,21 +78,22 @@ mul64p:
 	mov	12(%edi), %eax
 	adc	%eax, 12(%esi)
 	MOVDQA  (%esi), %xmm2
+
 	movdqa	%xmm2, %xmm0
 	call	printxmm0
-	movdqa	%xmm2, %xmm0
 m9:
-	mov     %ebp, %eax
-	sub	$4*2, %eax
-	mov	%eax, %esp
-	popl	%edi
-	popl	%esi
+	movdqa	%xmm2, %xmm0
+	mov	-4(%ebp), %esi
+	mov	-8(%ebp), %edi
 	mov     %ebp, %esp
 	pop     %ebp
 	ret
 //-------------------------------------------------------------
 
 printxmm0:
+	push	%eax
+	push	%ecx
+	push	%edx
 	xor	%ecx, %ecx
 	movdqa	%xmm0, %xmm7
 m1:
@@ -144,4 +146,8 @@ m4:
 	call	printf
 	add	$4*1, %esp
 	pop	%esi
+
+	pop	%edx
+	pop	%ecx
+	pop	%eax
 	ret
