@@ -20,11 +20,12 @@ int main(int argc, char **argv)
     unsigned char dc1[m], dc2[m];
     long tmp;
     fn[0]=0;
+    a=-1;
     if(argc==3) {
         sscanf(argv[1],"%s",fn);
         sscanf(argv[2],"%d",&a);
     }
-    printf("%s %d\n",fn,a);
+//    printf("%s %d\n",fn,a);
     if(stat(fn, &st)!=0) goto err2;
     fsize = st.st_size;
     n=fsize/m;

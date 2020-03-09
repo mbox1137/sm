@@ -23,7 +23,7 @@ int main(int argc, char **argv)
         sscanf(argv[1],"%s",fn);
         sscanf(argv[2],"%d",&n);
     }
-    printf("%s %d\n",fn,n);
+//    printf("%s %d\n",fn,n);
 //    h=open(fn, O_WRONLY|O_CREAT , 0644);
     h=creat(fn, 0644);
     for(k=0; k<n; k++) {
