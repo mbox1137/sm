@@ -55,9 +55,9 @@ int main(int argc, char **argv)
     if(close(h)!=0) goto err2;
     return(0);
 err3:
-    fprintf(stderr,"OVF Err");
+    fprintf(stderr,"OVF Err\n");
     return(3);
 err2:
-    fprintf(stderr,"I/O Err");
+    fprintf(stderr,"I/O Err\n");
     return(2);
 }
