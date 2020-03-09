@@ -3,15 +3,11 @@
 #include "binrev.h"
 
 void unmarshall(struct Data *out, const unsigned char *in) {
-union {
-    struct Data d;
-    unsigned char c[sizeof(struct Data)]
-    } du;
-le16toh();
-le64toh();
+    out->x = le16toh(((struct Data*)in)->x);
+    out->y = le64toh(((struct Data*)in)->y);
 }
 
 void marshall(unsigned char *out, const struct Data *in) {
-htole16();
-htole64();
+((struct Data*)out)->x = htole16(in->x);
+((struct Data*)out)->y = htole64(in->y);
 }

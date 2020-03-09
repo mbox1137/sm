@@ -2,7 +2,7 @@
 fn=binrev.dat
 main=./main
 n=11
-nn=11
+nn=1
 if [ -x $main ]
 then
 	$main $fn $n

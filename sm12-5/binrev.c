@@ -30,18 +30,18 @@ int main(int argc, char **argv)
     for(k=0; k<n/2; k++) {
         lseek(h, k*m, SEEK_SET);
         read(h, dc1, m);
-//        unmarshall(&d1, dc1);
-//        d1.y+=d1.x*a;	//ovf?
+        unmarshall(&d1, dc1);
+        d1.y+=d1.x*a;	//ovf?
 
         lseek(h, (n-k-1)*m, SEEK_SET);
         read(h, dc2, m);
-//        unmarshall(&d2, dc2);
-//        d2.y+=d2.x*a;	//ovf?
+        unmarshall(&d2, dc2);
+        d2.y+=d2.x*a;	//ovf?
 
-//        marshall(dc2, &d2);
+        marshall(dc2, &d2);
         lseek(h, k*m, SEEK_SET);
         write(h, dc2, m);
-//        marshall(dc1, &d1);
+        marshall(dc1, &d1);
         lseek(h, (n-k-1)*m, SEEK_SET);
         write(h, dc1, m);
     }
