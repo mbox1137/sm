@@ -31,12 +31,12 @@ typedef struct FunctionTable_ {
     funcptr_t func;
 } FunctionTable;
 
-FunctionTable fnt[]={	{"sin",&sin},
-                        {"cos",&cos},
-                        {"exp",&exp},
-                        {"log",&log},
-                        {"tan",&tan},
-                        {"sqrt",&sqrt}
+FunctionTable fnt[]={	{"sin",sin},
+                        {"cos",cos},
+                        {"exp",exp},
+                        {"log",log},
+                        {"tan",tan},
+                        {"sqrt",sqrt}
                     };
 
 int main()
