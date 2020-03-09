@@ -49,33 +49,38 @@ m1:
 	xorl	%eax, %eax
 	cmpl	$0, %esi
 	je	m9
-
-// if(fabs((node->key) - key)<1E-8)
-// fabs(2.0 * (node->key - key) / (node->key + key)) < 1E-8
 // xmm2 == key(%ebp)
 // xmm3 == (epsilon)
 // xmm4 == 2.0 (two)
 // xmm0 == node->key -> node->key-key -> (node->key-key)/(node->key+key)
 // xmm1 == node->key -> node->key+key
-
 	movsd	key(%ebp), %xmm2
 	movsd	(epsilon), %xmm3
 	movsd	(two), %xmm4
+// fabs(2.0 * (node->key - key) / (node->key + key)) < 1E-8
 	movsd	node_key(%esi), %xmm0
 	movsd	%xmm0, %xmm1
-
 	subsd	%xmm2, %xmm0
 	addsd	%xmm2, %xmm1
 	divsd	%xmm1, %xmm0
 	mulsd	%xmm4, %xmm0
-
 	xorpd	%xmm1, %xmm1
 	subpd	%xmm0, %xmm1
 	maxpd	%xmm1, %xmm0
-
 	comisd	%xmm3, %xmm0
-	ja	m2
+	jb	m6
+// if(fabs((node->key) - key)<1E-8)
+	movsd	node_key(%esi), %xmm0
+	subsd	%xmm2, %xmm0
+	xorpd	%xmm1, %xmm1
+	subpd	%xmm0, %xmm1
+	maxpd	%xmm1, %xmm0
+	comisd	%xmm3, %xmm0
+	jb	m6
 
+	movl	node_right(%esi), %esi
+	jmp	m1
+m6:
 	cmpl	$0, %edi
 	je	m3
 	movl	node_str(%esi), %eax
@@ -83,10 +88,6 @@ m1:
 m3:
 	xorl	%eax, %eax
 	incl	%eax
-	jmp	m9
-m2:
-	movl	node_right(%esi), %esi
-	jmp	m1
 m9:
 	popl	%edi
 	popl	%esi

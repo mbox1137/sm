@@ -8,4 +8,4 @@
 
 ./main 200000001 ;echo
 ./main 20000001  ;echo
-#./main -1E-9  ;echo
+./main -1E-9  ;echo
