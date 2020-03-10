@@ -16,7 +16,7 @@ static unsigned char bufferout[NN];
 static struct FileWriteState statout={STDOUT_FILENO,bufferout,NN,0,0};
 struct FileWriteState *stout=&statout;
 
-int myputbuff(int fd, int n)
+static int myputbuff(int fd, int n)
 {
     int res=0;
 
@@ -28,7 +28,7 @@ int myputbuff(int fd, int n)
     return(res);
 }
 
-void flush(struct FileWriteState *out)
+__attribute__ ((fastcall)) void flush(struct FileWriteState *out)
 {
     int n;
     if(out->count>0 && out->count<=NN)
@@ -37,7 +37,7 @@ void flush(struct FileWriteState *out)
     out->count=0;
 }
 
-void writechar(int c, struct FileWriteState *out)
+__attribute__ ((fastcall)) void writechar(int c, struct FileWriteState *out)
 {
     if(out->count>=NN)
         flush(out);

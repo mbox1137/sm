@@ -20,8 +20,8 @@ struct FileWriteState
 int nextchar();
 int lastchar();
 void myputchar(int ic);
-void writechar(int ic, struct FileWriteState *st);
-void flush(struct FileWriteState *st);
+__attribute__ ((fastcall)) void writechar(int ic, struct FileWriteState *st);
+__attribute__ ((fastcall)) void flush(struct FileWriteState *st);
 void myexit(int ret_val);
 struct FileReadState *stin;
 struct FileWriteState *stout;
