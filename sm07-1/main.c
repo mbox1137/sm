@@ -44,6 +44,7 @@ int main()
     char str[80], sname[20], sval[20];
     unsigned long n, k;
     char *cp;
+    char delim[]=" \t";
     double arg, val;
     n=sizeof(fnt)/sizeof(FunctionTable);
     while (!feof(stdin))
@@ -53,28 +54,33 @@ int main()
             break;
         }
         rtrim(str);
+        val=NAN;
         if(strlen(str) >0)
         {
-          printf("%s: ", str);
-          cp = strtok(str, " ");
+//          printf("%s: ", str);
+          cp = strtok(str, delim);
           if(cp==NULL) {
-            continue;
-            }
-          strcpy(sname,cp);
-          cp = strtok(NULL, " ");
-          if(cp==NULL) {
-            continue;
-            }
-          strcpy(sval,cp);
-          sscanf(sval,"%lf",&arg);
-          val=NAN;
-          for(k=0; k<n;k++) {
-            if(strcmp(sname,fnt[k].name)==0) {
-              val=fnt[k].func(arg);
-              break;
+            strcpy(sname,"");
+          } else {
+            strcpy(sname,cp);
+            cp = strtok(NULL, delim);
+            if(cp==NULL) {
+              strcpy(sval,"");
+            } else {
+              strcpy(sval,cp);
+              if(sscanf(sval,"%lf",&arg)!=1)
+                arg=NAN;
+//              val=NAN;
+              for(k=0; k<n;k++) {
+                if(strcmp(sname,fnt[k].name)==0) {
+                  val=fnt[k].func(arg);
+                  break;
+                }
+              }
             }
           }
-          printf("%s(%s)==%s(%lf)=%lf\n", sname, sval, sname, arg, val);
+//          printf("%s(%s)==%s(%lf)=%lf\n", sname, sval, sname, arg, val);
+          printf("%la\n", val);
         }
     }
     //sscanf;

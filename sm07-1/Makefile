@@ -1,6 +1,6 @@
 .PHONY:	all clean
-#CC	= cc
-CC	= clang
+CC	= cc
+#CC	= clang
 ASM	= as
 LD	= ld
 EXEC	= main
