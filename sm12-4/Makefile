@@ -19,27 +19,18 @@ LDFLAGS	= -no-pie -m32
 #LDFLAGS	= -m elf_i386
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
-EXEC	= main   binrev 5 test printData
-OBJS	= main.o binrev.o marshall.o test.o printData.o
-SCDRY	= main.s binrev.s marshall.s test.s printData.s
+EXEC	= main   test
+#OBJS	= main.o binary-tree.o test.o
+SCDRY	= main.s binary-tree.s
 
 .SECONDARY: $(SCDRY)
 ALL : $(EXEC)
 
-main : main.o Makefile
+main : main.o binary-tree.o Makefile
 	$(LD) $(LDFLAGS) -o main main.o
-
-printData : printData.o Makefile
-	$(LD) $(LDFLAGS) -o printData printData.o
 
 test : test.o Makefile
 	$(LD) $(LDFLAGS) -o test test.o
-
-binrev : binrev.o marshall.o Makefile
-	$(LD) $(LDFLAGS) -o binrev binrev.o marshall.o
-
-5 : binrev
-	cp binrev 5
 
 #$(EXEC) : $(OBJS) Makefile
 #	$(LD) $(LDFLAGS) $(GDB) -o $@ $(OBJS)

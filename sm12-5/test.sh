@@ -28,9 +28,9 @@ function myrun {
 
 if [ -x test ]
 then
-	cat test.dat
+	cat test.tst
 	echo
-	./test <test.dat
+	./test <test.tst
 else
 	echo "run make"
 fi
