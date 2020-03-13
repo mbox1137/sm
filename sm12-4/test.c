@@ -1,42 +1,46 @@
-#define _GNU_SOURCE
-#include <inttypes.h>
-#include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdint.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <string.h>
+#include <malloc.h>
+#include "binary-tree.h"
 
-struct _Data
+static struct Node node;
+const static int m=sizeof(struct Node);
+static int nkeys;
+static int *keys;
+static int h;
+
+void scan_tree(int nd);
+
+void scan_tree(int nd) {
+    if(lseek(h,nd*m,SEEK_SET)!=nd*m) return;
+    if(read(h, &node, m)!=m) return;
+    if(node.left_idx !=0) scan_tree(node.left_idx);
+    if(node.right_idx!=0) scan_tree(node.right_idx);
+    keys[nkeys++]=node.key;
+}
+
+int main(int argc, char **argv)
 {
-    int16_t x;
-    int64_t y;
-} __attribute__((packed));
-
-typedef struct _Data _Data;
-
-_Data data [1000005];
-char exec_str [1234];
-
-int
-main(void)
-{
-    int n, a;
-    scanf("%d%d", &n, &a);
-    for (int i = 0; i < n; i++) {
-        scanf("%hd%" PRId64, &data[i].x, &data[i].y);
+    int fsize;
+    char fn[80]="main.dat";
+    if(argc==2) {
+        sscanf(argv[1],"%s",fn);
     }
-    FILE *f = fopen("kek", "w");
-    fwrite(data, sizeof(_Data), n, f);
-    fclose(f);
-    snprintf(exec_str, 1234, "./5 kek %d", a);
-    int code = 0;
-    if (code = system(exec_str)) {
-        printf("Run finished with code %d\n", code);
+    h=open(fn, O_WRONLY,0x660);
+    nkeys=0;
+    while(1) {
+        if(scanf("%d%d%d", &node.key, &node.left_idx, &node.right_idx)!=3) {
+            break;
+        } else {
+            if(write(h, &node, m)!=m) return(-1);
+            nkeys++;
+        }
     }
-    f = fopen("kek", "r");
-    fread(data, sizeof(_Data), n, f);
-    for (int i = 0; i < n; i++) {
-        printf("%hd %" PRId64 "\n", data[i].x, data[i].y);
-    }
-    fclose(f);
-
-    return 0;
+    close(h);
+    return(0);
 }

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 main=./main
-binrev=./binrev
+test=./test
 
 function myrun {
 	fn=$1
@@ -28,12 +28,10 @@ function myrun {
 }
 
 
-if [ -x $main -a -x $binrev ]
+if [ -x $main -a -x $test ]
 then
-	myrun binrev.dat 4 10
-	myrun binrev.dat 5 10
-	myrun binrev.dat 11 1000000000
-	myrun
+	$test <main.tst main.dat
+	$main main.dat
 else
 	echo "run make"
 fi
