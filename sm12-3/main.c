@@ -20,7 +20,7 @@ int main(int argc, char **argv)
     struct FileContent fc={0, NULL};
     if(argc==3) {
         sscanf(argv[1],"%s",fn);
-        sscanf(argv[1],"%s",fn2);
+        sscanf(argv[2],"%s",fn2);
     }
     h=open(fn, O_RDONLY);
     h2=creat(fn2, 0644);
