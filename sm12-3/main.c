@@ -1,11 +1,6 @@
 #include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
-#include <string.h>
+#include <unistd.h>
 #include <malloc.h>
 #include "read_file.h"
 
@@ -26,7 +21,8 @@ int main(int argc, char **argv)
     h2=creat(fn2, 0644);
     if(h!=0 && h2!=0) {
         fc=read_file(h);
-        write(h2, fc.data, fc.size);
+        if(fc.data!=NULL && fc.size>=0 && fc.data[fc.size]==0)
+            write(h2, fc.data, fc.size);
     }
     free(fc.data);
     close(h);
