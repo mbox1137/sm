@@ -1,39 +1,11 @@
 #!/bin/bash
 
-main=./main
-binrev=./binrev
-
-function myrun {
-	fn=$1
-	n=$2
-	A=$3
-	rm -f $fn
-	if [ $1. != . ]; then
-		echo $main $fn $n
-		$main $fn $n
-		echo "До:"
-		ls -l $fn
-		./printData $fn
-	fi
-	echo $binrev $fn $A
-	if $binrev $fn $A
-	then
-		echo "После:"
-		ls -l $fn
-		./printData $fn
-	else
-		echo "ERR==$?"
-	fi
-	echo
-}
-
-
-if [ -x $main -a -x $binrev ]
+if [ -x ./main ]
 then
-	myrun binrev.dat 4 10
-	myrun binrev.dat 5 10
-	myrun binrev.dat 11 1000000000
-	myrun
+	./main
+	./main 77 3 77 88 99 0 88 0764 06
+	./main 77 4 66 77 88 99 0 88 0764 06
 else
+	echo task.uid task.gid_count task.gids[] stb.st_uid stb.st_gid stb.st_mode access
 	echo "run make"
 fi

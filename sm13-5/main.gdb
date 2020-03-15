@@ -1,2 +1,2 @@
-b writeu32
+b myaccess
 r
