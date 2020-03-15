@@ -31,7 +31,7 @@ int main(int argc, char **argv)
     if(argc==2) {
         sscanf(argv[1],"%s",fn);
     }
-    h=open(fn, O_WRONLY,0x660);
+    h=open(fn, O_WRONLY|O_CREAT|O_TRUNC, 0660);
     nkeys=0;
     while(1) {
         if(scanf("%d%d%d", &node.key, &node.left_idx, &node.right_idx)!=3) {
