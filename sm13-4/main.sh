@@ -2,16 +2,22 @@
 
 if [ -x ./main ]
 then
-	./main 9 0
-	./main 2 0777
-	./main 9 0777
-	./main 9 0666
-	./main 9 04666
-	./main 9 04777
-	./main 9 02666
-	./main 9 02777
-	./main 9 01666
-	./main 9 01777
+	./main 10 0
+	./main 3 0777
+	./main 10 0777
+	./main 10 0666
+	echo SUID
+	./main 10 04000
+	./main 10 04010
+	./main 10 04001
+	echo SGID
+	./main 10 02000
+	./main 10 02001
+	echo Sticky
+	./main 10 01000
+	./main 10 01002
+	./main 10 01001
+	./main 10 01003
 else
 	echo "run make"
 fi

@@ -26,14 +26,19 @@ const char *perms_to_str(char *buf, size_t size, int perms)
     mode|=S_IROTH|S_IWOTH|S_IXOTH;
     sprintf(buf, "0%o", perms);
 */
-    if(perms&S_ISUID)
-        tperms[2]=perms&S_IXUSR ? 's':'S';
-    if(perms&S_ISGID)
-        tperms[5]=perms&S_IXGRP ? 's':'S';
+    if(perms & S_ISUID)
+        if(perms & (S_IXGRP|S_IXOTH))
+            tperms[2]='s';
+    if(perms & S_ISGID)
+        if(perms & S_IXOTH)
+            tperms[5]='s';
     if(perms&S_ISVTX)
-        tperms[8]=perms&S_IXOTH ? 't':'T';
+        if((perms & S_IWOTH) && (perms & S_IXOTH))
+            tperms[8]='t';
 
     for(k=0; k<size; k++) {
+        if(k>=size-1)
+            break;
         buf[k]=tperms[k];
         if(tperms[k]==0)
             break;
