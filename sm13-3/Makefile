@@ -20,14 +20,14 @@ LDFLAGS	= -no-pie -m32
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
 EXEC	= main
-OBJS	= perms_to_str.o main.o
-SCDRY	= perms_to_str.s main.s
+OBJS	= main.o
+SCDRY	= main.s
 
 .SECONDARY: $(SCDRY)
 ALL : $(EXEC)
 
-main : main.o perms_to_str.o Makefile
-	$(LD) $(LDFLAGS) -o main main.o perms_to_str.o
+main : main.o Makefile
+	$(LD) $(LDFLAGS) -o main main.o
 
 #$(EXEC) : $(OBJS) Makefile
 #	$(LD) $(LDFLAGS) $(GDB) -o $@ $(OBJS)
@@ -35,7 +35,7 @@ main : main.o perms_to_str.o Makefile
 %.o: %.c
 #	$(CC) $(CFLAGS) $(GDB) -c -o $@ $<
 
-%.s: %.c Makefile *.h
+%.s: %.c Makefile
 	$(CC) $(CFLAGS) $(GDB) -S -o $@ $<
 
 %.o: %.asm Makefile
