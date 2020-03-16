@@ -20,6 +20,8 @@ int myaccess(const struct stat *stb, const struct Task *task, int access)
 */
     if(task->uid==0)
         return(1);
+    if(access == 0)
+        return(0);
     rwx=0;
     if(task->uid==stb->st_uid)
         rwx=(stb->st_mode>>6)&7;
