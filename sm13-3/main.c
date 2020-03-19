@@ -6,18 +6,18 @@
 
 int main(int argc, char **argv)
 {
-    char fn[80]="main.dat";
+    char fn[80]="main.tst";
     FILE *f;
     char str[NN];
     char delim[]=" \t\r\n";
     char *dat, *tim;
     int y, mon, d, h, m, s;
-    time_t t0, t, dt;
-    struct tm tm;
+    time_t t, t0, dt;
+    struct tm tm, tm0;
     if(argc==2)
         sscanf(argv[1],"%s",fn);
     else
-        printf("./main [main.dat]\n");
+        printf("./main [main.tst]\n");
     t0=0;
     f=fopen(fn,"r");
     while(!feof(f)) {
@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 //        printf("Source:\t%s",str);
         dat = strtok(str, delim);
         tim = strtok(NULL, delim);
-        printf("Clean:\t%s %s\n", dat, tim);
+//        printf("Clean:\t%s %s\n", dat, tim);
         sscanf(dat,"%d/%d/%d",&y,&mon,&d);
         sscanf(tim,"%d:%d:%d",&h,&m,&s);
 //        printf("Ints:\t%d %d %d %d %d %d\n", y, mon, d, h, m, s);
@@ -36,20 +36,19 @@ int main(int argc, char **argv)
         tm.tm_mday	= d;		// Day of the month (1-31) 
         tm.tm_mon	= mon-1;	// Month (0-11) 
         tm.tm_year	= y-1900;	// Year - 1900 
-/*
-        tm.tm_wday;			// Day of the week (0-6, Sunday = 0) 
-        tm.tm_yday;			// Day in the year (0-365, 1 Jan = 0) 
-*/
+        tm.tm_wday	= 0;		// Day of the week (0-6, Sunday = 0) 
+        tm.tm_yday	= 0;		// Day in the year (0-365, 1 Jan = 0) 
         tm.tm_isdst	= 1;		// Daylight saving time 
         t=mktime(&tm);
-        printf("%s", ctime(&t));
+//        printf("%s", ctime(&t));
         if(t0!=0)
         {
-            dt=t-t0;
+            dt=t-t0-(tm.tm_isdst-tm0.tm_isdst)*3600;
             printf("%ld\n", dt);
         }
         t0=t;
-        printf("\n");
+        tm0=tm;
+//        printf("\n");
     }
     fclose(f);
     return(0);

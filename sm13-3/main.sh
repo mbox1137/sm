@@ -2,7 +2,7 @@
 
 if [ -x ./main ]
 then
-	./main main.dat
+	./main main.tst
 else
 	echo "run make"
 fi
