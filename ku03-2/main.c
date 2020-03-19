@@ -6,13 +6,13 @@ int process(const signed char *a, int b, signed char *c);
 
 int myprocess(const signed char *a, int b, signed char *c)
 {
-	if(b*3 >= -2147483648 && b*3 <= 2147483647)
+	if((int64_t)b*3 >= -2147483648 && (int64_t)b*3 <= 2147483647)
 	{
-		if(*a*2 >= -128 && *a*2 <= 127)
+		if((int64_t)(*a)*2 >= -128 && (int64_t)(*a)*2 <= 127)
 		{
-			if(b*3 - *a*2 >= -128 && b*3-*a*2 <= 127)
+			if((int64_t)b*3 - *a*2 >= -128 && (int64_t)b*3-*a*2 <= 127)
 			{
-				*c = b*3 - *a*2;
+				*c = (char)(b*3 - *a*2);
 				return 0;
 			}
 			else
@@ -40,7 +40,7 @@ int main()
 	int res_2 = myprocess(a, b, c_2);
 	printf("a=%d\nb=%d\n", *a, b);
 	printf("your ans %d %d\n", res_1, *c);
-	printf("c ans    %d %d\n\n", res_1, *c_2);
+	printf("c ans    %d %d\n\n", res_2, *c_2);
 
 	return 0;
 }
