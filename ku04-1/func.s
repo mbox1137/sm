@@ -21,13 +21,13 @@ forward$args:
 
 //преобразовать типы и передать
 //forw(int v2, long long v3, float v4)
-//proc(long long v2, float v4, unsigned v3)
+//proc(void *p, long long v2, float v4, unsigned v3)
         movl    v3(%ebp), %esi
         movl    v3+4(%ebp), %edi
 	push	%esi
 
         movss   v4(%ebp), %xmm0
-	sub	$8, %esp
+	sub	$4, %esp
 	movss	%xmm0, (%esp)
 
         movl    v2(%ebp), %eax

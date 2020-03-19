@@ -12,12 +12,12 @@ int FUNC::prc(int v2, long long v3, float v4) {
 
 int main() 
 { 
- int v2 = 2;
- long long v3 = 4;
- float v4 = 1.0;
+ int v2 = 22;
+ long long v3 = 33;
+ float v4 = 4.4;
  FUNC func;
  func.prc(v2,v3,v4);
- cout << "Hello, world!" << endl;
+ cout << sizeof(v4) << endl;
  return 0; 
 }
 
