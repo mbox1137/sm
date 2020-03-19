@@ -21,7 +21,7 @@ process:
 //b * 3 - *a * 2
 calc:
 	movl	$3, %eax
-	mull	b(%ebp)
+	imull	b(%ebp)
 
 	cmp	$0, %edx
 	je	m1
@@ -32,14 +32,12 @@ m1:
 	movl	%eax, %ecx
 
 	movl	$2, %eax
-	mulb	(%esi)
+	imulb	(%esi)
 
-	cmp	$0, %ah
-	je	m2
-	cmp	$-1, %ah
-	je	m2
-	jmp	er2
-
+	cmp	$127, %ax
+	jg	er2
+	cmp	$-128, %ax
+	jl	er2
 m2:
 	cwde
 

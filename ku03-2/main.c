@@ -25,7 +25,7 @@ int myprocess(const signed char *a, int b, signed char *c)
 		return 1;
 }
 
-int main()
+int main(int argc, char **argv)
 {
 	signed char ch = 100;
 	signed char ch_2 = 100;
@@ -33,7 +33,15 @@ int main()
 	int b;
 	signed char *c = &ch;
 	signed char *c_2 = &ch_2;
-	scanf("%hhd%d", &aa, &b);
+//	scanf("%hhd%d", &aa, &b);
+	if(argc==3) {
+		sscanf(argv[1],"%hhd", &aa);
+		sscanf(argv[2],"%d", &b);
+	} else {
+		aa=120;
+		b=5;
+	}
+
 	const signed char *a = &aa;
 
 	int res_1 = process(a,b,c);
