@@ -1,3 +1,4 @@
 main
 main.s
 *.dat
+process.s
