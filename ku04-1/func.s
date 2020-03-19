@@ -1,6 +1,8 @@
 	.text
         .globl  forward$args
         .type   forward$args, @function
+        .globl  process
+        .type   process, @function
 
 //forw(int v2, long long v3, float v4)
 //proc(long long v2, float v4, unsigned v3)
