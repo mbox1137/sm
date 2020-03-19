@@ -1,29 +1,45 @@
 	.text
-        .globl  forward_args
-        .type   forward_args, @function
+        .globl  forward$args
+        .type   forward$args, @function
 
 //forw(int v2, long long v3, float v4)
 //proc(long long v2, float v4, unsigned v3)
-forward_args:
+
+	.equ    v2, 4*2
+	.equ    v3, v2+4
+	.equ    v4, v3+8
+
+forward$args:
 	pushl   %ebp
         movl    %esp, %ebp
 	pushl	%esi
 	pushl	%edi
 
 //передача параметров
-        movl    -4(%ebp), %edi
-        movl    -12(%ebp), %esi
-        movss   -16(%ebp), %xmm0
 
 //преобразовать типы и передать
+//forw(int v2, long long v3, float v4)
+//proc(long long v2, float v4, unsigned v3)
+        movl    v3(%ebp), %esi
+        movl    v3+4(%ebp), %edi
+	push	%esi
+
+        movss   v4(%ebp), %xmm0
+	sub	$8, %esp
+	movss	%xmm0, (%esp)
+
+        movl    v2(%ebp), %eax
+	cdq
+	push	%edx
+	push	%eax
 
 	push	%ecx
-        call	process
-	addl	$4, %esp
 
+        call	process
+	addl	$4+8+4+4+4, %esp
 return:
-	popl	%edi
-	popl	%esi
+	mov	-4(%ebp), %esi
+	mov	-8(%ebp), %edi
         movl	%ebp, %esp
 	popl	%ebp
 	ret
