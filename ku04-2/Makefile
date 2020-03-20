@@ -1,9 +1,9 @@
 .PHONY:	all clean
 
-GDB	=
-# -g
+GDB	= -g
 
-CC	= clang
+CC	= gcc
+#clang
 CFLAGS	= -m32 -fverbose-asm -msse3
 #CFLAGS	= -m32 -fverbose-asm -msse3 -nostdlib
 # -std=c99

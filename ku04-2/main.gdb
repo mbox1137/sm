@@ -1,3 +1,3 @@
-b forward$args
+b process
 b main
 r
