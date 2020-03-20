@@ -17,7 +17,7 @@ int main()
  float v4 = 4.4;
  FUNC func;
  func.prc(v2,v3,v4);
- cout << sizeof(v4) << endl;
+ cout << "sizeof(v4)=" << sizeof(v4) << endl;
  return 0; 
 }
 

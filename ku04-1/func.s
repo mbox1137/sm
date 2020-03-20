@@ -38,7 +38,8 @@ forward$args:
 	push	%ecx
 
         call	process
-	addl	$4+8+4+4+4, %esp
+	neg	%eax
+	addl	$4+4+4+4+4, %esp
 return:
 	mov	-4(%ebp), %esi
 	mov	-8(%ebp), %edi
