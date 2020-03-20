@@ -1,6 +1,6 @@
 	.text
-	.globl	process
-	.type	process, @function
+//	.globl	process
+//	.type	process, @function
 
 
 //int процесс(const signed char *a, int b, signed char *c);
@@ -12,7 +12,7 @@
 	.globl	процесс
 	.type	процесс, @function
 процесс:
-process:
+//process:
 	pushl	%ebp
 	movl	%esp, %ebp
 	pushl	%esi
