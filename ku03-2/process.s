@@ -1,18 +1,15 @@
+//https://stackoverflow.com/questions/8776445/x86-imul-result-is-correct-why
+
 	.text
-//	.globl	process
-//	.type	process, @function
-
-
-//int процесс(const signed char *a, int b, signed char *c);
 
 	.equ	pa, 4 * 2
 	.equ	b, pa + 4
 	.equ	pc, b + 4
 
-	.globl	процесс
-	.type	процесс, @function
-процесс:
-//process:
+//int процесс(const signed char *a, int b, signed char *c);
+	.globl	process
+	.type	process, @function
+process:
 	pushl	%ebp
 	movl	%esp, %ebp
 	pushl	%esi
@@ -25,26 +22,16 @@
 calc:
 	movl	$3, %eax
 	imull	b(%ebp)
-
-	cmp	$0, %edx
-	je	m1
-	cmp	$-1, %edx
-	je	m1
-	jmp	er1
-m1:
+	jo	er1
 	movl	%eax, %ecx
 
 	movl	$2, %eax
 	imulb	(%esi)
+	jo	er2
 
-	cmp	$127, %ax
-	jg	er2
-	cmp	$-128, %ax
-	jl	er2
-m2:
 	cwde
-
-	subl	%eax, %ecx
+	sub	%eax, %ecx
+	jo	er3
 	cmp	$127, %ecx
 	jg	er3
 	cmp	$-128, %ecx

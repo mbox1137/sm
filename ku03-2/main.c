@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-	int процесс(const signed char *a, int b, signed char *c);
+int process(const signed char *a, int b, signed char *c);
 
 int myprocess(const signed char *a, int b, signed char *c)
 {
@@ -43,7 +43,7 @@ int main(int argc, char **argv)
 	}
 
 	const signed char *a = &aa;
-	int res_1 = процесс(a,b,c);
+	int res_1 = process(a,b,c);
 	int res_2 = myprocess(a, b, c_2);
 	printf("a=%d\nb=%d\n", *a, b);
 	printf("your ans %d %d\n", res_1, *c);

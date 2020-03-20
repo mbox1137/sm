@@ -2,8 +2,8 @@
 
 GDB	= -g
 
-#CC	= gcc
-CC	= clang
+CC	= gcc
+#CC	= clang
 CFLAGS	= -m32 $(GDB)
 
 ASM	= nasm
