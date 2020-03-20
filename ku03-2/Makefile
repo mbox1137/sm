@@ -2,8 +2,9 @@
 
 GDB	= -g
 
-CC	= gcc
-CFLAGS	= -m32 -lgcc $(GDB)
+#CC	= gcc
+CC	= clang
+CFLAGS	= -m32 $(GDB)
 
 ASM	= nasm
 AFLAGS	= -f elf32 -g
@@ -12,7 +13,7 @@ AS	= as
 ASFLAGS	= -c --32 $(GDB)
 # -fPIC
 
-LD	= gcc
+LD	= $(CC)
 LDFLAGS	= -no-pie -m32 -lm $(GDB)
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 

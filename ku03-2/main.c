@@ -1,8 +1,14 @@
+#define UTF8 1
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
 
-int process(const signed char *a, int b, signed char *c);
+#if UTF8
+	int процесс(const signed char *a, int b, signed char *c);
+#else
+	int process(const signed char *a, int b, signed char *c);
+#endif
 
 int myprocess(const signed char *a, int b, signed char *c)
 {
@@ -43,8 +49,11 @@ int main(int argc, char **argv)
 	}
 
 	const signed char *a = &aa;
-
+#if UTF8
+	int res_1 = процесс(a,b,c);
+#else
 	int res_1 = process(a,b,c);
+#endif
 	int res_2 = myprocess(a, b, c_2);
 	printf("a=%d\nb=%d\n", *a, b);
 	printf("your ans %d %d\n", res_1, *c);

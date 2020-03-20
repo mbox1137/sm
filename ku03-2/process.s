@@ -9,6 +9,9 @@
 	.equ	b, pa + 4
 	.equ	pc, b + 4
 
+	.globl	процесс
+	.type	процесс, @function
+процесс:
 process:
 	pushl	%ebp
 	movl	%esp, %ebp
