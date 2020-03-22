@@ -17,9 +17,12 @@ int main(int argc, char **argv) {
      s.y[1]=6;
     }
     res=process(&s);
-    printf("%d*%d+%d*%d=%lld(%d)\n", 
+
+//long long t = (long long) p->z[0] * (long long) p->y[1] + (long long) p->z[1] * (long long) p->y[0];
+
+    printf("%d*%d+%d*%d=%lld(%d)\n",
                s.z[0],s.y[1] , s.z[1],s.y[0],
-     (uint64_t)s.z[0]*s.y[1] + s.z[1]*s.y[0],
+     ((int64_t)s.z[0]*s.y[1] + s.z[1]*s.y[0]) / 16,
                res);
     return 0;
 }
