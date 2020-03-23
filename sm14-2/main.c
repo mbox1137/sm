@@ -1,20 +1,24 @@
+//https://developer.ibm.com/technologies/linux/tutorials/l-dynamic-libraries/
+
 #include <stdio.h>
 #include <dlfcn.h>
 #include <string.h>
+#include <math.h>
 
 #define MAX_STRING      80
 
-void invoke_method( char *lib, char *method, float argument )
+double invoke_method( char *lib, char *method, double argument )
 {
   void *dl_handle;
-  float (*func)(float);
+  double (*func)(double);
+  double res;
   char *error;
 
   /* Open the shared object */
   dl_handle = dlopen( lib, RTLD_LAZY );
   if (!dl_handle) {
     printf( "!!! %s\n", dlerror() );
-    return;
+    return(NAN);
   }
 
   /* Resolve the symbol (method) from the object */
@@ -22,16 +26,16 @@ void invoke_method( char *lib, char *method, float argument )
   error = dlerror();
   if (error != NULL) {
     printf( "!!! %s\n", error );
-    return;
+    return(NAN);
   }
 
   /* Call the resolved method and print the result */
-  printf("  %f\n", (*func)(argument) );
+  res=(*func)(argument);
 
   /* Close the object */
   dlclose( dl_handle );
 
-  return;
+  return(res);
 }
 
 int main( int argc, char *argv[] )
@@ -39,21 +43,18 @@ int main( int argc, char *argv[] )
   char line[MAX_STRING+1];
   char lib[MAX_STRING+1];
   char method[MAX_STRING+1];
-  float argument;
+  double argument;
+
+  strcpy(lib,"libm.so");
+  if(argc!=2) {
+    fprintf(stderr,"./main sin\n");
+    return(-1);
+  }
+  strcpy(method,argv[1]);
 
   while (1) {
-
-    printf("> ");
-
-    line[0]=0;
-    fgets( line, MAX_STRING, stdin);
-
-    if (!strncmp(line, "bye", 3)) break;
-
-    sscanf( line, "%s %s %f", lib, method, &argument);
-
-    invoke_method( lib, method, argument );
-
+    if(scanf("%lf", &argument)!=1)
+      break;
+    printf("%.10g\n", invoke_method(lib,method,argument) );
   }
-
 }
