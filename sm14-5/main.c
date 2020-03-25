@@ -90,3 +90,8 @@ int main( int argc, char *argv[] )
     printf("%.10g\n", invoke_method(lib,method,argument) );
   }
 }
+/*
+void func(char *, char *, int, double);
+./solution libc.so.6 printf vssid 'Hello: %s, %d, %f' abc 10 12.4
+Hello: abc, 10, 12.400000
+*/
