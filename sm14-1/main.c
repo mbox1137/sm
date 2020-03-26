@@ -8,10 +8,11 @@
 
 int main(int argc, char* argv[])
 {
-    if(argc < 2)
-        return 1;
+    char *fn=".";
+    if(argc > 1)
+        fn=argv[1];
 
-    DIR* direct = opendir(argv[1]);
+    DIR* direct = opendir(fn);
 
     if (!direct)
     {
@@ -25,7 +26,7 @@ int main(int argc, char* argv[])
 
     uid_t uid = getuid();
 
-    while (entry)
+    while ((entry = readdir(direct))!=NULL)
     {
         char buf[PATH_MAX + 1];
 
@@ -47,7 +48,6 @@ int main(int argc, char* argv[])
 
         sum_size += file_stat.st_size;
 
-        entry = readdir(direct);
     }
 
     closedir(direct);

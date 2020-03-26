@@ -13,10 +13,10 @@ CFLAGS	= -fverbose-asm -O3
 ALL : $(EXEC)
 
 $(EXEC): $(OBJS)
-	$(CC) $(LDFLAGS) -o $@ $^
+	$(CC) $(LDFLAGS) -g -o $@ $^
 
 %.o: %.c Makefile
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -g -c -o $@ $<
 #	$(CC) $(CFLAGS) -S -o $<.S $<
 
 %.o: %.S Makefile
