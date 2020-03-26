@@ -1,2 +1,2 @@
-b main.gdb
-r
+b main
+r <err.tst
