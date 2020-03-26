@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
         return 0;
     }
 
-    struct dirent* entry = readdir(direct);
+    struct dirent* entry;
 
     unsigned long long sum_size = 0;
 
@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
     {
         char buf[PATH_MAX + 1];
 
-        snprintf(buf, PATH_MAX, "%s/%s", argv[1], entry->d_name);
+        snprintf(buf, PATH_MAX, "%s/%s", fn, entry->d_name);
 
         struct stat file_stat;
 
@@ -46,6 +46,7 @@ int main(int argc, char* argv[])
         if(!(isupper(entry->d_name[0])))
             continue;
 
+//        printf("%s %ld\n", entry->d_name, file_stat.st_size);
         sum_size += file_stat.st_size;
 
     }
