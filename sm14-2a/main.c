@@ -1,7 +1,17 @@
 #include <stdio.h>
 #include <dlfcn.h>
 
-int main(int argc, char ** argv)
+void process(void* func)
+{
+    double num, res;
+    while (scanf("%lf", &num) == 1)
+    {
+        res = ((double(*)(double)) func)(num);
+        printf("%.10g\n", res);
+    }
+}
+
+int main(int argc, char* argv[])
 {
     if (argc != 2)
         return 1;
@@ -10,20 +20,23 @@ int main(int argc, char ** argv)
 
     if (!lib)
     {
-        printf("%s\n", dlerror());
+        char* err = dlerror();
+        printf("%s\n", err);
         return 1;
     }
 
-    void * func = dlsym(lib, argv[1]);
+    void* func = dlsym(lib, argv[1]);
 
     if (!func)
     {
-        printf("%s\n", dlerror());
-        return 2;
+        char* err = dlerror();
+        printf("%s\n", err);
+        return 1;
     }
 
-    double num;
+    process(func);
 
-    while (scanf("%lf", &num) == 1)
-        printf("%.10g\n", ((double(*)(double)) func)(num));
+    dlclose(lib);
+
+    return 0;
 }

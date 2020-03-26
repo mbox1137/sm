@@ -7,7 +7,7 @@ EXEC	= main
 OBJS	= main.o
 LDFLAGS = -no-pie -m32 $(GDB) -ldl
 AFLAGS	=
-CFLAGS	= -fverbose-asm -O3
+CFLAGS	= -fverbose-asm -O3 -m32
 #-Os
 
 ALL : $(EXEC)
