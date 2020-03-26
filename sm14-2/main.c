@@ -1,60 +1,54 @@
 //https://developer.ibm.com/technologies/linux/tutorials/l-dynamic-libraries/
 
 #include <stdio.h>
-#include <dlfcn.h>
 #include <string.h>
-#include <math.h>
-
-#define MAX_STRING      80
-
-double invoke_method( char *lib, char *method, double argument )
-{
-  void *dl_handle;
-  double (*func)(double);
-  double res;
-  char *error;
-
-  /* Open the shared object */
-  dl_handle = dlopen( lib, RTLD_LAZY );
-  if (!dl_handle) {
-    printf( "!!! %s\n", dlerror() );
-    return(NAN);
-  }
-
-  /* Resolve the symbol (method) from the object */
-  func = dlsym( dl_handle, method );
-  error = dlerror();
-  if (error != NULL) {
-    printf( "!!! %s\n", error );
-    return(NAN);
-  }
-
-  /* Call the resolved method and print the result */
-  res=(*func)(argument);
-
-  /* Close the object */
-  dlclose( dl_handle );
-
-  return(res);
-}
+//#include <sys/types.h>
+#include <dirent.h>
+//#include <sys/types.h>
+#include <sys/stat.h>
+//#include <unistd.h>
 
 int main( int argc, char *argv[] )
 {
-  char line[MAX_STRING+1];
-  char lib[MAX_STRING+1];
-  char method[MAX_STRING+1];
-  double argument;
-
-  strcpy(lib,"libm.so");
+  DIR *dir;
+  struct dirent *de;
+  struct stat statbuf;
   if(argc!=2) {
-    fprintf(stderr,"./main sin\n");
+    fprintf(stderr,"main .\n");
     return(-1);
   }
-  strcpy(method,argv[1]);
+  dir=opendir(argv[1]);
+  while((de=readdir(dir))!=NULL) {
+/*
+           struct stat {
+               dev_t     st_dev;         // ID of device containing file 
+               ino_t     st_ino;         // Inode number 
+               mode_t    st_mode;        // File type and mode 
+               nlink_t   st_nlink;       // Number of hard links 
+               uid_t     st_uid;         // User ID of owner 
+               gid_t     st_gid;         // Group ID of owner 
+               dev_t     st_rdev;        // Device ID (if special file) 
+               off_t     st_size;        // Total size, in bytes 
+               blksize_t st_blksize;     // Block size for filesystem I/O 
+               blkcnt_t  st_blocks;      // Number of 512B blocks allocated 
 
-  while (1) {
-    if(scanf("%lf", &argument)!=1)
-      break;
-    printf("%.10g\n", invoke_method(lib,method,argument) );
+               // Since Linux 2.6, the kernel supports nanosecond
+               // precision for the following timestamp fields.
+               // For the details before Linux 2.6, see NOTES. 
+
+               struct timespec st_atim;  // Time of last access 
+               struct timespec st_mtim;  // Time of last modification 
+               struct timespec st_ctim;  // Time of last status change 
+
+           #define st_atime st_atim.tv_sec      // Backward compatibility 
+           #define st_mtime st_mtim.tv_sec
+           #define st_ctime st_ctim.tv_sec
+           };
+*/
+    stat(de->d_name, &statbuf);
+//man 7 inode
+    printf("%s %ld %s\n", de->d_name, statbuf.st_size, 
+     S_ISDIR(statbuf.st_mode)?"dir":"");
   }
+  closedir(dir);
 }
