@@ -1,5 +1,7 @@
 //https://developer.ibm.com/technologies/linux/tutorials/l-dynamic-libraries/
 
+#define DEBUG 1
+
 #include <stdio.h>
 #include <malloc.h>
 #include <string.h>
@@ -8,6 +10,8 @@
 //#include <sys/types.h>
 #include <sys/stat.h>
 //#include <unistd.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 int filelist(char **names, char *path) {
   DIR *dir;
@@ -19,6 +23,7 @@ int filelist(char **names, char *path) {
   nf=0;
   while((de=readdir(dir))!=NULL) {
     sprintf(ffn, "%s/%s", path, de->d_name);
+    if(access(ffn, R_OK|X_OK|F_OK)) continue;
     if(stat(ffn, &statbuf)!=0) continue;
     if(!S_ISDIR(statbuf.st_mode)) continue;
     if(strcmp(de->d_name,".")==0) continue;
@@ -33,8 +38,11 @@ int filelist(char **names, char *path) {
   return(nf);
 }
 
-void traverse(char *path) {
+static int mycmp(const void *p1, const void *p2) {
+  return strcasecmp(* (char * const *) p1, * (char * const *) p2);
+}
 
+void traverse(char *path) {
   char** pnames;
   char ffn[PATH_MAX];
 //  printf("%s\n", path);
@@ -43,19 +51,25 @@ void traverse(char *path) {
   if(nf==0) return;
   pnames=calloc(nf, sizeof(char*));
   filelist(pnames, path);
-  //qsort
+  qsort(pnames, nf, sizeof(char *), mycmp);
   for(k=0; k<nf; k++) {
     sprintf(ffn, "%s/%s", path, pnames[k]);
     printf("cd %s",pnames[k]);
-    printf("\t-> %s\n",ffn);
+#if DEBUG
+    printf("\t-> %s",ffn);
+#endif
+    printf("\n");
     traverse(ffn);
     printf("cd ..");
-    printf("\t-> %s\n",path);
+#if DEBUG
+    printf("\t-> %s",path);
+#endif
+    printf("\n");
   }
   for(k=0; k<nf; k++) {
    if(pnames[k]) free(pnames[k]);
   }
-  free(pnames);
+  if(pnames) free(pnames);
   return;
 }
 
