@@ -1,6 +1,7 @@
 //https://developer.ibm.com/technologies/linux/tutorials/l-dynamic-libraries/
 
 #include <stdio.h>
+#include <malloc.h>
 #include <string.h>
 //#include <sys/types.h>
 #include <dirent.h>
@@ -8,17 +9,69 @@
 #include <sys/stat.h>
 //#include <unistd.h>
 
-int main( int argc, char *argv[] )
-{
+int filelist(char **names, char *path) {
   DIR *dir;
   struct dirent *de;
   struct stat statbuf;
-  if(argc!=2) {
-    fprintf(stderr,"main .\n");
+  char ffn[PATH_MAX];
+  int nf;
+  if((dir=opendir(path))==NULL) return(0);
+  nf=0;
+  while((de=readdir(dir))!=NULL) {
+    sprintf(ffn, "%s/%s", path, de->d_name);
+    if(stat(ffn, &statbuf)!=0) continue;
+    if(!S_ISDIR(statbuf.st_mode)) continue;
+    if(strcmp(de->d_name,".")==0) continue;
+    if(strcmp(de->d_name,"..")==0) continue;
+    if(names) {
+      names[nf]=calloc(strlen(de->d_name)+1,sizeof(char));
+      strcpy(names[nf], de->d_name);
+    }
+    nf++;
+  }
+  closedir(dir);
+  return(nf);
+}
+
+void traverse(char *path) {
+
+  char** pnames;
+  char ffn[PATH_MAX];
+//  printf("%s\n", path);
+  int k, nf;
+  nf=filelist(NULL, path);
+  if(nf==0) return;
+  pnames=calloc(nf, sizeof(char*));
+  filelist(pnames, path);
+  //qsort
+  for(k=0; k<nf; k++) {
+    sprintf(ffn, "%s/%s", path, pnames[k]);
+    printf("cd %s",pnames[k]);
+    printf("\t-> %s\n",ffn);
+    traverse(ffn);
+    printf("cd ..");
+    printf("\t-> %s\n",path);
+  }
+  for(k=0; k<nf; k++) {
+   if(pnames[k]) free(pnames[k]);
+  }
+  free(pnames);
+  return;
+}
+
+int main( int argc, char *argv[] )
+{
+  char *fn="a";
+  int nf;
+  if(argc==2) fn=argv[1];
+  else if(argc!=1) {
+    fprintf(stderr,"main [a]\n");
     return(-1);
   }
-  dir=opendir(argv[1]);
-  while((de=readdir(dir))!=NULL) {
+  traverse(fn);
+}
+
+//man 7 inode
 /*
            struct stat {
                dev_t     st_dev;         // ID of device containing file 
@@ -45,10 +98,3 @@ int main( int argc, char *argv[] )
            #define st_ctime st_ctim.tv_sec
            };
 */
-    stat(de->d_name, &statbuf);
-//man 7 inode
-    printf("%s %ld %s\n", de->d_name, statbuf.st_size, 
-     S_ISDIR(statbuf.st_mode)?"dir":"");
-  }
-  closedir(dir);
-}

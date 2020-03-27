@@ -1,3 +1,2 @@
-b process
 b main
-r
+r .
