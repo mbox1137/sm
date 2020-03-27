@@ -1,8 +1,3 @@
 #!/bin/bash
-
-if [ -x ./main ]
-then
-	./main <main.tst
-else
-	echo "run make"
-fi
+#https://defuse.ca/big-number-calculator.htm
+./main .

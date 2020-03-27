@@ -1,2 +1,3 @@
-b main.gdb
+b process
+b main
 r
