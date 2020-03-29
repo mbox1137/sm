@@ -1,3 +1,5 @@
+       #define DEBUG 1
+
        #include <sys/mman.h>
        #include <sys/stat.h>
        #include <fcntl.h>
@@ -17,12 +19,23 @@
            off_t offset, pa_offset;
            size_t length;
            ssize_t s;
+           char *fn;
+           int line1, line2;
 
-           if (argc < 3 || argc > 4) {
-               fprintf(stderr, "%s file offset [length]\n", argv[0]);
+           if (argc == 4) {
+               fn=argv[1];
+               if(sscanf(argv[2],"%d",&line1)!=1)
+                   handle_error("line1");
+               if(sscanf(argv[3],"%d",&line2)!=1)
+                   handle_error("line2");
+           } else {
+               fprintf(stderr, "%s file line1 line2\n", argv[0]);
                exit(EXIT_FAILURE);
            }
-
+#if DEBUG
+           printf("%s %d %d\n", fn, line1, line2);
+           return(EXIT_SUCCESS);
+#endif
            fd = open(argv[1], O_RDONLY);
            if (fd == -1)
                handle_error("open");
