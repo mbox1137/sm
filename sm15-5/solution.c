@@ -21,7 +21,9 @@
            size_t length;
            ssize_t s;
            char fn[132];
-           int line1, line2;
+           int line, line1, line2;
+           char *cp;
+           int ostatok;
 
            if (argc == 1) {
                strcpy(fn,"file.txt");
@@ -49,6 +51,8 @@
                handle_error("fstat");
 
            offset = 0;
+           length = sb.st_size;
+
            pa_offset = offset & ~(sysconf(_SC_PAGE_SIZE) - 1);
                /* offset for mmap() must be page aligned */
 
@@ -57,7 +61,6 @@
                exit(EXIT_FAILURE);
            }
 
-           length = sb.st_size;
            if (offset + length > sb.st_size) {
                length = sb.st_size - offset;
                        /* Can't display bytes past end of file */
@@ -70,6 +73,20 @@
                        MAP_PRIVATE, fd, pa_offset);
            if (addr == MAP_FAILED)
                handle_error("mmap");
+
+           cp=(char*)addr;
+           line=0;
+           ostatok=length-(cp-addr);
+           while(ostatok>0) {
+               if(*cp=='\n') {
+                   line++;
+                   printf("line=%d\n",line);
+               }
+               cp++;
+               ostatok=length-(cp-addr);
+               printf("ostatok=%d\n",ostatok);
+           }
+
 
            s = write(STDOUT_FILENO, addr + offset - pa_offset, length);
            if (s != length) {
