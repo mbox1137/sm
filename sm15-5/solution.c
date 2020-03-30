@@ -6,6 +6,7 @@
        #include <stdio.h>
        #include <stdlib.h>
        #include <unistd.h>
+       #include <string.h>
 
        #define handle_error(msg) \
            do { perror(msg); exit(EXIT_FAILURE); } while (0)
@@ -19,11 +20,16 @@
            off_t offset, pa_offset;
            size_t length;
            ssize_t s;
-           char *fn;
+           char fn[132];
            int line1, line2;
 
-           if (argc == 4) {
-               fn=argv[1];
+           if (argc == 1) {
+               strcpy(fn,"file.txt");
+               line1=4;
+               line2=6;
+           } else if (argc == 4) {
+               if(sscanf(argv[1],"%s",fn)!=1)
+                   handle_error("filename");
                if(sscanf(argv[2],"%d",&line1)!=1)
                    handle_error("line1");
                if(sscanf(argv[3],"%d",&line2)!=1)
@@ -34,16 +40,15 @@
            }
 #if DEBUG
            printf("%s %d %d\n", fn, line1, line2);
-           return(EXIT_SUCCESS);
 #endif
-           fd = open(argv[1], O_RDONLY);
+           fd = open(fn, O_RDONLY);
            if (fd == -1)
                handle_error("open");
 
            if (fstat(fd, &sb) == -1)           /* To obtain file size */
                handle_error("fstat");
 
-           offset = atoi(argv[2]);
+           offset = 0;
            pa_offset = offset & ~(sysconf(_SC_PAGE_SIZE) - 1);
                /* offset for mmap() must be page aligned */
 
@@ -52,10 +57,9 @@
                exit(EXIT_FAILURE);
            }
 
-           if (argc == 4) {
-               length = atoi(argv[3]);
-               if (offset + length > sb.st_size)
-                   length = sb.st_size - offset;
+           length = sb.st_size;
+           if (offset + length > sb.st_size) {
+               length = sb.st_size - offset;
                        /* Can't display bytes past end of file */
 
            } else {    /* No length arg ==> display to end of file */
@@ -78,6 +82,5 @@
 
            munmap(addr, length + offset - pa_offset);
            close(fd);
-
            exit(EXIT_SUCCESS);
        }
