@@ -25,7 +25,7 @@
            char *cp, *cpl;
            int ostatok;
            char *fmt;
-           int k, ic;
+           int k, kl, ic;
 
            if (argc == 1) {
                strcpy(fn,"file.txt");
@@ -77,6 +77,7 @@
                handle_error("mmap");
 
            cp=(char*)addr;
+           line=0;
            for(k=0; k<length; k++) {
                ic=cp[k];
                if(ic<' ')
@@ -97,7 +98,8 @@
                line++;
                printf("%d)\t\t---- %d\n",k,line);
            }
-
+//return(-1);
+           kl=k;
            while(k>=0) {
                k--;
                ic=cp[k];
@@ -112,6 +114,11 @@
                        printf("\n");
                        break;
                    }
+                   printf("\n");
+                   printf("k=%d kl=%d kl-k=%d\n",k,kl,kl-k);
+//               s = write(STDOUT_FILENO, &cp[k], kl-k);
+                   printf("\n");
+                   kl=k;
                }
                printf("\n");
            }
