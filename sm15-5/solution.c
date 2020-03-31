@@ -80,27 +80,41 @@
            for(k=0; k<length; k++) {
                ic=cp[k];
                if(ic<' ')
-                   printf("(%d)",ic);
+                   printf("%d)\t(%d)",k,ic);
                else
-                   printf("('%c')",ic);
-               if(ic=='\n' || k==length-1) {
+                   printf("%d)\t('%c')",k,ic);
+               if(ic=='\n') {
                    line++;
-                   printf(" ---- %d",line);
+                   printf("\t---- %d",line);
+                   if(line>=line2) {
+                       printf("\n");
+                       break;
+                   }
                }
                printf("\n");
            }
-/*
-           while(ostatok>0) {
-               if(*cp=='\n' || ostatok==1) {
-                   cpl=cp+1;
-                   line++;
-                   printf("line=%d\n",line);
-               }
-               cp++;
-               ostatok=length-(cp-addr);
-               printf("ostatok=%d\n",ostatok);
+           if(k==length) {
+               line++;
+               printf("%d)\t\t---- %d\n",k,line);
            }
-*/
+
+           while(k>=0) {
+               k--;
+               ic=cp[k];
+               if(ic<' ')
+                   printf("%d)\t(%d)",k,ic);
+               else
+                   printf("%d)\t('%c')",k,ic);
+               if(ic=='\n') {
+                   line--;
+                   printf("\t---- %d",line);
+                   if(line<=line1) {
+                       printf("\n");
+                       break;
+                   }
+               }
+               printf("\n");
+           }
 
            s = write(STDOUT_FILENO, addr + offset - pa_offset, length);
            if (s != length) {
