@@ -22,8 +22,10 @@
            ssize_t s;
            char fn[132];
            int line, line1, line2;
-           char *cp;
+           char *cp, *cpl;
            int ostatok;
+           char *fmt;
+           int k, ic;
 
            if (argc == 1) {
                strcpy(fn,"file.txt");
@@ -75,10 +77,22 @@
                handle_error("mmap");
 
            cp=(char*)addr;
-           line=0;
-           ostatok=length-(cp-addr);
+           for(k=0; k<length; k++) {
+               ic=cp[k];
+               if(ic<' ')
+                   printf("(%d)",ic);
+               else
+                   printf("('%c')",ic);
+               if(ic=='\n' || k==length-1) {
+                   line++;
+                   printf(" ---- %d",line);
+               }
+               printf("\n");
+           }
+/*
            while(ostatok>0) {
-               if(*cp=='\n') {
+               if(*cp=='\n' || ostatok==1) {
+                   cpl=cp+1;
                    line++;
                    printf("line=%d\n",line);
                }
@@ -86,7 +100,7 @@
                ostatok=length-(cp-addr);
                printf("ostatok=%d\n",ostatok);
            }
-
+*/
 
            s = write(STDOUT_FILENO, addr + offset - pa_offset, length);
            if (s != length) {
