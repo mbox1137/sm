@@ -112,7 +112,13 @@
            kl=k;
            while(1) {
                if(k==0) {
-                   s = write(STDOUT_FILENO, nl, 2);
+                   s = write(STDOUT_FILENO, nl, 1);
+                   if (s != 1) {
+                       if (s == -1)
+                           handle_error("write");
+                       fprintf(stderr, "partial write");
+                       exit(EXIT_FAILURE);
+                   }
                    break;
                }
                k--;
@@ -140,7 +146,19 @@
                    printf("k+1=%d kl=%d kl-k-1=%d\n",k+1,kl,kl-k-1);
 #endif
                    s = write(STDOUT_FILENO, &cp[k+1], kl-k-1);
-                   s = write(STDOUT_FILENO, nl, 2);
+                   if (s != kl-k-1) {
+                       if (s == -1)
+                           handle_error("write");
+                       fprintf(stderr, "partial write");
+                       exit(EXIT_FAILURE);
+                   }
+                   s = write(STDOUT_FILENO, nl, 1);
+                   if (s != 1) {
+                       if (s == -1)
+                           handle_error("write");
+                       fprintf(stderr, "partial write");
+                       exit(EXIT_FAILURE);
+                   }
                    kl=k;
                    line--;
                }
