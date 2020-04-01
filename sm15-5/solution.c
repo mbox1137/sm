@@ -1,4 +1,4 @@
-       #define DEBUG 1
+       #define DEBUG 0
 
        #include <sys/mman.h>
        #include <sys/stat.h>
@@ -26,6 +26,7 @@
            int ostatok;
            char *fmt;
            int k, kl, ic;
+           char *nl="\n";
 
            if (argc == 1) {
                strcpy(fn,"file.txt");
@@ -80,49 +81,74 @@
            line=0;
            for(k=0; k<length; k++) {
                ic=cp[k];
+#if DEBUG
                if(ic<' ')
                    printf("%d)\t(%d)",k,ic);
                else
                    printf("%d)\t('%c')",k,ic);
+#endif
                if(ic=='\n') {
                    line++;
+#if DEBUG
                    printf("\t---- %d",line);
+#endif
                    if(line>=line2) {
+#if DEBUG
                        printf("\n");
+#endif
                        break;
                    }
                }
+#if DEBUG
                printf("\n");
+#endif
            }
            if(k==length) {
                line++;
+#if DEBUG
                printf("%d)\t\t---- %d\n",k,line);
+#endif
            }
-//return(-1);
            kl=k;
-           while(k>=0) {
+           while(1) {
+               if(k==0) {
+                   s = write(STDOUT_FILENO, nl, 2);
+                   break;
+               }
                k--;
+               if(k<0)
+                   break;
                ic=cp[k];
+#if DEBUG
                if(ic<' ')
                    printf("%d)\t(%d)",k,ic);
                else
                    printf("%d)\t('%c')",k,ic);
+#endif
                if(ic=='\n') {
-                   line--;
+#if DEBUG
                    printf("\t---- %d",line);
-                   if(line<=line1) {
+#endif
+                   if(line<line1) {
+#if DEBUG
                        printf("\n");
+#endif
                        break;
                    }
+#if DEBUG
                    printf("\n");
-                   printf("k=%d kl=%d kl-k=%d\n",k,kl,kl-k);
-//               s = write(STDOUT_FILENO, &cp[k], kl-k);
-                   printf("\n");
+                   printf("k+1=%d kl=%d kl-k-1=%d\n",k+1,kl,kl-k-1);
+#endif
+                   s = write(STDOUT_FILENO, &cp[k+1], kl-k-1);
+                   s = write(STDOUT_FILENO, nl, 2);
                    kl=k;
+                   line--;
                }
+#if DEBUG
                printf("\n");
+#endif
            }
-
+/*
            s = write(STDOUT_FILENO, addr + offset - pa_offset, length);
            if (s != length) {
                if (s == -1)
@@ -131,7 +157,7 @@
                fprintf(stderr, "partial write");
                exit(EXIT_FAILURE);
            }
-
+*/
            munmap(addr, length + offset - pa_offset);
            close(fd);
            exit(EXIT_SUCCESS);
