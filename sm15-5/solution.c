@@ -1,4 +1,4 @@
-       #define DEBUG 0
+       #define DEBUG 1
 
        #include <sys/mman.h>
        #include <sys/stat.h>
@@ -88,11 +88,13 @@
                    printf("%d)\t('%c')",k,ic);
 #endif
                if(ic=='\n') {
+                   if(k+1==length)
+                       break;
                    line++;
 #if DEBUG
                    printf("\t---- %d",line);
 #endif
-                   if(line>=line2) {
+                   if(line>=line2-1) {
 #if DEBUG
                        printf("\n");
 #endif
@@ -135,7 +137,7 @@
 #if DEBUG
                    printf("\t---- %d",line);
 #endif
-                   if(line<line1) {
+                   if(line<line1-1) {
 #if DEBUG
                        printf("\n");
 #endif
