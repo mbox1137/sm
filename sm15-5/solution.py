@@ -3,7 +3,10 @@
 #./solution file.txt 4 5
 import sys, os, glob
 import itertools
-fl=glob.glob("f?.txt")
+if len(sys.argv) == 1:
+    fl=glob.glob("f?.txt")
+else:
+    fl=[sys.argv[1]]
 kl=list()
 with open("t.txt") as t:
     while(True):
