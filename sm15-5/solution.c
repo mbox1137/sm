@@ -1,4 +1,4 @@
-       #define DEBUG 1
+       #define DEBUG 0
 
        #include <sys/mman.h>
        #include <sys/stat.h>
@@ -76,7 +76,7 @@
                        MAP_PRIVATE, fd, pa_offset);
            if (addr == MAP_FAILED)
                handle_error("mmap");
-
+/*
            cp=(char*)addr;
            line=0;
            for(k=0; k<length; k++) {
@@ -167,15 +167,6 @@
 #if DEBUG
                printf("\n");
 #endif
-           }
-/*
-           s = write(STDOUT_FILENO, addr + offset - pa_offset, length);
-           if (s != length) {
-               if (s == -1)
-                   handle_error("write");
-
-               fprintf(stderr, "partial write");
-               exit(EXIT_FAILURE);
            }
 */
            munmap(addr, length + offset - pa_offset);
