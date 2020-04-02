@@ -1,27 +1,30 @@
 .PHONY:	all clean
+GDC	= -g
 CC	= cc
 #CC	= clang
 ASM	= as
 LD	= ld
-EXEC	= write_binary
-OBJS	= write_binary.o
-LDFLAGS	= -lm
+EXEC	= main write_binary
+OBJS	= write_binary.o main.o
+LDFLAGS	= -lm -m32
 AFLAGS	=
-CFLAGS	= -fverbose-asm -O3
+CFLAGS	= -fverbose-asm -O3 -m32
 #-Os
 
 ALL : $(EXEC)
 
-$(EXEC): $(OBJS)
-	$(CC) $(LDFLAGS) -o $@ $^
+#$(EXEC): $(OBJS)
+#	$(CC) $(LDFLAGS) -o $@ $^
+
+main : main.o
+	$(CC) $(LDFLAGS) $(GDC) -o $@ $^
+
+write_binary : write_binary.o
+	$(CC) $(LDFLAGS) $(GDC) -o $@ $^
 
 %.o: %.c Makefile
-	$(CC) $(CFLAGS) -c -o $@ $<
-#	$(CC) $(CFLAGS) -S -o $<.S $<
-
-%.o: %.S Makefile
-	$(ASM) $(AFLAGS) -o $@ -a=$@.lst $<
+	$(CC) $(CFLAGS) $(GDC) -c -o $@ $<
 
 clean:
-	rm -f $(EXEC) *.o *.lst *.S *~
+	rm -f $(EXEC) $(OBJS) *.lst *.S *~
 
