@@ -8,7 +8,7 @@ int main(int argc, char **argv)
 {
     char str[NN];
     char delim[]=" \t\r\n";
-    char *ft, *from, *to;
+    char *ft, *from, *to, *tmp;
     unsigned long long a1, a2, ds, sum;
     int err, bof;
     sum=0;
@@ -24,6 +24,7 @@ int main(int argc, char **argv)
         if((ft = strtok(str, delim)) == NULL) {err=1; continue;}
         if((from = strtok(ft, "-")) == NULL) {err=1; continue;}
         if((to = strtok(NULL, "-")) == NULL) {err=1; continue;}
+        if((tmp = strtok(NULL, "-")) != NULL) {err=1; continue;}
 //        printf("%s %s\n", from, to);
         if(sscanf(from, "%llx", &a1)!=1) {err=1; continue;}
         if(sscanf(to, "%llx", &a2)!=1) {err=1; continue;}
