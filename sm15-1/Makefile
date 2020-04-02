@@ -8,8 +8,8 @@ EXEC	= main write_binary
 OBJS	= write_binary.o main.o
 LDFLAGS	= -lm -m32
 AFLAGS	=
-CFLAGS	= -fverbose-asm -O3 -m32
-#-Os
+CFLAGS	= -fverbose-asm -m32 -O0
+#-O3
 
 ALL : $(EXEC)
 
