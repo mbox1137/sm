@@ -28,6 +28,7 @@ int main(int argc, char **argv)
 //        printf("%s %s\n", from, to);
         if(sscanf(from, "%llx", &a1)!=1) {err=1; continue;}
         if(sscanf(to, "%llx", &a2)!=1) {err=1; continue;}
+        if(a1>a2) {err=1; continue;}
         ds = a2-a1;
         sum += ds;
 //        printf("a1=0x%x\ta2=0x%x\tds=0x%x\tsum=0x%x\n", a1, a2, ds, sum);
