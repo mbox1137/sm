@@ -4,7 +4,7 @@ GDB	= -g
 
 CC	= gcc
 #clang
-CFLAGS	= -m32 -fverbose-asm -msse3 -rdynamic
+CFLAGS	= -m32 -fverbose-asm -msse3 -rdynamic -O0
 #CFLAGS	= -m32 -fverbose-asm -msse3 -nostdlib
 # -std=c99
 
@@ -24,9 +24,9 @@ LDFLAGS	= -no-pie -m32 $(GDB) -ldl
 #LDFLAGS	= -m elf_i386
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
-EXEC	= solution
-OBJS	= solution.o
-SCDRY	= solution.s
+EXEC	= solution main
+OBJS	= solution.o main.o 
+SCDRY	= solution.s main.s
 
 .SECONDARY: $(SCDRY)
 ALL : $(EXEC)
@@ -34,8 +34,8 @@ ALL : $(EXEC)
 solution : solution.o Makefile
 	$(LD) $(LDFLAGS) -o solution solution.o
 
-test : test.o Makefile
-	$(LD) $(LDFLAGS) -o test test.o
+main : main.o Makefile
+	$(LD) $(LDFLAGS) -o main main.o
 
 #$(EXEC) : $(OBJS) Makefile
 #	$(LD) $(LDFLAGS) $(GDB) -o $@ $(OBJS)

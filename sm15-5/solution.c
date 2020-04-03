@@ -76,99 +76,26 @@
                        MAP_PRIVATE, fd, pa_offset);
            if (addr == MAP_FAILED)
                handle_error("mmap");
-/*
+
            cp=(char*)addr;
            line=0;
-           for(k=0; k<length; k++) {
-               ic=cp[k];
-#if DEBUG
-               if(ic<' ')
-                   printf("%d)\t(%d)",k,ic);
-               else
-                   printf("%d)\t('%c')",k,ic);
-#endif
-               if(ic=='\n') {
-                   if(k+1==length)
-                       break;
-                   line++;
-#if DEBUG
-                   printf("\t---- %d",line);
-#endif
-                   if(line>=line2-1) {
-#if DEBUG
-                       printf("\n");
-#endif
-                       break;
-                   }
-               }
-#if DEBUG
-               printf("\n");
-#endif
-           }
-           if(k==length) {
+           kl=0;
+           for(;;) {
+               k=kl;
+           //Пропустить лидирующие \n
+               while(k<length && cp[k]=='\n') k++;
+               kl=k;
+           //kl -> Первый символ просле строки
+               while(kl<length && cp[kl]!='\n') kl++;
+           // k=первый символ строки, kl=последний +1
+               if(k==kl) break;
                line++;
-#if DEBUG
-               printf("%d)\t\t---- %d\n",k,line);
-#endif
            }
-           kl=k;
-           while(1) {
-               if(k==0) {
-                   s = write(STDOUT_FILENO, nl, 1);
-                   if (s != 1) {
-                       if (s == -1)
-                           handle_error("write");
-                       fprintf(stderr, "partial write");
-                       exit(EXIT_FAILURE);
-                   }
-                   break;
-               }
-               k--;
-               if(k<0)
-                   break;
-               ic=cp[k];
-#if DEBUG
-               if(ic<' ')
-                   printf("%d)\t(%d)",k,ic);
-               else
-                   printf("%d)\t('%c')",k,ic);
-#endif
-               if(ic=='\n') {
-#if DEBUG
-                   printf("\t---- %d",line);
-#endif
-                   if(line<line1-1) {
-#if DEBUG
-                       printf("\n");
-#endif
-                       break;
-                   }
-#if DEBUG
-                   printf("\n");
-                   printf("k+1=%d kl=%d kl-k-1=%d\n",k+1,kl,kl-k-1);
-#endif
-                   s = write(STDOUT_FILENO, &cp[k+1], kl-k-1);
-                   if (s != kl-k-1) {
-                       if (s == -1)
-                           handle_error("write");
-                       fprintf(stderr, "partial write");
-                       exit(EXIT_FAILURE);
-                   }
-                   s = write(STDOUT_FILENO, nl, 1);
-                   if (s != 1) {
-                       if (s == -1)
-                           handle_error("write");
-                       fprintf(stderr, "partial write");
-                       exit(EXIT_FAILURE);
-                   }
-                   kl=k;
-                   line--;
-               }
-#if DEBUG
-               printf("\n");
-#endif
-           }
-*/
+           
+           while(kl>0 && cp[kl-1]=='\n') kl--;
+           k=kl-1;
+           while(k>0 && cp[k-1]!='\n') k--;
+
            munmap(addr, length + offset - pa_offset);
            close(fd);
            exit(EXIT_SUCCESS);
