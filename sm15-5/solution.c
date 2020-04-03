@@ -89,12 +89,19 @@
                while(kl<length && cp[kl]!='\n') kl++;
            // k=первый символ строки, kl=последний +1
                if(k==kl) break;
+               if(line+1>=line2-1) break;
                line++;
            }
-           
-           while(kl>0 && cp[kl-1]=='\n') kl--;
-           k=kl-1;
-           while(k>0 && cp[k-1]!='\n') k--;
+           for(;;) {
+               while(kl>0 && cp[kl-1]=='\n') kl--;
+               k=kl-1;
+               while(k>0 && cp[k-1]!='\n') k--;
+               if(line<line1-1) break;
+               write(STDOUT_FILENO, &cp[k], kl-k);
+               write(STDOUT_FILENO, nl, 1);
+               kl=k-1;
+               line--;
+           }
 
            munmap(addr, length + offset - pa_offset);
            close(fd);
