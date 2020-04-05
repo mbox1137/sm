@@ -1,2 +1,2 @@
 b main
-r file.txt 1 3
+r f3.txt 1 4

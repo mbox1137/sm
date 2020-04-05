@@ -82,25 +82,24 @@
            kl=0;
            for(;;) {
                k=kl;
-           //Пропустить лидирующие \n
-               while(k<length && cp[k]=='\n') k++;
+               while(k<length && cp[k]=='\n') { k++; line++; }
                kl=k;
-           //kl -> Первый символ просле строки
                while(kl<length && cp[kl]!='\n') kl++;
-           // k=первый символ строки, kl=последний +1
                if(k==kl) break;
-               if(line+1>=line2-1) break;
-               line++;
+               if(!(line<line2)) break;
+//               line++;
            }
            for(;;) {
-               while(kl>0 && cp[kl-1]=='\n') kl--;
-               k=kl-1;
-               while(k>0 && cp[k-1]!='\n') k--;
+               while(kl>0 && cp[kl]=='\n') { kl--; line--; }
+               if(kl<0) break;
+               k=kl;
+               if((kl>0) && (kl<length)) kl++;
+               while(k>0 && cp[k]!='\n') k--;
+               if((k>0) && (k<length)) k++;
+               write(STDOUT_FILENO, &cp[k], kl-k); if(cp[k]!='\n') write(STDOUT_FILENO, nl, 1);
                if(line<line1-1) break;
-               write(STDOUT_FILENO, &cp[k], kl-k);
-               write(STDOUT_FILENO, nl, 1);
                kl=k-1;
-               line--;
+//               line--;
            }
 
            munmap(addr, length + offset - pa_offset);
