@@ -5,9 +5,19 @@
 import varints
 import sys
 import random
-nums = [random.randint(0,1000) for _ in range(10)]
+
+nums=list()
+while(True):
+    try:
+        s=input()
+    except EOFError:
+        break
+    nums.append(int(s))
+print(nums)
+
+#nums = [random.randint(0,1000) for _ in range(10)]
 print(sys.getsizeof(nums),4512)  
-var = varints.sqliteu.encode( nums )
+var = varints.leb128s.encode( nums )
 print(type(var),sys.getsizeof(var),1816)
 for a_byte in var:
     print (bin(a_byte))

@@ -1,4 +1,3 @@
 main
 main.s
-solution
-solution.s
+*.bin
