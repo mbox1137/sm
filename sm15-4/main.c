@@ -1,3 +1,9 @@
+//https://unixhow.com/3169/chto-takoe-i-dlya-chego-nuzhen-sistemnyj-vyzov-mmap
+//....
+//Такой метод имеет ограничения на системах с 32-разрядным ядром, поскольку 
+//там существует ограничение на максимальный размер файла, который "можно 
+//отобразить". Этот предел - 4 гигабайта.
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
