@@ -89,17 +89,19 @@
                if(!(line<line2)) break;
 //               line++;
            }
+           k=kl;
            for(;;) {
-               while(kl>0 && cp[kl]=='\n') { kl--; line--; }
-               if(kl<0) break;
-               k=kl;
-               if((kl>0) && (kl<length)) kl++;
-               while(k>0 && cp[k]!='\n') k--;
-               if((k>0) && (k<length)) k++;
-               write(STDOUT_FILENO, &cp[k], kl-k); if(cp[k]!='\n') write(STDOUT_FILENO, nl, 1);
-               if(line<line1-1) break;
-               kl=k-1;
-//               line--;
+               if(k<0) break;
+               if(line<line1) break;
+               if(cp[k]=='\n') line--;
+               k--;
+           }
+           k++;
+
+           if(kl>k) {
+               write(STDOUT_FILENO, &cp[k], kl-k);
+               if(cp[kl-1]!='\n')
+                   write(STDOUT_FILENO, nl, 1);
            }
 
            munmap(addr, length + offset - pa_offset);

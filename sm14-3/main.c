@@ -42,13 +42,16 @@ static int mycmp(const void *p1, const void *p2) {
   return strcasecmp(* (char * const *) p1, * (char * const *) p2);
 }
 
-void traverse(char *path) {
+void traverse(char *path, char *name) {
   char** pnames;
   char ffn[PATH_MAX];
   int k, nf;
   DIR *dir;
   if((dir=opendir(path))==NULL) return;
-  printf("cd %s\n",path);
+  if(name)
+    printf("cd %s\n",name);
+  else
+    printf("cd %s\n",path);
   nf=filelist(NULL, path);
   if(nf) {
     pnames=calloc(nf, sizeof(char*));
@@ -56,7 +59,7 @@ void traverse(char *path) {
     qsort(pnames, nf, sizeof(char *), mycmp);
     for(k=0; k<nf; k++) {
       sprintf(ffn, "%s/%s", path, pnames[k]);
-      traverse(ffn);
+      traverse(ffn,pnames[k]);
     }
     for(k=0; k<nf; k++)
       if(pnames[k])
@@ -77,5 +80,5 @@ int main( int argc, char *argv[] )
     fprintf(stderr,"main [a]\n");
     return(-1);
   }
-  traverse(fn);
+  traverse(fn, NULL);
 }
