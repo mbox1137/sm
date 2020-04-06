@@ -42,16 +42,36 @@ static int mycmp(const void *p1, const void *p2) {
   return strcasecmp(* (char * const *) p1, * (char * const *) p2);
 }
 
+char *lastname(char *path) {
+  char *cp, *lastname, delims[]="/";
+  lastname=NULL;
+  cp=strtok(path,delims);
+  while(cp) {
+    lastname=cp;
+    cp=strtok(NULL,delims);
+  }
+  return(lastname);
+}
+
 void traverse(char *path, char *name) {
   char** pnames;
   char ffn[PATH_MAX];
+  char tmpp[PATH_MAX];
   int k, nf;
   DIR *dir;
+  struct stat statbuf;
   if((dir=opendir(path))==NULL) return;
+#if 1
+  if(stat(path, &statbuf)!=0) return;
+  if(!S_ISDIR(statbuf.st_mode)) return;
+  strcpy(tmpp, path);
+  printf("cd %s\n",lastname(tmpp));
+#else
   if(name)
     printf("cd %s\n",name);
   else
     printf("cd %s\n",path);
+#endif
   nf=filelist(NULL, path);
   if(nf) {
     pnames=calloc(nf, sizeof(char*));
