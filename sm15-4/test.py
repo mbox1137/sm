@@ -16,12 +16,12 @@ while(True):
 print(nums)
 
 #nums = [random.randint(0,1000) for _ in range(10)]
-print(sys.getsizeof(nums),4512)  
+print(f"nums: {sys.getsizeof(nums)}")
 var = varints.leb128s.encode( nums )
-print(type(var),sys.getsizeof(var),1816)
+print(f"var: {type(var)}: {sys.getsizeof(var)}")
+"""
 for a_byte in var:
     print (bin(a_byte))
-"""
 binary_file = open("test.txt", "wb")
 binary_file.write(b'\x00')
 binary_file.close()
