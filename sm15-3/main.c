@@ -11,41 +11,19 @@
        #define handle_error(msg) \
            do { perror(msg); exit(EXIT_FAILURE); } while (0)
 
-       int
-       main(int argc, char *argv[])
+       size_t meml(char *cp, size_t n) {
+           return(0);
+       }
+
+       size_t filel(char *fn)
        {
            char *addr;
            int fd;
            struct stat sb;
            off_t offset, pa_offset;
            size_t length;
-           ssize_t s;
-           char fn[132];
-           int line, line1, line2;
-           char *cp, *cpl;
-           int ostatok;
-           char *fmt;
-           int k, kl, ic;
-           char *nl="\n";
+           size_t k;
 
-           if (argc == 1) {
-               strcpy(fn,"file.txt");
-               line1=4;
-               line2=6;
-           } else if (argc == 4) {
-               if(sscanf(argv[1],"%s",fn)!=1)
-                   handle_error("filename");
-               if(sscanf(argv[2],"%d",&line1)!=1)
-                   handle_error("line1");
-               if(sscanf(argv[3],"%d",&line2)!=1)
-                   handle_error("line2");
-           } else {
-               fprintf(stderr, "%s file line1 line2\n", argv[0]);
-               exit(EXIT_FAILURE);
-           }
-#if DEBUG
-           printf("%s %d %d\n", fn, line1, line2);
-#endif
            fd = open(fn, O_RDONLY);
            if (fd == -1)
                handle_error("open");
@@ -77,34 +55,22 @@
            if (addr == MAP_FAILED)
                handle_error("mmap");
 
-           cp=(char*)addr;
-           line=0;
-           kl=0;
-           for(;;) {
-               k=kl;
-               while(k<length && cp[k]=='\n') { k++; line++; }
-               kl=k;
-               while(kl<length && cp[kl]!='\n') kl++;
-               if(k==kl) break;
-               if(!(line<line2)) break;
-//               line++;
-           }
-           k=kl;
-           for(;;) {
-               if(k<0) break;
-               if(line<line1) break;
-               if(cp[k]=='\n') line--;
-               k--;
-           }
-           k++;
-
-           if(kl>k) {
-               write(STDOUT_FILENO, &cp[k], kl-k);
-               if(cp[kl-1]!='\n')
-                   write(STDOUT_FILENO, nl, 1);
-           }
+           k=meml(addr, length);
 
            munmap(addr, length + offset - pa_offset);
            close(fd);
+           return(k);
+       }
+
+       int main(int argc, char *argv[])
+       {
+           int k;
+           char s[132];
+           if (argc < 2) {
+               sprintf(s,"%s *.txt", argv[0]);
+               handle_error(s);
+           }
+           for(k=1; k<argc; k++)
+               printf("%d\n", filel(argv[k]));
            exit(EXIT_SUCCESS);
        }
