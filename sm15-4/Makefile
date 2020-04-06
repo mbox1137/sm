@@ -24,9 +24,9 @@ LDFLAGS	= -no-pie -m32 $(GDB) -ldl
 #LDFLAGS	= -m elf_i386
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
-EXEC	= solution main
-OBJS	= solution.o main.o 
-SCDRY	= solution.s main.s
+EXEC	= main
+OBJS	= main.o 
+SCDRY	= main.s
 
 .SECONDARY: $(SCDRY)
 ALL : $(EXEC)
