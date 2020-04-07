@@ -19,13 +19,10 @@
            struct stat sb;
            off_t offset, pa_offset;
            size_t length;
-           ssize_t s;
            char fn[132];
            int line, line1, line2;
-           char *cp, *cpl;
-           int ostatok;
-           char *fmt;
-           int k, kl, ic;
+           char *cp;
+           int k, k0, kl;
            char *nl="\n";
 
            if (argc == 1) {
