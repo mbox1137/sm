@@ -75,6 +75,7 @@
                handle_error("mmap");
 
            cp=(char*)addr;
+
            line=0;
            kl=0;
            for(;;) {
@@ -86,6 +87,7 @@
                if(!(line<line2)) break;
 //               line++;
            }
+
            k=kl;
            for(;;) {
                if(k<0) break;
