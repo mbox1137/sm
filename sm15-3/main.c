@@ -1,4 +1,4 @@
-       #define DEBUG 0
+       #define DEBUG 1
 
        #include <sys/mman.h>
        #include <sys/stat.h>
@@ -12,7 +12,14 @@
            do { perror(msg); exit(EXIT_FAILURE); } while (0)
 
        size_t meml(char *cp, size_t n) {
-           return(0);
+           int k, kl;
+           kl=0;
+           for(k=0; k<n; k++)
+               if(cp[k]=='\n')
+                   kl++;
+           if(cp[n-1]!='\n')
+               kl++;
+           return(kl);
        }
 
        size_t filel(char *fn)
@@ -26,10 +33,13 @@
 
            fd = open(fn, O_RDONLY);
            if (fd == -1)
-               handle_error("open");
+               return(-1);
 
            if (fstat(fd, &sb) == -1)           /* To obtain file size */
-               handle_error("fstat");
+               return(-1);
+           
+           if(sb.st_size == 0)
+               return(0);
 
            offset = 0;
            length = sb.st_size;
@@ -39,21 +49,20 @@
 
            if (offset >= sb.st_size) {
                fprintf(stderr, "offset is past end of file\n");
-               exit(EXIT_FAILURE);
+               return(-1);
            }
 
            if (offset + length > sb.st_size) {
                length = sb.st_size - offset;
                        /* Can't display bytes past end of file */
-
            } else {    /* No length arg ==> display to end of file */
                length = sb.st_size - offset;
            }
-
+           
            addr = mmap(NULL, length + offset - pa_offset, PROT_READ,
                        MAP_PRIVATE, fd, pa_offset);
            if (addr == MAP_FAILED)
-               handle_error("mmap");
+               return(-1);
 
            k=meml(addr, length);
 
@@ -71,6 +80,10 @@
                handle_error(s);
            }
            for(k=1; k<argc; k++)
+#if DEBUG
+               printf("%d %s\n", filel(argv[k]), argv[k]);
+#else
                printf("%d\n", filel(argv[k]));
+#endif
            exit(EXIT_SUCCESS);
        }
