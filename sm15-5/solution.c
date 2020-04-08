@@ -77,30 +77,29 @@
            cp=(char*)addr;
 
            line=0;
-           kl=0;
+           k=0;
            for(;;) {
-               k=kl;
-               while(k<length && cp[k]=='\n') { k++; line++; }
-               kl=k;
-               while(kl<length && cp[kl]!='\n') kl++;
-               if(k==kl) break;
-               if(!(line<line2)) break;
-//               line++;
+               if(k>=length) break;
+               if(cp[k]=='\n') line++;
+               if(line > line2-1) break;
+               k++;
            }
+           write(STDOUT_FILENO, cp, k); write(STDOUT_FILENO, nl, 1);
+//           printf("k=%d\n",k);
 
-           k=kl;
+           kl=k;
            for(;;) {
-               if(k<0) break;
-               if(line<line1) break;
-               if(cp[k]=='\n') line--;
-               k--;
-           }
-           k++;
-
-           if(kl>k) {
-               write(STDOUT_FILENO, &cp[k], kl-k);
-               if(cp[kl-1]!='\n')
+               if(cp[k]=='\n') {
+//                   printf("k=%d kl=%d line=%d\n",k,kl,line);
+                   line--;
+                   if(line < line1-1) break;
+                   if(kl-k-1>0)
+                       write(STDOUT_FILENO, &cp[k+1], kl-k-1);
                    write(STDOUT_FILENO, nl, 1);
+                   kl=k;
+               }
+               if(k<0) break;
+               k0=k--;
            }
 
            munmap(addr, length + offset - pa_offset);

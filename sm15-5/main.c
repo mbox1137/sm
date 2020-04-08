@@ -1,20 +1,42 @@
+#define DEBUG 0
+
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+
+#define N 132
+
+#define handle_error(msg) \
+	do { perror(msg); exit(EXIT_FAILURE); } while (0)
 
 int main(int argc, char *argv[])
 {
-	char s[120]="The quick brown fox jumps over the lazy dog.";
-	char *token;
-	if(argc==2) {
-		strcpy(s, argv[1]);
+	char fn[N];
+	unsigned char buf[N];
+	int h,n;
+	int line1, line2;
+
+	if (argc == 1) {
+		strcpy(fn,"file.txt");
+		line1=4;
+		line2=6;
+	} else if (argc == 4) {
+		if(sscanf(argv[1],"%s",fn)!=1)
+			handle_error("filename");
+		if(sscanf(argv[2],"%d",&line1)!=1)
+			handle_error("line1");
+		if(sscanf(argv[3],"%d",&line2)!=1)
+			handle_error("line2");
 	} else {
-		printf("%s \"%s\"\n", argv[0], s);
+		fprintf(stderr, "%s file line1 line2\n", argv[0]);
+		exit(EXIT_FAILURE);
 	}
-	token=strtok(s," ");
-	while(token!=NULL) {
-		printf("%s\n",token);
-		token=strtok(NULL," ");
-	}
-	exit(EXIT_SUCCESS);
+	h=open(fn, O_RDONLY);
+	n=read(h,buf,N);
+	write(STDOUT_FILENO, buf, n);
+	close(h);
 }
