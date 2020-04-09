@@ -22,7 +22,7 @@
            char fn[132];
            int line, line1, line2;
            char *cp;
-           int k, k0, kl;
+           int k, dk, kl;
            char *nl="\n";
 
            if (argc == 1) {
@@ -74,35 +74,40 @@
            if (addr == MAP_FAILED)
                handle_error("mmap");
 
-           cp=(char*)addr;
+	cp=(char*)addr;
 
-           line=0;
-           k=0;
-           for(;;) {
-               if(k>=length) break;
-               if(cp[k]=='\n') line++;
-               if(line > line2-1) break;
-               k++;
-           }
-           write(STDOUT_FILENO, cp, k); write(STDOUT_FILENO, nl, 1);
-//           printf("k=%d\n",k);
+	line=0;
+	k=0;
+	for(;;) {
+	    if(k>=length) break;
+	    if(cp[k]=='\n') line++;
+	    if(line > line2-1) break;
+	    k++;
+	}
 
-           kl=k;
-           for(;;) {
-               if(cp[k]=='\n') {
-//                   printf("k=%d kl=%d line=%d\n",k,kl,line);
-                   line--;
-                   if(line < line1-1) break;
-                   if(kl-k-1>0)
-                       write(STDOUT_FILENO, &cp[k+1], kl-k-1);
-                   write(STDOUT_FILENO, nl, 1);
-                   kl=k;
-               }
-               if(k<0) break;
-               k0=k--;
-           }
+	kl=k;
+	for(;;) {
+	    k--;
+	    if(kl>0) {
+                if(k>=0) {
+	            if(cp[k]=='\n') {
+		        line--;
+		        if(line < line1-1) break;
+		        dk=kl-k-1;
+		        if(dk>0)
+		            write(STDOUT_FILENO, &cp[k+1], dk);
+                        write(STDOUT_FILENO, nl, 1);
+                        kl=k;
+                    }
+                }	//k>=0
+            } else {	//kl>0
+                kl=k+1;
+                write(STDOUT_FILENO, nl, 1);
+            }
+	    if(kl<0) break;
+	}
 
-           munmap(addr, length + offset - pa_offset);
-           close(fd);
-           exit(EXIT_SUCCESS);
-       }
+	munmap(addr, length + offset - pa_offset);
+	close(fd);
+	exit(EXIT_SUCCESS);
+    }
