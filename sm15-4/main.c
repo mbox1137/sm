@@ -77,7 +77,10 @@
                        MAP_PRIVATE, fd, pa_offset);
            if (addr == MAP_FAILED)
                handle_error("mmap");
-
+           else {
+               printf("%d\n", length);
+               printf("%d\n", length);
+           }
            k=sum_sLEB128(addr, length);
 
            munmap(addr, length + offset - pa_offset);
