@@ -1,3 +1,7 @@
 #!/bin/bash
 #https://defuse.ca/big-number-calculator.htm
-./main a
+
+#DEBUG
+#./main ~ >main.lst
+#find ~ -type d >find.lst
+#cat main.lst |./main.py find.lst

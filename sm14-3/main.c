@@ -1,3 +1,6 @@
+#define DEBUG 0
+
+#include <errno.h>
 #include <stdio.h>
 #include <malloc.h>
 #include <string.h>
@@ -5,6 +8,31 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <unistd.h>
+
+static int mycmp(const void *p1, const void *p2)
+{
+    return strcasecmp(* (char * const *) p1, * (char * const *) p2);
+}
+
+char *lastname(char *path)
+{
+    char *cp, *lastname, delims[] = "/";
+    int n;
+    n = strlen(path);
+    if ((n>0) && (path[n - 1] == delims[0]))
+        path[n - 1] = 0;
+
+    lastname = NULL;
+    cp = strtok(path, delims);
+
+    while(cp)
+    {
+        lastname = cp;
+        cp = strtok(NULL, delims);
+    }
+
+    return lastname;
+}
 
 int filelist(char **names, char *path)
 {
@@ -33,7 +61,10 @@ int filelist(char **names, char *path)
         {
             names[nf] = calloc(strlen(de->d_name) + 1, sizeof(char));
             if (names[nf] == NULL)
+            {
+                fprintf(stderr, "calloc error\n");
                 exit(1);
+            }
             strcpy(names[nf], de->d_name);
         }
         nf++;
@@ -41,31 +72,6 @@ int filelist(char **names, char *path)
 
     closedir(dir);
     return nf;
-}
-
-static int mycmp(const void *p1, const void *p2)
-{
-    return strcasecmp(* (char * const *) p1, * (char * const *) p2);
-}
-
-char *lastname(char *path)
-{
-    char *cp, *lastname, delims[] = "/";
-    int n;
-    n = strlen(path);
-    if (path[n - 1] == delims[0])
-        path[n - 1] = 0;
-
-    lastname = NULL;
-    cp = strtok(path, delims);
-
-    while(cp)
-    {
-        lastname = cp;
-        cp = strtok(NULL, delims);
-    }
-
-    return lastname;
 }
 
 void traverse(char *path, char *name)
@@ -77,20 +83,28 @@ void traverse(char *path, char *name)
     DIR *dir;
     struct stat statbuf;
     if ((dir = opendir(path)) == NULL)
-        return;
-#if 1
-    if (stat(path, &statbuf) != 0)
-        return;
+        {
+            strerror_r(errno, tmpp, PATH_MAX);
+            fprintf(stderr, "Err: opendir (%d=%s) %s\n", errno, tmpp, path);
+            return;
+        }
+    if (lstat(path, &statbuf) != 0)
+        {
+            fprintf(stderr, "Err: stat (%s)\n", path);
+            return;
+        }
+    closedir(dir);
     if (!S_ISDIR(statbuf.st_mode))
-        return;
+        {
+//            fprintf(stderr, "Err: opendir (%s)\n", path);
+            return;
+        }
+#if DEBUG
+    printf("%s\n", path);
+#else
     strcpy(tmpp, path);
     if (name != NULL)
         printf("cd %s\n", lastname(tmpp));
-#else
-    if (name)
-        printf("cd %s\n", name);
-    else
-        printf("cd %s\n", path);
 #endif
     nf=filelist(NULL, path);
     if (nf)
@@ -104,7 +118,7 @@ void traverse(char *path, char *name)
         for (k = 0; k < nf; k++)
         {
             sprintf(ffn, "%s/%s", path, pnames[k]);
-            traverse(ffn,pnames[k]);
+        traverse(ffn,pnames[k]);
         }
 
         for (k = 0; k < nf; k++)
@@ -113,9 +127,11 @@ void traverse(char *path, char *name)
         if (pnames)
             free(pnames);
     }
+#if DEBUG
+#else
     if (name != NULL)
         printf("cd ..\n");
-
+#endif
     return;
 }
 
