@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 
     for(k = 1; k < argc; k++)
 #if DEBUG
-        printf("%d %s\n", filel(argv[k]), argv[k]);
+        printf("%d\t%s\n", filel(argv[k]), argv[k]);
 #else
         printf("%d\n", filel(argv[k]));
 #endif
