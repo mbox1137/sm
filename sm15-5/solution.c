@@ -82,9 +82,11 @@
 	    if(k>=length)
                 break;
 	    if(cp[k]=='\n')
+                {
+	        if(line > line2)
+	            break;
 	        line++;
-	    if(line >= line2)
-	        break;
+	        }
 	    k++;
 	}
 
