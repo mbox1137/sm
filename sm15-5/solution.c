@@ -83,14 +83,14 @@
                 break;
 	    if(cp[k]=='\n')
                 {
-	        if(line > line2)
+	        if(line >= line2)
 	            break;
 	        line++;
 	        }
 	    k++;
 	}
 
-	k--;
+//	k--;
 	kl=k;
 	for(;;)
         {
