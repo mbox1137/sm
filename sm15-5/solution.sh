@@ -1,12 +1,13 @@
 #!/bin/bash
 #./solution.py
 function my {
-	echo $1..$2
-	cat ab.txt|hexdump -C; ./solution ab.txt $1 $2 |hexdump -C
+	echo $1 $2..$3
+	cat $1|hexdump -C; ./solution $1 $2 $3 |hexdump -C
 	echo
 }
 
-n1=0
-for n2 in {0..17}; do
-	my $n1 $n2
-done
+#for n2 in {0..17}; do
+#	my ab.txt 0 $n2
+#done
+
+my f2.txt 0 10
