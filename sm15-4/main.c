@@ -2,6 +2,7 @@
 //https://github.com/gcc-mirror/gcc/blob/master/include/leb128.h
 
 #define DEBUG 0
+#define NNM 15
 
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -115,6 +116,10 @@ size_t filel(char *fn)
     return k;
 }
 
+int file2(char *fn) {
+    return filel(fn);
+}
+
 int main(int argc, char *argv[])
 {
     char s[132];
@@ -126,7 +131,7 @@ int main(int argc, char *argv[])
     }
 
     for(int k = 1; k < argc; k++)
-        printf("%d\n", filel(argv[k]));
+        printf("%d\n", file2(argv[k]));
 
     return 0;
 }

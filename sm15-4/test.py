@@ -8,11 +8,15 @@ import random
 
 nums=list()
 while(True):
-    try:
-        s=input()
-    except EOFError:
+    s=sys.stdin.readline()
+    if(len(s)==0):
         break
-    nums.append(int(s))
+    s=s.strip()
+    sl=s.split('#')
+    if(len(sl)>0):
+        s=sl[0]
+    qq=list(map(int,s.split()))
+    nums.extend(qq)
 print(nums)
 
 #nums = [random.randint(0,1000) for _ in range(10)]
