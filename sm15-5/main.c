@@ -1,3 +1,7 @@
+//https://stackoverflow.com/questions/6565357/git-push-requires-username-and-password
+//git config credential.helper store
+//git config --global credential.helper 'cache --timeout 7200'
+
 #define DEBUG 0
 
 #include <sys/mman.h>
