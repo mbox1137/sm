@@ -118,11 +118,19 @@ size_t filel(char *fn, off_t offset, size_t len, off_t *newp, int64_t *r)
 int file2(char *fn) {
     off_t start, newstart;
     size_t slen, n;
-    int64_t s;
-    
-    n=filel(fn, start, slen, &newstart, &s);
-
-    return s;
+    int64_t s, sum;
+    sum=0;
+    start=0;
+    slen=(1>>12);
+    for(;;)
+    {
+        n=filel(fn, start, slen, &newstart, &s);
+        if(n==0)
+            break;
+        sum+=s;
+        start=newstart;
+    }
+    return sum;
 }
 
 int main(int argc, char *argv[])
