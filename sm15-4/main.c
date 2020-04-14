@@ -66,14 +66,13 @@ size_t sum_sLEB128(unsigned char *cp, size_t n, int64_t *s)
     return rb0;
 }
 
-size_t filel(char *fn)
+size_t filel(char *fn, off_t offset, size_t len, off_t *newp, int64_t *r)
 {
     char *addr;
     int fd;
     struct stat sb;
-    off_t offset, pa_offset;
+    off_t pa_offset;
     size_t length, rb;
-    int64_t k;
 
     fd = open(fn, O_RDONLY);
     if (fd == -1)
@@ -109,15 +108,21 @@ size_t filel(char *fn)
         printf("%d\n", length);
     }
 
-    rb = sum_sLEB128((unsigned char*)addr, length, &k);
+    rb = sum_sLEB128((unsigned char*)addr, length, r);
 
     munmap(addr, length + offset - pa_offset);
     close(fd);
-    return k;
+    return rb;
 }
 
 int file2(char *fn) {
-    return filel(fn);
+    off_t start, newstart;
+    size_t slen, n;
+    int64_t s;
+    
+    n=filel(fn, start, slen, &newstart, &s);
+
+    return s;
 }
 
 int main(int argc, char *argv[])
