@@ -94,7 +94,7 @@ size_t filel(char *fn, off_t offset, size_t len, off_t *newo, int64_t *r)
     if (addr == MAP_FAILED)
         handle_error("mmap");
 
-    rb = sum_sLEB128((unsigned char*)addr, len, r);
+    rb = sum_sLEB128((unsigned char*)(addr+offset), len, r);
 
     munmap(addr, len + offset - pa_offset);
     close(fd);
