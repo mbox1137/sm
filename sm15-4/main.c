@@ -22,7 +22,7 @@ static inline size_t read_sleb128_to_int64 (unsigned char *buf, unsigned char *b
     int64_t result = 0;
     unsigned char byte;
 
-    while (1)
+    for(;;)
     {
         if (p >= buf_end)
             return 0;
@@ -50,12 +50,12 @@ size_t sum_sLEB128(unsigned char *cp, size_t n, int64_t *s)
     dcp = 0;
     rb0=0;
     *s = 0;
-    while(1)
+    for(;;)
     {
         rb = read_sleb128_to_int64 (&cp[dcp], &cp[n], &r);
-        rb0+=rb;
         if(rb == 0)
             break;
+        rb0+=rb;
         dcp += rb;
 #if DEBUG
         printf("r=%lld (+%d)\n",r,dcp);
@@ -66,13 +66,13 @@ size_t sum_sLEB128(unsigned char *cp, size_t n, int64_t *s)
     return rb0;
 }
 
-size_t filel(char *fn, off_t offset, size_t slen, off_t *newo, int64_t *r)
+size_t filel(char *fn, off_t offset, size_t len, off_t *newo, int64_t *r)
 {
     char *addr;
     int fd;
     struct stat sb;
     off_t pa_offset;
-    size_t len, rb;
+    size_t rb;
 
     fd = open(fn, O_RDONLY);
     if (fd == -1)
@@ -81,37 +81,24 @@ size_t filel(char *fn, off_t offset, size_t slen, off_t *newo, int64_t *r)
     if (fstat(fd, &sb) == -1)           /* To obtain file size */
         handle_error("fstat");
 
-//    offset = 0;
-    len = sb.st_size;
-
     pa_offset = offset & ~(sysconf(_SC_PAGE_SIZE) - 1);
                /* offset for mmap() must be page aligned */
 
     if (offset >= sb.st_size)
-    {
-        fprintf(stderr, "offset is past end of file\n");
-        exit(EXIT_FAILURE);
-    }
+        return(0);
 
     if (offset + len > sb.st_size)
-        len = sb.st_size - offset;
-                       /* Can't display bytes past end of file */
-    else    /* No len arg ==> display to end of file */
         len = sb.st_size - offset;
 
     addr = mmap(NULL, len + offset - pa_offset, PROT_READ, MAP_PRIVATE, fd, pa_offset);
     if (addr == MAP_FAILED)
         handle_error("mmap");
-    else
-    {
-        printf("%d\n", len);
-        printf("%d\n", len);
-    }
 
     rb = sum_sLEB128((unsigned char*)addr, len, r);
 
     munmap(addr, len + offset - pa_offset);
     close(fd);
+    *newo=offset+rb;
     return rb;
 }
 
@@ -121,7 +108,7 @@ int file2(char *fn) {
     int64_t s, sum;
     sum=0;
     start=0;
-    slen=(1>>12);	//4K
+    slen=15;	//(1<<12);	//4K
     for(;;)
     {
         n=filel(fn, start, slen, &newstart, &s);
