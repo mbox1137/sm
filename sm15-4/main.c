@@ -108,7 +108,9 @@ int file2(char *fn) {
     int64_t s, sum;
     sum=0;
     start=0;
-    slen=15;	//(1<<12);	//4K
+//    slen=15;
+//    slen=(1<<12);	//4K
+    slen=(1ll<<32)-1;	//4G-1
     for(;;)
     {
         n=filel(fn, start, slen, &newstart, &s);
