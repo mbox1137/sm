@@ -66,13 +66,13 @@ size_t sum_sLEB128(unsigned char *cp, size_t n, int64_t *s)
     return rb0;
 }
 
-size_t filel(char *fn, off_t offset, size_t len, off_t *newp, int64_t *r)
+size_t filel(char *fn, off_t offset, size_t slen, off_t *newo, int64_t *r)
 {
     char *addr;
     int fd;
     struct stat sb;
     off_t pa_offset;
-    size_t length, rb;
+    size_t len, rb;
 
     fd = open(fn, O_RDONLY);
     if (fd == -1)
@@ -81,8 +81,8 @@ size_t filel(char *fn, off_t offset, size_t len, off_t *newp, int64_t *r)
     if (fstat(fd, &sb) == -1)           /* To obtain file size */
         handle_error("fstat");
 
-    offset = 0;
-    length = sb.st_size;
+//    offset = 0;
+    len = sb.st_size;
 
     pa_offset = offset & ~(sysconf(_SC_PAGE_SIZE) - 1);
                /* offset for mmap() must be page aligned */
@@ -93,24 +93,24 @@ size_t filel(char *fn, off_t offset, size_t len, off_t *newp, int64_t *r)
         exit(EXIT_FAILURE);
     }
 
-    if (offset + length > sb.st_size)
-        length = sb.st_size - offset;
+    if (offset + len > sb.st_size)
+        len = sb.st_size - offset;
                        /* Can't display bytes past end of file */
-    else    /* No length arg ==> display to end of file */
-        length = sb.st_size - offset;
+    else    /* No len arg ==> display to end of file */
+        len = sb.st_size - offset;
 
-    addr = mmap(NULL, length + offset - pa_offset, PROT_READ, MAP_PRIVATE, fd, pa_offset);
+    addr = mmap(NULL, len + offset - pa_offset, PROT_READ, MAP_PRIVATE, fd, pa_offset);
     if (addr == MAP_FAILED)
         handle_error("mmap");
     else
     {
-        printf("%d\n", length);
-        printf("%d\n", length);
+        printf("%d\n", len);
+        printf("%d\n", len);
     }
 
-    rb = sum_sLEB128((unsigned char*)addr, length, r);
+    rb = sum_sLEB128((unsigned char*)addr, len, r);
 
-    munmap(addr, length + offset - pa_offset);
+    munmap(addr, len + offset - pa_offset);
     close(fd);
     return rb;
 }
@@ -121,7 +121,7 @@ int file2(char *fn) {
     int64_t s, sum;
     sum=0;
     start=0;
-    slen=(1>>12);
+    slen=(1>>12);	//4K
     for(;;)
     {
         n=filel(fn, start, slen, &newstart, &s);
