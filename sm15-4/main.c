@@ -1,8 +1,10 @@
 //https://unixhow.com/3169/chto-takoe-i-dlya-chego-nuzhen-sistemnyj-vyzov-mmap
 //https://github.com/gcc-mirror/gcc/blob/master/include/leb128.h
 
-#define DEBUG 0
-#define NNM 15
+#define DEBUG 1
+#define		NNM 15
+//#define	NNM (1<<12);		//4K
+//#define	NNM ((1ll<<32)-1);	//4G-1
 
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -41,7 +43,7 @@ static inline size_t read_sleb128_to_int64 (unsigned char *buf, unsigned char *b
     return p - buf;
 }
 
-size_t sum_sLEB128(unsigned char *cp, size_t n, int64_t *s)
+size_t sum_sLEB128(unsigned char *cp, size_t yn, size_t rn, int64_t *s)
 {
     int64_t r;
     size_t dcp, rb, rb0;
@@ -52,7 +54,7 @@ size_t sum_sLEB128(unsigned char *cp, size_t n, int64_t *s)
     *s = 0;
     for(;;)
     {
-        rb = read_sleb128_to_int64 (&cp[dcp], &cp[n], &r);
+        rb = read_sleb128_to_int64 (&cp[dcp], &cp[rn], &r);
         if(rb == 0)
             break;
         rb0+=rb;
@@ -62,6 +64,8 @@ size_t sum_sLEB128(unsigned char *cp, size_t n, int64_t *s)
 #endif
         *s += r;
         k++;
+        if(rb0>yn)
+            break;
     }
     return rb0;
 }
@@ -72,7 +76,7 @@ size_t filel(char *fn, off_t offset, size_t len, off_t *newo, int64_t *r)
     int fd;
     struct stat sb;
     off_t pa_offset;
-    size_t rb;
+    size_t rb, ylen;
 
     fd = open(fn, O_RDONLY);
     if (fd == -1)
@@ -87,14 +91,17 @@ size_t filel(char *fn, off_t offset, size_t len, off_t *newo, int64_t *r)
     if (offset >= sb.st_size)
         return(0);
 
+    ylen=len-7;
     if (offset + len > sb.st_size)
+    {
         len = sb.st_size - offset;
-
+        ylen=len;
+    }
     addr = mmap(NULL, len + offset - pa_offset, PROT_READ, MAP_PRIVATE, fd, pa_offset);
     if (addr == MAP_FAILED)
         handle_error("mmap");
 
-    rb = sum_sLEB128((unsigned char*)(addr+offset), len, r);
+    rb = sum_sLEB128((unsigned char*)(addr+offset-pa_offset), ylen, len, r);
 
     munmap(addr, len + offset - pa_offset);
     close(fd);
@@ -108,9 +115,7 @@ int file2(char *fn) {
     int64_t s, sum;
     sum=0;
     start=0;
-//    slen=15;
-//    slen=(1<<12);	//4K
-    slen=(1ll<<32)-1;	//4G-1
+    slen=NNM;
     for(;;)
     {
         n=filel(fn, start, slen, &newstart, &s);
