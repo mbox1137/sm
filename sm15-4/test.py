@@ -30,7 +30,7 @@ if len(sys.argv)>1:
 if len(nums)==0:
     nums=[k for k in range(int(sys.argv[2]))]
 
-print(f"sum({nums[:5]}...{nums[-5:]})={sum(nums)}")
+print(f"sum({nums[:3]}...{nums[-3:]})={sum(nums)}")
 
 #nums = [random.randint(0,1000) for _ in range(10)]
 print(f"nums: {sys.getsizeof(nums)}")

@@ -2,9 +2,10 @@
 //https://github.com/gcc-mirror/gcc/blob/master/include/leb128.h
 
 #define DEBUG 0
-//#define		NNM 15
+//#define	NNM 15
 //#define	NNM (1<<12);		//4K
-#define	NNM ((1ll<<32)-1);	//4G-1
+#define		NNM (1<<22);		//4M
+//#define	NNM ((1ll<<32)-1);	//4G-1
 
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -70,13 +71,15 @@ size_t sum_sLEB128(unsigned char *cp, size_t yn, size_t rn, int64_t *s)
     return rb0;
 }
 
-size_t filel(char *fn, off_t offset, size_t len, off_t *newo, int64_t *r)
+size_t filel(char *fn, off_t offset, size_t len, off_t *newo, int64_t *r, 
+    size_t *fsize, size_t *wsize)
 {
     char *addr;
     int fd;
     struct stat sb;
     off_t pa_offset;
     size_t rb, ylen;
+    size_t wmax;
 
     fd = open(fn, O_RDONLY);
     if (fd == -1)
@@ -84,6 +87,8 @@ size_t filel(char *fn, off_t offset, size_t len, off_t *newo, int64_t *r)
 
     if (fstat(fd, &sb) == -1)           /* To obtain file size */
         handle_error("fstat");
+
+    *fsize=sb.st_size;
 
     pa_offset = offset & ~(sysconf(_SC_PAGE_SIZE) - 1);
                /* offset for mmap() must be page aligned */
@@ -97,6 +102,9 @@ size_t filel(char *fn, off_t offset, size_t len, off_t *newo, int64_t *r)
         len = sb.st_size - offset;
         ylen=len;
     }
+
+    *wsize=len;
+
     addr = mmap(NULL, len + offset - pa_offset, PROT_READ, MAP_PRIVATE, fd, pa_offset);
     if (addr == MAP_FAILED)
         handle_error("mmap");
@@ -109,27 +117,34 @@ size_t filel(char *fn, off_t offset, size_t len, off_t *newo, int64_t *r)
     return rb;
 }
 
-int file2(char *fn) {
+int file2(char *fn, size_t *fsize, size_t *wsize) {
     off_t start, newstart;
     size_t slen, n;
     int64_t s, sum;
+    size_t wmax, ws;
     sum=0;
     start=0;
     slen=NNM;
+    wmax=0;
     for(;;)
     {
-        n=filel(fn, start, slen, &newstart, &s);
+        n=filel(fn, start, slen, &newstart, &s,  fsize, &ws);
+        if(ws>wmax)
+            wmax=ws;
         if(n==0)
             break;
         sum+=s;
         start=newstart;
     }
+    *wsize=wmax;
     return sum;
 }
 
 int main(int argc, char *argv[])
 {
     char s[132];
+    int sum;
+    size_t fsize, wsize;
 
     if (argc < 2)
     {
@@ -138,7 +153,12 @@ int main(int argc, char *argv[])
     }
 
     for(int k = 1; k < argc; k++)
-        printf("%d\n", file2(argv[k]));
+    {
+        sum=file2(argv[k], &fsize, &wsize);
+        printf("%d\n", fsize);
+        printf("%d\n", wsize);
+        printf("%d\n", sum);
+    }
 
     return 0;
 }
