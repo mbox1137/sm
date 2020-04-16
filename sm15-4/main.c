@@ -1,10 +1,10 @@
 //https://unixhow.com/3169/chto-takoe-i-dlya-chego-nuzhen-sistemnyj-vyzov-mmap
 //https://github.com/gcc-mirror/gcc/blob/master/include/leb128.h
 
-#define DEBUG 1
-#define		NNM 15
+#define DEBUG 0
+//#define		NNM 15
 //#define	NNM (1<<12);		//4K
-//#define	NNM ((1ll<<32)-1);	//4G-1
+#define	NNM ((1ll<<32)-1);	//4G-1
 
 #include <sys/mman.h>
 #include <sys/stat.h>
