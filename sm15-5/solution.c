@@ -78,18 +78,23 @@
 
 	line=0;
 	k=0;
+	kl=-1;
 	for(;;) {
-	    if(k>=length)
+	    while((k<length) && (cp[k]!='\n'))
+	        k++;
+            line++;
+            if(line>=line2)
                 break;
-	    if(cp[k]=='\n')
-                {
-	        if(line >= line2)
-	            break;
-	        line++;
-	        }
-	    k++;
+            dk=k-kl-1;
+            if(dk>0)
+                write(STDOUT_FILENO, &cp[kl+1], dk);
+            write(STDOUT_FILENO, nl, 1);
+            kl=k;
+            k++;
+	    if(k>=length)
+	        break;
 	}
-
+#if 0
 	if((k>=length) && (k>0) && (cp[k-1]=='\n'))
            k--;
 	kl=k;
@@ -121,7 +126,7 @@
                 break;
             }
 	}	//for(;;)
-
+#endif
 	munmap(addr, length + offset - pa_offset);
 	close(fd);
 	exit(EXIT_SUCCESS);

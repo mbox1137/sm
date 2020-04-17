@@ -106,7 +106,8 @@ size_t filel(char *fn, off_t offset, size_t len, off_t *newo, int64_t *r,
 
     *wsize=len;
 
-    addr = mmap(NULL, len + offset - pa_offset, PROT_READ, MAP_PRIVATE, fd, pa_offset);
+    addr = mmap(NULL, len + offset - pa_offset, PROT_READ, 
+        MAP_PRIVATE | MAP_32BIT, fd, pa_offset);
     if (addr == MAP_FAILED)
         handle_error("mmap");
 

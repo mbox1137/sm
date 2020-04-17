@@ -10,4 +10,6 @@ function my {
 #	my ab.txt 0 $n2
 #done
 
-my f2.txt 0 10
+my file.txt 0 10
+my f.txt 0 10
+my f1.txt 0 10
