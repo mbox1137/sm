@@ -94,39 +94,7 @@
 	    if(k>=length)
 	        break;
 	}
-#if 0
-	if((k>=length) && (k>0) && (cp[k-1]=='\n'))
-           k--;
-	kl=k;
-	for(;;)
-        {
-	    k--;
-	    if(kl>0)
-            {
-                if(k>=0)
-                {
-	            if(cp[k]=='\n')
-                    {
-		        if(line <= line1)
-		            break;
-		        line--;
-	                if(cp[k+1]!='\n')
-                        {
-		            dk=kl-k-1;
-                            if(dk>0)
-		                write(STDOUT_FILENO, &cp[k+1], dk);
-                        }
-                        write(STDOUT_FILENO, nl, 1);
-                        kl=k;
-                    }	//cp[k]=='\n'
-                }	//k>=0
-            } else	//kl>0
-            {
-                write(STDOUT_FILENO, nl, 1);
-                break;
-            }
-	}	//for(;;)
-#endif
+
 	munmap(addr, length + offset - pa_offset);
 	close(fd);
 	exit(EXIT_SUCCESS);
