@@ -4,7 +4,8 @@
 #define DEBUG 0
 //#define	NNM 15
 //#define	NNM (1<<12);		//4K
-#define		NNM (1<<22);		//4M
+//#define	NNM (1<<22);		//4M
+#define		NNM (1ll<<31);		//2G
 //#define	NNM ((1ll<<32)-1);	//4G-1
 
 #include <sys/mman.h>

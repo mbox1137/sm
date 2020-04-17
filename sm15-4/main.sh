@@ -6,5 +6,7 @@ cat main.tst |./test.py test.bin
 cat test.bin |hexdump -C
 ./main test.bin
 echo
-dd if=/dev/zero of=zero.bin bs=4k count=4k
+#2G-1k
+dd if=/dev/zero of=zero.bin bs=1k count=2097151
+#dd if=/dev/zero of=zero.bin bs=4k count=4k
 ./main zero.bin
