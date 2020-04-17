@@ -59,5 +59,5 @@ main : main.o Makefile
 	$(AS) $(ASFLAGS) $(GDB) -a=$@.lst -o $@ $<
 
 clean:
-	rm -f $(EXEC) $(OBJS) $(SCDRY) *~ *.lst .[^.]*~ *.dat
+	rm -f $(EXEC) $(OBJS) $(SCDRY) *~ *.lst .[^.]*~ *.bin
 
