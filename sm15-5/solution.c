@@ -101,9 +101,9 @@
 	for(;;) {
 	    while((k>=0) && (cp[k]!='\n'))
 	        k--;
-            line--;
             if(line<=line1-1)
                 break;
+            line--;
             dk=kl-k-1;
             if(dk>0)
                 write(STDOUT_FILENO, &cp[k+1], dk);
