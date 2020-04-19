@@ -87,8 +87,8 @@
                 break;
 	    while((k<length) && (cp[k]!='\n'))
 	        k++;
+#if DEBUG
             dk=k-kl-1;
-#if DEUG
             if(dk>0)
                 write(STDOUT_FILENO, &cp[kl+1], dk);
             write(STDOUT_FILENO, nl, 1);
@@ -101,7 +101,8 @@
 #if DEBUG
         write(STDOUT_FILENO, delim, 5);
 #endif
-//        line--;
+        if(k<length)
+            line--;
 	k=kl-1;
 	for(;;) {
 	    while((k>=0) && (cp[k]!='\n'))

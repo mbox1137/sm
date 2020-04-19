@@ -1,4 +1,4 @@
 b main
-b solution.c:77
-b solution.c:98
-r f.txt 2 3
+b solution.c:81
+b solution.c:105
+r f2.txt 1 4
