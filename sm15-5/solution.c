@@ -81,11 +81,11 @@
 	k=0;
 	kl=-1;
 	for(;;) {
-	    while((k<length) && (cp[k]!='\n'))
-	        k++;
             line++;
             if(line>=line2)
                 break;
+	    while((k<length) && (cp[k]!='\n'))
+	        k++;
             dk=k-kl-1;
             if(dk>0)
                 write(STDOUT_FILENO, &cp[kl+1], dk);
@@ -97,21 +97,21 @@
 	}
 
         write(STDOUT_FILENO, delim, 5);
-	kl=k;
+	k=kl-1;
 	for(;;) {
 	    while((k>=0) && (cp[k]!='\n'))
 	        k--;
+            line--;
+            if(line<=line1-1)
+                break;
             dk=kl-k-1;
             if(dk>0)
                 write(STDOUT_FILENO, &cp[k+1], dk);
             write(STDOUT_FILENO, nl, 1);
-            line--;
-            if(line<line1)
-                break;
             kl=k;
-            k--;
 	    if(k<0)
 	        break;
+            k--;
 	}
 
 	munmap(addr, length + offset - pa_offset);
