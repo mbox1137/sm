@@ -24,8 +24,9 @@
            char *cp;
            int k, dk, kl;
            char *nl="\n";
+#if DEBUG
            char *delim="----\n";
-
+#endif
            if (argc == 1) {
                strcpy(fn,"file.txt");
                line1=4;
@@ -87,16 +88,20 @@
 	    while((k<length) && (cp[k]!='\n'))
 	        k++;
             dk=k-kl-1;
+#if DEUG
             if(dk>0)
                 write(STDOUT_FILENO, &cp[kl+1], dk);
             write(STDOUT_FILENO, nl, 1);
+#endif
             kl=k;
             k++;
 	    if(k>=length)
 	        break;
 	}
-
+#if DEBUG
         write(STDOUT_FILENO, delim, 5);
+#endif
+//        line--;
 	k=kl-1;
 	for(;;) {
 	    while((k>=0) && (cp[k]!='\n'))
