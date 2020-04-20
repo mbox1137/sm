@@ -9,6 +9,57 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+typedef struct {
+    char *names;
+    char **pnames;
+    off_t kn;
+    size_t nn;
+    off_t kpn;
+    size_t npn;
+    } CTRLN;
+
+void addname(CTRLN *z, char *name) {
+    size_t n;
+    if(!name) {
+        if(z->names)
+            free(z->names);
+        if(z->pnames)
+            free(z->pnames);
+        z->kn=0;
+        z->nn=0;
+        z->kpn=0;
+        z->npn=0;
+        return;
+    }
+    n=strlen(name);
+    if(n==0) {
+        z->kn=0;
+        z->kpn=0;
+        return;
+    }
+    if((z->kn+n+1) >= (z->nn)) {
+        if(!z->names) {
+            z->nn = 1<<10;
+            z->names = malloc(z->nn);
+        } else {
+            z->nn *= 2;
+            z->names = realloc(z->names, z->nn);
+        }
+    }
+    if((z->kpn) >= (z->npn)) {
+        if(!z->pnames) {
+            z->npn = 1<<7;
+            z->pnames = malloc(z->npn*sizeof(char*));
+        } else {
+            z->npn *= 2;
+            z->pnames = realloc(z->pnames, z->npn*sizeof(char*));
+        }
+    }
+    (z->pnames)[(z->kpn)++]=&((z->names)[z->kn]);
+    strcpy(&((z->names)[z->kn]),name);
+    z->kn += n+1;
+}
+
 static int mycmp(const void *p1, const void *p2)
 {
     return strcasecmp(* (char * const *) p1, * (char * const *) p2);
@@ -139,15 +190,19 @@ void traverse(char *path, char *name)
 int main(int argc, char *argv[])
 {
     char *fn = "a";
+    CTRLN ctrln;
+    ctrln.names=NULL;
+    ctrln.pnames=NULL;
+
+    addname(&ctrln, NULL);	//init
     if (argc == 2)
         fn=argv[1];
     else if (argc != 1)
     {
-        fprintf(stderr, "main [a]\n");
+        fprintf(stderr, "%s [dir]\n",argv[0]);
         return -1;
     }
-
     traverse(fn, NULL);
-
+    addname(&ctrln, NULL);	//finit
     return 0;
 }
