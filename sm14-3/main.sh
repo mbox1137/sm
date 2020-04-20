@@ -1,7 +1,9 @@
 #!/bin/bash
-#https://defuse.ca/big-number-calculator.htm
+#./main.sh >main.log 2>&1
 
-#DEBUG
-#./main ~ >main.lst
-#find ~ -type d >find.lst
-#cat main.lst |./main.py find.lst
+echo tree:
+time tree ~/BP/P/C/Andrew/ >/dev/null
+echo ----
+echo
+echo ./main:
+time ./main ~/BP/P/C/Andrew/ >/dev/null
