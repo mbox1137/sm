@@ -125,7 +125,7 @@ int filelist(char **names, char *path)
     return nf;
 }
 
-void traverse(char *path, char *name)
+void traverse_(char *path, char *name)
 {
     char** pnames;
     char ffn[PATH_MAX];
@@ -169,7 +169,7 @@ void traverse(char *path, char *name)
         for (k = 0; k < nf; k++)
         {
             sprintf(ffn, "%s/%s", path, pnames[k]);
-        traverse(ffn,pnames[k]);
+        traverse_(ffn,pnames[k]);
         }
 
         for (k = 0; k < nf; k++)
@@ -186,15 +186,18 @@ void traverse(char *path, char *name)
     return;
 }
 
+void traverse(char *path, char *name)
+{
+    CTRLN ctrln;
+    ctrln.names=NULL;
+    ctrln.pnames=NULL;
+    addname(&ctrln, NULL);	//init
+    addname(&ctrln, NULL);	//finit
+}
 
 int main(int argc, char *argv[])
 {
     char *fn = "a";
-    CTRLN ctrln;
-    ctrln.names=NULL;
-    ctrln.pnames=NULL;
-
-    addname(&ctrln, NULL);	//init
     if (argc == 2)
         fn=argv[1];
     else if (argc != 1)
@@ -202,7 +205,6 @@ int main(int argc, char *argv[])
         fprintf(stderr, "%s [dir]\n",argv[0]);
         return -1;
     }
-    traverse(fn, NULL);
-    addname(&ctrln, NULL);	//finit
+    traverse_(fn, NULL);
     return 0;
 }
