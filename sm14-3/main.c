@@ -1,4 +1,4 @@
-#define DEBUG 1
+#define DEBUG 0
 #define _GNU_SOURCE 1
 
 #include <errno.h>
@@ -12,15 +12,15 @@
 
 typedef struct {
     char *names;
-    off_t *pnames;
-    off_t kn;
-    size_t nn;
-    off_t kpn;
-    size_t npn;
+    int *pnames;
+    int kn;
+    int nn;
+    int kpn;
+    int npn;
     } CTRLN;
 
 void addname(CTRLN *z, char *name) {
-    size_t n;
+    int n;
     if(!name) {
         if(z->names)
             free(z->names);
@@ -40,7 +40,7 @@ void addname(CTRLN *z, char *name) {
     }
     if((z->kn+n+1) >= (z->nn)) {
         if(!z->names) {
-            z->nn = 1<<12;
+            z->nn = 1<<13;
             z->names = malloc(z->nn);
             if(z->names == NULL)
                 z->names = NULL;
@@ -53,13 +53,13 @@ void addname(CTRLN *z, char *name) {
     }
     if((z->kpn) >= (z->npn)) {
         if(!z->pnames) {
-            z->npn = 1<<9;
-            z->pnames = malloc(z->npn*sizeof(off_t));
+            z->npn = 1<<10;
+            z->pnames = malloc((z->npn) * sizeof(int));
             if(z->pnames == NULL)
                 z->pnames = NULL;
         } else {
             z->npn *= 2;
-            z->pnames = realloc(z->pnames, z->npn*sizeof(off_t));
+            z->pnames = realloc(z->pnames, z->npn*sizeof(int));
             if(z->pnames == NULL)
                 z->pnames = NULL;
         }
@@ -196,13 +196,13 @@ void traverse_(char *path, char *name)
     return;
 }
 
-static int mycmp(off_t *k1, off_t *k2, void *pz)
+static int mycmp(const void *kp1, const void *kp2, void *pz)
 {
     char *p1, *p2;
     CTRLN *z;
     z=(CTRLN*) pz;
-    p1=&(z->names[z->pnames[*k1]]);
-    p2=&(z->names[z->pnames[*k2]]);
+    p1=&(z->names[*(int*)kp1]);
+    p2=&(z->names[*(int*)kp2]);
     return strcasecmp(p1, p2);
 }
 
@@ -214,7 +214,7 @@ void traverse(char *path, char *name)
     struct stat statbuf;
     char ffn[PATH_MAX];
     char tmpp[PATH_MAX];
-    off_t k;
+    int k;
     DIR *dir;
     struct dirent *de;
 
@@ -248,7 +248,7 @@ void traverse(char *path, char *name)
         addname(&ctrln, de->d_name);
     }
     closedir(dir);
-//    qsort_r(ctrln.pnames, ctrln.npn, sizeof(off_t), mycmp, &ctrln);
+    qsort_r(ctrln.pnames, ctrln.kpn, sizeof(int), mycmp, &ctrln);
 
     for (k = 0; k < ctrln.kpn; k++)
     {
