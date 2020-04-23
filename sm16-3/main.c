@@ -39,7 +39,7 @@ EXAMPLE
 
         mypid=getpid();
         if(n>0) {
-            printf("%d",k);
+            printf("%d",1);
             fflush(NULL);
         }
         for(k=2;k<=n;k++) {
