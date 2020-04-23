@@ -25,15 +25,22 @@ EXAMPLE
         pid_t cpid;
         char buf;
         int exitstatus;
+        int n;
 
         if (argc != 2) {
-            fprintf(stderr, "Usage: %s <string>\n", argv[0]);
+            fprintf(stderr, "Usage: %s 3\n", argv[0]);
             exitstatus=EXIT_FAILURE;
             goto exit;
         }
 
-        if(!(pipefd=malloc(1*2*sizeof(int)))) {
-            perror("pipe");
+        if(sscanf(argv[1],"%d",&n)!=1) {
+            perror("sscanf");
+            exitstatus=EXIT_FAILURE;
+            goto exit;
+        }
+
+        if(!(pipefd=malloc(n*2*sizeof(int)))) {
+            perror("malloc");
             exitstatus=EXIT_FAILURE;
             goto exit;
         }
