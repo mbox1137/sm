@@ -21,60 +21,44 @@ EXAMPLE
     int
     main(int argc, char *argv[])
     {
-        int *pipefd;
-        pid_t cpid;
-        char buf;
+        pid_t cpid, mypid;
+        int k, n;
         int exitstatus;
-        int n;
 
         if (argc != 2) {
             fprintf(stderr, "Usage: %s 3\n", argv[0]);
             exitstatus=EXIT_FAILURE;
-            goto exit;
+            exit(exitstatus);
         }
 
         if(sscanf(argv[1],"%d",&n)!=1) {
             perror("sscanf");
             exitstatus=EXIT_FAILURE;
-            goto exit;
-        }
-
-        if(!(pipefd=malloc(n*2*sizeof(int)))) {
-            perror("malloc");
-            exitstatus=EXIT_FAILURE;
-            goto exit;
-        }
-
-        if (pipe(pipefd) == -1) {
-            perror("pipe");
-            exitstatus=EXIT_FAILURE;
-            goto exit;
-        }
-
-        cpid = fork();
-        if (cpid == -1) {
-            perror("fork");
-            exitstatus=EXIT_FAILURE;
-            goto exit;
-        }
-
-        if (cpid == 0) {      /* Child reads from pipe */
-            close(pipefd[1]);           /* Close unused write end */
-            while (read(pipefd[0], &buf, 1) > 0)
-                write(STDOUT_FILENO, &buf, 1);
-            write(STDOUT_FILENO, "\n", 1);
-            close(pipefd[0]);
-            exitstatus=EXIT_SUCCESS;
             exit(exitstatus);
-        } else {          /* Parent writes argv[1] to pipe */
-            close(pipefd[0]);           /* Close unused read end */
-            write(pipefd[1], argv[1], strlen(argv[1]));
-            close(pipefd[1]);           /* Reader will see EOF */
-            wait(NULL);             /* Wait for child */
-            exitstatus=EXIT_SUCCESS;
-            goto exit;
         }
-exit:
-        free(pipefd);
-        exit(exitstatus);
+
+        mypid=getpid();
+        if(n>0) {
+            printf("%d",k);
+            fflush(NULL);
+        }
+        for(k=2;k<=n;k++) {
+            cpid = fork();
+            if (cpid == -1) {
+                perror("fork");
+                exitstatus=EXIT_FAILURE;
+                exit(exitstatus);
+            }
+            if (cpid == 0) {      /* Child reads from pipe */
+                printf(" %d",k);
+                fflush(NULL);
+                continue;
+            } else {          /* Parent writes argv[1] to pipe */
+                wait(NULL);             /* Wait for child */
+                break;
+            }
+        }
+        if(mypid==getpid() && n>0)
+            printf("\n");
+        exit(EXIT_SUCCESS);
     }

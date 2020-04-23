@@ -1,6 +1,8 @@
 #!/bin/bash
 function my {
-	echo $1 $2..$3
-	echo
+	while [ . != .$1 ] ; do
+	echo $1: $(./main $1)
+	shift
+	done
 }
-./main
+my {0..5}
