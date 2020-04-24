@@ -1,4 +1,5 @@
 #define DEBUG 1
+
 /*
 man 2 pipe
 
@@ -43,25 +44,25 @@ EXAMPLE
 #else
             if (cpid == -1) {
 #endif
-                perror("fork");
-                printf("-1\n");
                 exitstatus=EXIT_FAILURE;
                 exit(exitstatus);
             }
             if (cpid == 0) {	/* Child */
                 continue;
             } else {		/* Parent */
-//                wait(NULL);	/* Wait for child */
                 waitpid(cpid, &pstat, 0);
                 if ( WIFEXITED(pstat) ) 
                 { 
-                    int exitstatus = WEXITSTATUS(pstat);
-                    printf("Exit status of the child was %d\n", exitstatus);
+                    exitstatus = WEXITSTATUS(pstat);
+                    if(exitstatus) {
+                        if(mypid==getpid())
+                            printf("-1\n");
+                        exit(EXIT_FAILURE);
+                    }
                 }
                 printf("%d\n",n);
                 break;
             }
         }
-        if(mypid==getpid())
-            exit(EXIT_SUCCESS);
+        exit(EXIT_SUCCESS);
     }
