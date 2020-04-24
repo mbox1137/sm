@@ -22,7 +22,7 @@ EXAMPLE
     main(int argc, char *argv[])
     {
         pid_t cpid, mypid;
-        int k, n;
+        int n;
         int exitstatus;
 
         if (argc != 1) {
@@ -31,34 +31,26 @@ EXAMPLE
             exit(exitstatus);
         }
 
-        while(scanf("%d",&n)==1) {
-            printf("%d\n", n);
-        }
-        
-        return(0);
-
         mypid=getpid();
-        if(n>0) {
-            printf("%d",1);
-            fflush(NULL);
-        }
-        for(k=2;k<=n;k++) {
+        for(;;) {
+            if(scanf("%d",&n)!=1)
+                exit(EXIT_SUCCESS);
             cpid = fork();
             if (cpid == -1) {
                 perror("fork");
+                printf("-1\n");
                 exitstatus=EXIT_FAILURE;
                 exit(exitstatus);
             }
-            if (cpid == 0) {      /* Child reads from pipe */
-                printf(" %d",k);
-                fflush(NULL);
+            if (cpid == 0) {      /* Child */
                 continue;
-            } else {          /* Parent writes argv[1] to pipe */
+            } else {          /* Parent */
                 wait(NULL);             /* Wait for child */
+                printf("%d\n",n);
+//                fflush(NULL);
                 break;
             }
         }
-        if(mypid==getpid() && n>0)
-            printf("\n");
-        exit(EXIT_SUCCESS);
+        if(mypid==getpid())
+            exit(EXIT_SUCCESS);
     }
