@@ -1,3 +1,4 @@
+#define DEBUG 1
 /*
 man 2 pipe
 
@@ -24,6 +25,7 @@ EXAMPLE
         pid_t cpid, mypid;
         int n;
         int exitstatus;
+        int pstat;
 
         if (argc != 1) {
             fprintf(stderr, "Usage: %s <main.tst\n", argv[0]);
@@ -36,18 +38,27 @@ EXAMPLE
             if(scanf("%d",&n)!=1)
                 exit(EXIT_SUCCESS);
             cpid = fork();
+#if DEBUG
+            if ( (cpid == -1) || (n == -1) ) {
+#else
             if (cpid == -1) {
+#endif
                 perror("fork");
                 printf("-1\n");
                 exitstatus=EXIT_FAILURE;
                 exit(exitstatus);
             }
-            if (cpid == 0) {      /* Child */
+            if (cpid == 0) {	/* Child */
                 continue;
-            } else {          /* Parent */
-                wait(NULL);             /* Wait for child */
+            } else {		/* Parent */
+//                wait(NULL);	/* Wait for child */
+                waitpid(cpid, &pstat, 0);
+                if ( WIFEXITED(pstat) ) 
+                { 
+                    int exitstatus = WEXITSTATUS(pstat);
+                    printf("Exit status of the child was %d\n", exitstatus);
+                }
                 printf("%d\n",n);
-//                fflush(NULL);
                 break;
             }
         }
