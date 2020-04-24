@@ -25,17 +25,17 @@ EXAMPLE
         int k, n;
         int exitstatus;
 
-        if (argc != 2) {
-            fprintf(stderr, "Usage: %s 3\n", argv[0]);
+        if (argc != 1) {
+            fprintf(stderr, "Usage: %s <main.tst\n", argv[0]);
             exitstatus=EXIT_FAILURE;
             exit(exitstatus);
         }
 
-        if(sscanf(argv[1],"%d",&n)!=1) {
-            perror("sscanf");
-            exitstatus=EXIT_FAILURE;
-            exit(exitstatus);
+        while(scanf("%d",&n)==1) {
+            printf("%d\n", n);
         }
+        
+        return(0);
 
         mypid=getpid();
         if(n>0) {

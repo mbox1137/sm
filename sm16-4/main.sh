@@ -5,4 +5,4 @@ function my {
 	shift
 	done
 }
-my {0..5}
+./main <main.tst
