@@ -73,8 +73,18 @@ N,   F,   A0, D, K
         printf("N=%d F=%s A0=%d D=%d K=%d\n",n,f,a0,d,k);
 #endif
 //----------------------------------------------- без пайпов!!!
-        mypid=getpid();
-        kill(mypid, SIGSTOP);
+        cpid=fork();
+        if(cpid==0) {	//child
+            kill(getpid(), SIGSTOP);
+            sleep(1);
+        } else {	//parent
+            sleep(1);
+            printf("...\n");
+            sleep(1);
+            kill(cpid, SIGCONT);
+            wait(NULL);
+        }
+//        pause();
         return(0);
 exit:
         exit(exitstatus);
