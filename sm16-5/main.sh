@@ -1,6 +1,2 @@
 #!/bin/bash
-function my {
-	echo $1 $2..$3
-	echo
-}
-./main
+./main 3 out.bin 4 2 4

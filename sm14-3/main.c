@@ -1,5 +1,8 @@
 #define DEBUG 0
+#define	QSORT_R 0
+#if QSORT_R
 #define _GNU_SOURCE 1
+#endif
 
 #include <errno.h>
 #include <stdio.h>
@@ -217,6 +220,10 @@ void traverse(char *path, char *name)
     int k;
     DIR *dir;
     struct dirent *de;
+#if QSORT_R
+#else
+    char **namesorted;
+#endif
 
     addname(&ctrln, NULL);	//init
 
@@ -248,6 +255,7 @@ void traverse(char *path, char *name)
         addname(&ctrln, de->d_name);
     }
     closedir(dir);
+#if QSORT_R
     qsort_r(ctrln.pnames, ctrln.kpn, sizeof(int), mycmp, &ctrln);
 
     for (k = 0; k < ctrln.kpn; k++)
@@ -255,6 +263,23 @@ void traverse(char *path, char *name)
         sprintf(ffn, "%s/%s", path, &ctrln.names[ctrln.pnames[k]]);
         traverse(ffn, &ctrln.names[ctrln.pnames[k]]);
     }
+#else
+    namesorted=malloc(ctrln.kpn*sizeof(char*));
+    if(namesorted==NULL) {
+    }
+
+    for (k = 0; k < ctrln.kpn; k++)
+        namesorted[k]=&ctrln.names[ctrln.pnames[k]];
+
+    qsort(namesorted, ctrln.kpn, sizeof(char*), mycmp_);
+
+    for (k = 0; k < ctrln.kpn; k++)
+    {
+        sprintf(ffn, "%s/%s", path, namesorted[k]);
+        traverse(ffn, namesorted[k]);
+    }
+    free(namesorted);
+#endif
     addname(&ctrln, NULL);	//finit
 #if DEBUG
 #else
