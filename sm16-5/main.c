@@ -22,11 +22,14 @@ EXAMPLE
     #include <malloc.h>
 
     int startArithmeticProgression(int a0, int d, int k) {	//pid
-        pid_t cpid;
+        pid_t cpid, mypid;
         cpid=fork();
         if(cpid==0) {	//child
-            kill(getpid(), SIGSTOP);
-            sleep(10);
+            mypid=getpid();
+            for(;;) {
+                printf("%d:\n", mypid);
+                kill(mypid, SIGSTOP);
+            }
         } else {	//parent
             return(cpid);
         }
@@ -89,7 +92,13 @@ N,   F,   A0, D, K
         for(i=0; i<n; i++) {
             cpids[i]=startArithmeticProgression(a0, d, k);
         }
+        sleep(1);
         for(i=0; i<n; i++) {
+            kill(cpids[i], SIGCONT);
+        }
+        sleep(1);
+        for(i=0; i<n; i++) {
+            kill(cpids[i], SIGTERM);
             kill(cpids[i], SIGCONT);
         }
         wait(NULL);
