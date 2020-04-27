@@ -27,9 +27,9 @@ EXAMPLE
         if(cpid==0) {	//child
             mypid=getpid();
             for(;;) {
-                usleep(0.5*1E6);
                 kill(mypid, SIGSTOP);
-                printf("%d:\n", mypid);
+                usleep(0.5E6);
+                printf("%d: a0=%d\n", mypid, a0);
             }
         } else {	//parent
             return(cpid);
@@ -39,11 +39,10 @@ EXAMPLE
     int
     main(int argc, char *argv[])
     {
-        int exitstatus;
+        int wstatus;
         int n, a0, d, k, i, j;
         char f[132];
         pid_t *cpids, pid;
-        int wstatus;
 
         n=3;
         strcpy(f,"out.bin");
@@ -53,34 +52,36 @@ EXAMPLE
 
 #if DEBUG
         printf("N=%d F=%s A0=%d D=%d K=%d\n",n,f,a0,d,k);
+        sleep(1);
 #endif
 //----------------------------------------------- без пайпов!!!
         cpids=malloc(n*sizeof(pid_t));
         if(cpids==NULL) {
         }
         for(i=0; i<n; i++) {
-            cpids[i]=startArithmeticProgression(a0, d, k);
+            cpids[i]=startArithmeticProgression(a0+d*i, d*n, k);
         }
         for(j=0; j<k; j++) {
-//            sleep(1);
             for(i=0; i<n; i++) {
+//                printf("\ti=%d\n", i);
                 for(;;) {
                     pid=waitpid(cpids[i], &wstatus, WUNTRACED);
                     if(WIFSTOPPED(wstatus))
                         break;
                 }
                 kill(pid, SIGCONT);
-//            printf("\n");
             }
         }
-        sleep(1);
         for(i=0; i<n; i++) {
+            for(;;) {
+                pid=waitpid(cpids[i], &wstatus, WUNTRACED);
+                if(WIFSTOPPED(wstatus))
+                    break;
+                }
             kill(cpids[i], SIGTERM);
             kill(cpids[i], SIGCONT);
         }
         wait(NULL);
         free(cpids);
         return(0);
-exit:
-        exit(exitstatus);
     }
