@@ -20,6 +20,18 @@ EXAMPLE
     #include <unistd.h>
     #include <string.h>
     #include <malloc.h>
+
+    int startArithmeticProgression(int a0, int d, int k) {	//pid
+        pid_t cpid;
+        cpid=fork();
+        if(cpid==0) {	//child
+            kill(getpid(), SIGSTOP);
+            sleep(10);
+        } else {	//parent
+            return(cpid);
+        }
+    }
+
 /*
 3 out.bin 4   2  4
 N,   F,   A0, D, K
@@ -27,12 +39,10 @@ N,   F,   A0, D, K
     int
     main(int argc, char *argv[])
     {
-        int *pipefd;
-        pid_t cpid, mypid;
-        char buf;
         int exitstatus;
-        int n, a0, d, k;
+        int n, a0, d, k, i;
         char f[132];
+        pid_t *cpids;
 
         if (argc != 6) {
             fprintf(stderr, "Usage: %s N FileName A0 D K\n", argv[0]);
@@ -73,65 +83,18 @@ N,   F,   A0, D, K
         printf("N=%d F=%s A0=%d D=%d K=%d\n",n,f,a0,d,k);
 #endif
 //----------------------------------------------- без пайпов!!!
-        cpid=fork();
-        if(cpid==0) {	//child
-            kill(getpid(), SIGSTOP);
-            sleep(1);
-        } else {	//parent
-            sleep(1);
-            printf("...\n");
-            sleep(1);
-            kill(cpid, SIGCONT);
-            wait(NULL);
+        cpids=malloc(n*sizeof(pid_t));
+        if(cpids==NULL) {
         }
-//        pause();
+        for(i=0; i<n; i++) {
+            cpids[i]=startArithmeticProgression(a0, d, k);
+        }
+        for(i=0; i<n; i++) {
+            kill(cpids[i], SIGCONT);
+        }
+        wait(NULL);
+        free(cpids);
         return(0);
 exit:
         exit(exitstatus);
     }
-#if 0
-       #include <sys/wait.h>
-       #include <stdlib.h>
-       #include <unistd.h>
-       #include <stdio.h>
-
-       int
-       main(int argc, char *argv[])
-       {
-           pid_t cpid, w;
-           int wstatus;
-
-           cpid = fork();
-           if (cpid == -1) {
-               perror("fork");
-               exit(EXIT_FAILURE);
-           }
-
-           if (cpid == 0) {            /* Code executed by child */
-               printf("Child PID is %ld\n", (long) getpid());
-               if (argc == 1)
-                   pause();                    /* Wait for signals */
-               _exit(atoi(argv[1]));
-
-           } else {                    /* Code executed by parent */
-               do {
-                   w = waitpid(cpid, &wstatus, WUNTRACED | WCONTINUED);
-                   if (w == -1) {
-                       perror("waitpid");
-                       exit(EXIT_FAILURE);
-                   }
-
-                   if (WIFEXITED(wstatus)) {
-                       printf("exited, status=%d\n", WEXITSTATUS(wstatus));
-                   } else if (WIFSIGNALED(wstatus)) {
-                       printf("killed by signal %d\n", WTERMSIG(wstatus));
-                   } else if (WIFSTOPPED(wstatus)) {
-                       printf("stopped by signal %d\n", WSTOPSIG(wstatus));
-                   } else if (WIFCONTINUED(wstatus)) {
-                       printf("continued\n");
-                   }
-               } while (!WIFEXITED(wstatus) && !WIFSIGNALED(wstatus));
-               exit(EXIT_SUCCESS);
-           }
-       }
-#endif

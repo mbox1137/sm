@@ -4,7 +4,7 @@ GDB	= -g
 
 CC	= gcc
 #clang
-CFLAGS	= -m32 -fverbose-asm -msse3 -rdynamic -Wunused-variable -O0
+CFLAGS	= -m32 -fverbose-asm -Wunused-variable
 #CFLAGS	= -m32 -fverbose-asm -msse3 -nostdlib
 # -std=c99
 
@@ -19,7 +19,7 @@ ASFLAGS	= -c --32
 #ASFLAGS	= -m32 -c
 
 LD	= $(CXX)
-LDFLAGS	= -no-pie -m32 $(GDB) -ldl
+LDFLAGS	= -no-pie -m32 $(GDB)
 #LD	= ld
 #LDFLAGS	= -m elf_i386
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
