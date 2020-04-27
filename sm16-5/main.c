@@ -27,7 +27,9 @@ EXAMPLE
         if(cpid==0) {	//child
             mypid=getpid();
             for(;;) {
+                sleep(0.25);
                 printf("%d:\n", mypid);
+                fflush(NULL);
                 kill(mypid, SIGSTOP);
             }
         } else {	//parent
@@ -35,53 +37,20 @@ EXAMPLE
         }
     }
 
-/*
-3 out.bin 4   2  4
-N,   F,   A0, D, K
-*/
     int
     main(int argc, char *argv[])
     {
         int exitstatus;
-        int n, a0, d, k, i;
+        int n, a0, d, k, i, j;
         char f[132];
-        pid_t *cpids;
+        pid_t *cpids, pid;
+        
+        n=3;
+        strcpy(f,"out.bin");
+        a0=4;
+        d=2;
+        k=4;
 
-        if (argc != 6) {
-            fprintf(stderr, "Usage: %s N FileName A0 D K\n", argv[0]);
-            exitstatus=EXIT_FAILURE;
-            goto exit;
-        }
-
-        if(sscanf(argv[1],"%d",&n)!=1) {
-            perror("N?");
-            exitstatus=EXIT_FAILURE;
-            goto exit;
-        }
-
-        if(sscanf(argv[2],"%s",f)!=1) {
-            perror("F?");
-            exitstatus=EXIT_FAILURE;
-            goto exit;
-        }
-
-        if(sscanf(argv[3],"%d",&a0)!=1) {
-            perror("A0?");
-            exitstatus=EXIT_FAILURE;
-            goto exit;
-        }
-
-        if(sscanf(argv[4],"%d",&d)!=1) {
-            perror("D?");
-            exitstatus=EXIT_FAILURE;
-            goto exit;
-        }
-
-        if(sscanf(argv[5],"%d",&k)!=1) {
-            perror("K?");
-            exitstatus=EXIT_FAILURE;
-            goto exit;
-        }
 #if DEBUG
         printf("N=%d F=%s A0=%d D=%d K=%d\n",n,f,a0,d,k);
 #endif
@@ -92,9 +61,19 @@ N,   F,   A0, D, K
         for(i=0; i<n; i++) {
             cpids[i]=startArithmeticProgression(a0, d, k);
         }
-        sleep(1);
-        for(i=0; i<n; i++) {
-            kill(cpids[i], SIGCONT);
+        for(j=0; j<k; j++) {
+//            sleep(1);
+            for(i=0; i<n; i++) {
+                pid=waitpid(cpids[i], NULL, WUNTRACED);
+/*
+                printf("pid=%d\n",pid);
+                fflush(NULL);
+*/
+//WIFSTOPPED(wstatus)
+                kill(pid, SIGCONT);
+            printf("\n");
+            fflush(NULL);
+            }
         }
         sleep(1);
         for(i=0; i<n; i++) {
