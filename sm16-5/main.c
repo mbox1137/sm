@@ -27,10 +27,9 @@ EXAMPLE
         if(cpid==0) {	//child
             mypid=getpid();
             for(;;) {
-                sleep(0.25);
-                printf("%d:\n", mypid);
-                fflush(NULL);
+                usleep(0.5*1E6);
                 kill(mypid, SIGSTOP);
+                printf("%d:\n", mypid);
             }
         } else {	//parent
             return(cpid);
@@ -44,7 +43,8 @@ EXAMPLE
         int n, a0, d, k, i, j;
         char f[132];
         pid_t *cpids, pid;
-        
+        int wstatus;
+
         n=3;
         strcpy(f,"out.bin");
         a0=4;
@@ -64,15 +64,13 @@ EXAMPLE
         for(j=0; j<k; j++) {
 //            sleep(1);
             for(i=0; i<n; i++) {
-                pid=waitpid(cpids[i], NULL, WUNTRACED);
-/*
-                printf("pid=%d\n",pid);
-                fflush(NULL);
-*/
-//WIFSTOPPED(wstatus)
+                for(;;) {
+                    pid=waitpid(cpids[i], &wstatus, WUNTRACED);
+                    if(WIFSTOPPED(wstatus))
+                        break;
+                }
                 kill(pid, SIGCONT);
-            printf("\n");
-            fflush(NULL);
+//            printf("\n");
             }
         }
         sleep(1);
