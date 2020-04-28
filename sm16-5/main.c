@@ -27,8 +27,8 @@ EXAMPLE
         if(cpid==0) {	//child
             mypid=getpid();
             for(;;) {
-                kill(mypid, SIGSTOP);
                 usleep(0.5E6);
+                kill(mypid, SIGSTOP);
                 printf("%d: a0=%d\n", mypid, a0);
             }
         } else {	//parent
@@ -39,10 +39,10 @@ EXAMPLE
     int
     main(int argc, char *argv[])
     {
-        int wstatus;
         int n, a0, d, k, i, j;
         char f[132];
-        pid_t *cpids, pid;
+        pid_t *cpids;
+        siginfo_t infop;
 
         n=3;
         strcpy(f,"out.bin");
@@ -63,21 +63,24 @@ EXAMPLE
         }
         for(j=0; j<k; j++) {
             for(i=0; i<n; i++) {
-//                printf("\ti=%d\n", i);
                 for(;;) {
-                    pid=waitpid(cpids[i], &wstatus, WUNTRACED);
-                    if(WIFSTOPPED(wstatus))
+                    infop.si_code=0;
+                    waitid(P_PID, cpids[i], &infop, WEXITED|WSTOPPED);
+                    if(infop.si_code==CLD_STOPPED)
                         break;
                 }
-                kill(pid, SIGCONT);
+                kill(cpids[i], SIGCONT);
+                usleep(1000);
             }
         }
         for(i=0; i<n; i++) {
             for(;;) {
-                pid=waitpid(cpids[i], &wstatus, WUNTRACED);
-                if(WIFSTOPPED(wstatus))
+                waitid(P_PID, cpids[i], &infop, WEXITED|WSTOPPED);
+                if(infop.si_code==CLD_STOPPED)
                     break;
-                }
+            }
+        }
+        for(i=0; i<n; i++) {
             kill(cpids[i], SIGTERM);
             kill(cpids[i], SIGCONT);
         }
