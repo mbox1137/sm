@@ -27,7 +27,7 @@ EXAMPLE
         if(cpid==0) {	//child
             mypid=getpid();
             for(;;) {
-                usleep(0.5E6);
+//                usleep(0.5E6);
                 kill(mypid, SIGSTOP);
                 printf("%d: a0=%d\n", mypid, a0);
             }
@@ -52,7 +52,7 @@ EXAMPLE
 
 #if DEBUG
         printf("N=%d F=%s A0=%d D=%d K=%d\n",n,f,a0,d,k);
-        sleep(1);
+//        sleep(1);
 #endif
 //----------------------------------------------- без пайпов!!!
         cpids=malloc(n*sizeof(pid_t));
@@ -65,12 +65,18 @@ EXAMPLE
             for(i=0; i<n; i++) {
                 for(;;) {
                     infop.si_code=0;
-                    waitid(P_PID, cpids[i], &infop, WEXITED|WSTOPPED);
+                    waitid(P_PID, cpids[i], &infop, WSTOPPED);
                     if(infop.si_code==CLD_STOPPED)
                         break;
                 }
                 kill(cpids[i], SIGCONT);
-                usleep(1000);
+                for(;;) {
+                    infop.si_code=0;
+                    waitid(P_PID, cpids[i], &infop, WCONTINUED);
+                    if(infop.si_code==CLD_CONTINUED)
+                        break;
+                }
+                usleep(499);
             }
         }
         for(i=0; i<n; i++) {
