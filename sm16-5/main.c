@@ -60,6 +60,7 @@ EXAMPLE
 //----------------------------------------------- без пайпов!!!
         cpids=malloc(n*sizeof(pid_t));
         if(cpids==NULL) {
+            return(-1);
         }
         for(i=0; i<n; i++) {
             cpids[i]=startArithmeticProgression(a0+d*i, d*n, k);
@@ -85,7 +86,7 @@ EXAMPLE
         for(i=0; i<n; i++) {
             for(;;) {
                 waitid(P_PID, cpids[i], &infop, WEXITED|WSTOPPED);
-                if(infop.si_code==CLD_STOPPED)
+                if(infop.si_code==CLD_STOPPED || infop.si_code==CLD_EXITED)
                     break;
             }
         }
