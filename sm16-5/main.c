@@ -23,13 +23,16 @@ EXAMPLE
 
     int startArithmeticProgression(int a0, int d, int k) {	//pid
         pid_t cpid, mypid;
+        int a;
         cpid=fork();
         if(cpid==0) {	//child
+            a=a0;
             mypid=getpid();
             for(;;) {
 //                usleep(0.5E6);
                 kill(mypid, SIGSTOP);
-                printf("%d: a0=%d\n", mypid, a0);
+                printf("%d: a=%d\n", mypid, a);
+                a+=d;
             }
         } else {	//parent
             return(cpid);
