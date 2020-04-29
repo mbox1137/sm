@@ -11,8 +11,9 @@
     #include <unistd.h>
     #include <string.h>
     #include <malloc.h>
+    #include <fcntl.h>
 
-    int startArithmeticProgression(int a0, int d, int k) {	//pid
+    int startArithmeticProgression(int h, int a0, int d, int k) {	//pid
         pid_t cpid, mypid;
         int a;
         cpid=fork();
@@ -22,7 +23,12 @@
             for(;;) {
 //                usleep(0.5E6);
                 kill(mypid, SIGSTOP);
+#if WRITE
+//        lseek(h, n*k*sizeof(int), SEEK_SET);
+                write(h, &a, sizeof(int));
+#else
                 printf("%d: a=%d\n", mypid, a);
+#endif
                 a+=d;
             }
         } else {	//parent
@@ -34,6 +40,7 @@
     main(int argc, char *argv[])
     {
         int n, a0, d, k, i, j;
+        int h;
         char f[132];
         pid_t *cpids;
         siginfo_t infop;
@@ -49,12 +56,13 @@
 //        sleep(1);
 #endif
 //----------------------------------------------- без пайпов!!!
+        h=creat(f,0664);
         cpids=malloc(n*sizeof(pid_t));
         if(cpids==NULL) {
             return(-1);
         }
         for(i=0; i<n; i++) {
-            cpids[i]=startArithmeticProgression(a0+d*i, d*n, k);
+            cpids[i]=startArithmeticProgression(h, a0+d*i, d*n, k);
         }
         for(j=0; j<k; j++) {
             for(i=0; i<n; i++) {
@@ -87,5 +95,6 @@
         }
         wait(NULL);
         free(cpids);
+        close(h);
         return(0);
     }
