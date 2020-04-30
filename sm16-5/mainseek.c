@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
 #if DEBUG
     printf("N=%d F=%s A0=%d D=%d K=%d\n", n, f, a0, d, k);
 #endif
-    h = creat(f, 0664);
+    h = creat(f, S_IRUSR|S_IWUSR| S_IRGRP| S_IROTH);
 
     cpids = malloc(n * sizeof(pid_t));
     if(cpids == NULL)
