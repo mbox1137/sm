@@ -23,7 +23,7 @@ int startArithmeticProgression(int h, int i, int n, int a0, int d, int k) { //pi
             write(h, &a, sizeof(int));
             a += d;
         }
-        exit(0);
+        _exit(EXIT_SUCCESS);	//Do nothing
     } else
         return(cpid);
 }
