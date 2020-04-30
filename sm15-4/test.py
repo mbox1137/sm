@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #https://github.com/bright-tools/varints
 #https://www.devdungeon.com/content/working-binary-data-python#writefile
 
