@@ -36,12 +36,28 @@
         char f[132];
         pid_t *cpids;
 
-        n=3;
-        strcpy(f,"out.bin");
-        a0=4;
-        d=2;
-        k=4;
-
+        if (argc == 1)
+        {
+            n=3;
+            strcpy(f,"out.bin");
+            a0=4;
+            d=2;
+            k=4;
+        } else if (argc == 6) {
+            if(sscanf(argv[1], "%d", &n) != 1)
+                exit(1);
+            if(sscanf(argv[2], "%s", f) != 1)
+                exit(1);
+            if(sscanf(argv[3], "%d", &a0) != 1)
+                exit(1);
+            if(sscanf(argv[4], "%d", &d) != 1)
+                exit(1);
+            if(sscanf(argv[5], "%d", &k) != 1)
+                exit(1);
+        } else {
+            fprintf(stderr, "%s: 3 out.bin 4 2 4", argv[0]);
+            exit(1);
+        }
 #if DEBUG
         printf("N=%d F=%s A0=%d D=%d K=%d\n",n,f,a0,d,k);
 #endif
@@ -56,5 +72,5 @@
         wait(NULL);
         free(cpids);
         close(h);
-        return(0);
+        return 0;
     }
