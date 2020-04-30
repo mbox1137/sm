@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #https://defuse.ca/big-number-calculator.htm
 #./solution file.txt 4 5
 import sys, os, subprocess, glob

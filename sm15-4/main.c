@@ -17,7 +17,7 @@
 #include <string.h>
 
 #define handle_error(msg) \
-        do { perror(msg); exit(EXIT_FAILURE); } while (0)
+        { perror(msg); exit(EXIT_FAILURE); }
 
 static inline size_t read_sleb128_to_int64 (unsigned char *buf, unsigned char *buf_end, int64_t *r)
 {
@@ -26,7 +26,7 @@ static inline size_t read_sleb128_to_int64 (unsigned char *buf, unsigned char *b
     int64_t result = 0;
     unsigned char byte;
 
-    for(;;)
+    while(1)
     {
         if (p >= buf_end)
             return 0;
@@ -52,27 +52,27 @@ size_t sum_sLEB128(unsigned char *cp, size_t yn, size_t rn, int64_t *s)
     int k;
     k = 0;
     dcp = 0;
-    rb0=0;
+    rb0 = 0;
     *s = 0;
-    for(;;)
+    while(1)
     {
         rb = read_sleb128_to_int64 (&cp[dcp], &cp[rn], &r);
         if(rb == 0)
             break;
-        rb0+=rb;
+        rb0 += rb;
         dcp += rb;
 #if DEBUG
         printf("r=%lld (+%d)\n",r,dcp);
 #endif
         *s += r;
         k++;
-        if(rb0>yn)
+        if(rb0 > yn)
             break;
     }
     return rb0;
 }
 
-size_t filel(char *fn, off_t offset, size_t len, off_t *newo, int64_t *r, 
+size_t filel(char *fn, off_t offset, size_t len, off_t *newo, int64_t *r,
     size_t *fsize, size_t *wsize)
 {
     char *addr;
@@ -80,7 +80,7 @@ size_t filel(char *fn, off_t offset, size_t len, off_t *newo, int64_t *r,
     struct stat sb;
     off_t pa_offset;
     size_t rb, ylen;
-    size_t wmax;
+//    size_t wmax;
 
     fd = open(fn, O_RDONLY);
     if (fd == -1)
@@ -89,24 +89,24 @@ size_t filel(char *fn, off_t offset, size_t len, off_t *newo, int64_t *r,
     if (fstat(fd, &sb) == -1)           /* To obtain file size */
         handle_error("fstat");
 
-    *fsize=sb.st_size;
+    *fsize = sb.st_size;
 
     pa_offset = offset & ~(sysconf(_SC_PAGE_SIZE) - 1);
                /* offset for mmap() must be page aligned */
 
     if (offset >= sb.st_size)
-        return(0);
+        return 0;
 
-    ylen=len-7;
+    ylen = len - 7;
     if (offset + len > sb.st_size)
     {
         len = sb.st_size - offset;
-        ylen=len;
+        ylen = len;
     }
 
-    *wsize=len;
+    *wsize = len;
 
-    addr = mmap(NULL, len + offset - pa_offset, PROT_READ, 
+    addr = mmap(NULL, len + offset - pa_offset, PROT_READ,
         MAP_PRIVATE | MAP_32BIT, fd, pa_offset);
     if (addr == MAP_FAILED)
         handle_error("mmap");
@@ -115,44 +115,43 @@ size_t filel(char *fn, off_t offset, size_t len, off_t *newo, int64_t *r,
 
     munmap(addr, len + offset - pa_offset);
     close(fd);
-    *newo=offset+rb;
+    *newo = offset + rb;
     return rb;
 }
 
-int file2(char *fn, size_t *fsize, size_t *wsize) {
+int file2(char *fn, size_t *fsize, size_t *wsize)
+{
     off_t start, newstart;
     size_t slen, n;
     int64_t s, sum;
     size_t wmax, ws;
-    sum=0;
-    start=0;
-    slen=NNM;
-    wmax=0;
-    for(;;)
+    sum = 0;
+    start = 0;
+    slen = NNM;
+    wmax = 0;
+
+    while(1)
     {
-        n=filel(fn, start, slen, &newstart, &s,  fsize, &ws);
-        if(ws>wmax)
-            wmax=ws;
-        if(n==0)
+        n = filel(fn, start, slen, &newstart, &s, fsize, &ws);
+        if(ws > wmax)
+            wmax = ws;
+        if(n == 0)
             break;
-        sum+=s;
-        start=newstart;
+        sum += s;
+        start = newstart;
     }
+
     *wsize=wmax;
     return sum;
 }
 
 int main(int argc, char *argv[])
 {
-    char s[132];
     int sum;
     size_t fsize, wsize;
 
     if (argc < 2)
-    {
-        sprintf(s,"%s file.bin", argv[0]);
-        handle_error(s);
-    }
+        return 0;
 
     for(int k = 1; k < argc; k++)
     {

@@ -198,7 +198,7 @@ void traverse_(char *path, char *name)
 #endif
     return;
 }
-
+/*
 static int mycmp(const void *kp1, const void *kp2, void *pz)
 {
     char *p1, *p2;
@@ -208,6 +208,7 @@ static int mycmp(const void *kp1, const void *kp2, void *pz)
     p2=&(z->names[*(int*)kp2]);
     return strcasecmp(p1, p2);
 }
+*/
 
 void traverse(char *path, char *name)
 {
