@@ -1,17 +1,10 @@
 #!/bin/bash
 #./main 3 out.bin 4 2 4
+TMPF=tmp.txt
 function myrun {
-	./mainseek $@
-	if ! ./check $@
-	then
-		echo $@
-		ls -la $2
-		hexdump -d $2
-		echo
-	fi
+	wc <in.txt >out.txt
+	$1 <$2 >$TMPF
+	cmp $3 $TMPF
 }
 
-myrun 3 out3x4.bin 4 2 4
-#myrun 3 out3x40.bin 4 2 40
-#myrun 30 out30x4.bin 4 2 4
-#myrun 30 out30x40.bin 4 2 40
+myrun wc in.txt out.txt
