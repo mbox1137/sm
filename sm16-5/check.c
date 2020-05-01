@@ -1,4 +1,5 @@
 #define DEBUG 0
+#define NN 10
 
 #include <signal.h>
 #include <sys/types.h>
@@ -15,6 +16,7 @@ int main(int argc, char *argv[])
     int n, a, retval, a0, d, k, i;
     int h;
     char f[132];
+    int nn;
 
     if (argc == 1)
     {
@@ -44,11 +46,19 @@ int main(int argc, char *argv[])
     h = open(f, O_RDONLY);
     i=0;
     retval=0;
-    while((read(h,&a,sizeof(int)))==sizeof(int)) {
+    for(;;) {
+        for(nn=0; nn<NN; nn++) {
+            lseek(h, i*sizeof(int), SEEK_SET);
+            if(read(h,&a,sizeof(int))==sizeof(int))
+                break;
+        }
+        if(nn==NN)
+            break;
         if(a!=a0+i*d) {
             retval=1;
             break;
         }
+//        printf("i=%d\n",i);
         i++;
     }
     close(h);

@@ -17,52 +17,27 @@ int startArithmeticProgression(int h, int i, int n, int a0, int d, int k) { //pi
     pid_t cpid;
     int a, j;
     off_t off;
-    size_t siz;
-    int nn, nnn;
+    size_t siz, sizz;
+    int nn;
 
     cpid = fork();
     if (cpid == 0)
     {
+        a=a0;
         for(j = 0; j < k; j++)
         {
+            off=(i + j * n) * sizeof(int);
+            siz=sizeof(int);
             for(nn=0;nn<NN;nn++) {
-                printf(" j%d",j);
-                if(flock(h, LOCK_EX))
-                    usleep(10);
-                else
+                lseek(h, off, SEEK_SET);
+                sizz=write(h, &a, siz);
+                if(siz==sizz)
                     break;
-            }
-            if(nn==NN){
-            }
-            for(nnn=0;nnn<NN;nnn++) {
-                off=(i + j * n) * sizeof(int);
-                for(nn=0;nn<NN;nn++)
-                    if(lseek(h, off, SEEK_SET)==off)
-                        break;
-                if(nn==NN){
-                }
-                a = a0+j*d;
-                siz=sizeof(int);
-                for(nn=0;nn<NN;nn++) {
-                    printf(" w%d",j);
-                    if(write(h, &a, siz)==siz)
-                        break;
-                }
-                if(nn==NN){
-                }
             }
             sync();
 //            syncfs(h);
-            for(nn=0;nn<NN;nn++) {
-                printf(" J%d",j);
-                if(flock(h, LOCK_UN))
-                    usleep(10);
-                else
-                    break;
-            }
-            if(nn==NN){
-            }
             a += d;
+            usleep(1000);
         }
         _exit(EXIT_SUCCESS);	//Do nothing else
     } else
