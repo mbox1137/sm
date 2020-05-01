@@ -10,30 +10,11 @@
 #include <malloc.h>
 #include <fcntl.h>
 
-int startArithmeticProgression(int h, int i, int n, int a0, int d, int k) { //pid
-    pid_t cpid;
-    int a, j;
-    cpid = fork();
-    if (cpid == 0)
-    {
-        a = a0;
-        for(j = 0; j < k; j++)
-        {
-            lseek(h, (i + j * n) * sizeof(int), SEEK_SET);
-            write(h, &a, sizeof(int));
-            a += d;
-        }
-        _exit(EXIT_SUCCESS);	//Do nothing else
-    } else
-        return(cpid);
-}
-
 int main(int argc, char *argv[])
 {
-    int n, a0, d, k, i;
+    int n, a, retval, a0, d, k, i;
     int h;
     char f[132];
-    pid_t *cpids;
 
     if (argc == 1)
     {
@@ -60,22 +41,20 @@ int main(int argc, char *argv[])
 #if DEBUG
     printf("N=%d F=%s A0=%d D=%d K=%d\n", n, f, a0, d, k);
 #endif
-    h = creat(f, S_IRUSR|S_IWUSR| S_IRGRP| S_IROTH);
-
-    cpids = malloc(n * sizeof(pid_t));
-    if(cpids == NULL)
-        return -1;
-
-    for(i = 0; i < n; i++)
-        cpids[i] = startArithmeticProgression(h, i, n, a0 + d * i, d * n, k);
-
-    wait(NULL);
-
-    free(cpids);
-
+    h = open(f, O_RDONLY);
+    i=0;
+    retval=0;
+    while((read(h,&a,sizeof(int)))==sizeof(int)) {
+        if(a!=a0+i*d) {
+            retval=1;
+            break;
+        }
+        i++;
+    }
     close(h);
-
-    return 0;
+    if(i!=n*k)
+        retval=2;
+    return(retval);
 }
 
 // http://www.opennet.ru/base/dev/unix_signals.txt.html
