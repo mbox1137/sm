@@ -1,100 +1,98 @@
 #define DEBUG 1
-#define WRITE 1
-
-//http://www.opennet.ru/base/dev/unix_signals.txt.html
-
-    #include <signal.h>
-    #include <sys/types.h>
-    #include <sys/wait.h>
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include <unistd.h>
-    #include <string.h>
-    #include <malloc.h>
-    #include <fcntl.h>
-
-    int startArithmeticProgression(int h, int a0, int d, int k) {	//pid
-        pid_t cpid, mypid;
-        int a;
-        cpid=fork();
-        if(cpid==0) {	//child
-            a=a0;
-            mypid=getpid();
-            for(;;) {
-//                usleep(0.5E6);
-                kill(mypid, SIGSTOP);
-#if WRITE
-//        lseek(h, n*k*sizeof(int), SEEK_SET);
-                write(h, &a, sizeof(int));
-#else
-                printf("%d: a=%d\n", mypid, a);
-#endif
-                a+=d;
-            }
-        } else {	//parent
-            return(cpid);
-        }
-    }
+//https://stackoverflow.com/questions/44221222/how-to-use-execlp-with-redirected-output
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <sys/wait.h>
+#include <string.h>
+#include <linux/limits.h>
 
     int
     main(int argc, char *argv[])
     {
-        int n, a0, d, k, i, j;
-        int h;
-        char f[132];
-        pid_t *cpids;
-        siginfo_t infop;
+        pid_t pid;
+        char *file, *arg2, *arg4;
+        char arg1[]="<", arg3[]=">";
+        char fn1[PATH_MAX];
+        char fn2[PATH_MAX];
+        int k;
 
-        n=3;
-        strcpy(f,"out.bin");
-        a0=4;
-        d=2;
-        k=4;
-
-#if DEBUG
-        printf("N=%d F=%s A0=%d D=%d K=%d\n",n,f,a0,d,k);
-//        sleep(1);
-#endif
-//----------------------------------------------- без пайпов!!!
-        h=creat(f,0664);
-        cpids=malloc(n*sizeof(pid_t));
-        if(cpids==NULL) {
-            return(-1);
+        if(argc != 4) {
+            for(k=1;k<argc;k++)
+                fprintf(stderr,"%d %s\n", k, argv[k]);
+            fprintf(stderr,"./prog wc in.txt out.txt\n");
+            return(1);
+        } else {
+            file=argv[1];
+            arg2=argv[2];
+            arg4=argv[3];
+            sprintf(fn1,"<%s",argv[2]);
+            sprintf(fn2,">%s",argv[3]);
         }
-        for(i=0; i<n; i++) {
-            cpids[i]=startArithmeticProgression(h, a0+d*i, d*n, k);
+        pid=fork();
+        if(pid==0) {
+//            execlp(file, arg1, arg2, arg3, arg4, NULL);
+            execlp(file, fn1, fn2, NULL);
+            exit(0);
+        } else {
+            wait(NULL);
         }
-        for(j=0; j<k; j++) {
-            for(i=0; i<n; i++) {
-                for(;;) {
-                    infop.si_code=0;
-                    waitid(P_PID, cpids[i], &infop, WSTOPPED);
-                    if(infop.si_code==CLD_STOPPED)
-                        break;
-                }
-                kill(cpids[i], SIGCONT);
-                for(;;) {
-                    infop.si_code=0;
-                    waitid(P_PID, cpids[i], &infop, WCONTINUED);
-                    if(infop.si_code==CLD_CONTINUED)
-                        break;
-                }
-                usleep(499);
-            }
-        }
-        for(i=0; i<n; i++) {
-            for(;;) {
-                waitid(P_PID, cpids[i], &infop, WEXITED|WSTOPPED);
-                if(infop.si_code==CLD_STOPPED || infop.si_code==CLD_EXITED)
-                    break;
-            }
-        }
-        for(i=0; i<n; i++) {
-            kill(cpids[i], SIGTERM);
-            kill(cpids[i], SIGCONT);
-        }
-        wait(NULL);
-        free(cpids);
-        close(h);
         return(0);
     }
+
+/*
+'>' is not a parameter, it is normally interpreted by a shell. If you want to achieve the same effect in C code, you have to do the same thing the shell normally does:
+
+    open a file (1.txt) for writing
+    fork() a new process
+    [in child] replace the stdout of the new process with the file's descriptor using dup2()
+    [in child] exec the command
+
+Simplified example code for POSIX:
+
+#define _POSIX_C_SOURCE 200101L
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(void)
+{
+    int outfd = open("1.txt", O_CREAT|O_WRONLY|O_TRUNC, 0644);
+    if (!outfd)
+    {
+        perror("open");
+        return EXIT_FAILURE;
+    }
+    pid_t pid = fork();
+    if (pid < 0)
+    {
+        close(outfd);
+        perror("fork");
+        return EXIT_FAILURE;
+    }
+
+    if (pid)
+    {
+        // child code
+        dup2(outfd, 1); // replace stdout
+        close(outfd);
+
+        // just a "useless cat" for simplicity:
+        execlp("cat", "cat", "redir.c", 0);
+    }
+    else
+    {
+        // parent code
+        close(outfd);
+        int status;
+        waitpid(pid, &status, 0);
+        if (WIFEXITED(status)) return WEXITSTATUS(status);
+        else return EXIT_FAILURE;
+    }
+}
+*/
