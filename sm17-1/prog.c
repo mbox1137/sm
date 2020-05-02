@@ -1,7 +1,9 @@
 #define DEBUG 1
 /*
 https://stackoverflow.com/questions/44221222/how-to-use-execlp-with-redirected-output
-'>' is not a parameter, it is normally interpreted by a shell. If you want to achieve the same effect in C code, you have to do the same thing the shell normally does:
+'>' is not a parameter, it is normally interpreted by a shell. If you want to 
+achieve the same effect in C code, you have to do the same thing the shell 
+normally does:
 
     open a file (1.txt) for writing
     fork() a new process
@@ -75,34 +77,3 @@ int main(int argc, char *argv[])
         else return EXIT_FAILURE;
     }
 }
-
-/*
-#include <stdio.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <sys/wait.h>
-#include <string.h>
-#include <linux/limits.h>
-
-    int
-    main(int argc, char *argv[])
-    {
-        pid_t pid;
-        char *file, *arg2, *arg4;
-        char arg1[]="<", arg3[]=">";
-        char fn1[PATH_MAX];
-        char fn2[PATH_MAX];
-        int k;
-
-        pid=fork();
-        if(pid==0) {
-//            execlp(file, arg1, arg2, arg3, arg4, NULL);
-            execlp(file, fn1, fn2, NULL);
-            exit(0);
-        } else {
-            wait(NULL);
-        }
-        return(0);
-    }
-*/
