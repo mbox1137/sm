@@ -1,8 +1,12 @@
 #define DEBUG 1
 
+#include <stdio.h>
 #include "mysys.h"
 
 int mysys(const char *str) {
+#if DEBUG
+    fprintf(stderr,"cmd=\"%s\"\n",str);
+#endif
     return(0);
 }
 
