@@ -8,4 +8,4 @@ function myrun {
 	cmp $3 $TMPF
 }
 
-myrun wc in.txt out.txt
+myrun wc in.tst out.txt
