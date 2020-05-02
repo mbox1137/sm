@@ -1,5 +1,5 @@
 #define DEBUG 0
-#define NN 10
+#define NN 1
 #define _GNU_SOURCE 1
 
 #include <signal.h>
@@ -21,6 +21,12 @@ int startArithmeticProgression(int h, int i, int n, int a0, int d, int k) { //pi
     int nn;
 
     cpid = fork();
+    if (cpid < 0)
+    {
+        close(h);
+        perror("fork");
+        return EXIT_FAILURE;
+    }
     if (cpid == 0)
     {
         a=a0;
@@ -34,11 +40,12 @@ int startArithmeticProgression(int h, int i, int n, int a0, int d, int k) { //pi
                 if(siz==sizz)
                     break;
             }
-            sync();
+//            sync();
 //            syncfs(h);
             a += d;
-            usleep(1000);
+//            usleep(1000);
         }
+        close(h);
         _exit(EXIT_SUCCESS);	//Do nothing else
     } else
         return(cpid);
@@ -50,6 +57,7 @@ int main(int argc, char *argv[])
     int h;
     char f[132];
     pid_t *cpids;
+    int status;
 
     if (argc == 1)
     {
@@ -76,8 +84,12 @@ int main(int argc, char *argv[])
 #if DEBUG
     printf("N=%d F=%s A0=%d D=%d K=%d\n", n, f, a0, d, k);
 #endif
-    h = creat(f, S_IRUSR|S_IWUSR| S_IRGRP| S_IROTH);
-
+    if((h=creat(f, S_IRUSR|S_IWUSR| S_IRGRP| S_IROTH))==0) 
+        return(-3);
+    if(ftruncate(h,n*k*sizeof(int))) {
+        perror("ftruncate");
+        return(-2);
+    }
     cpids = malloc(n * sizeof(pid_t));
     if(cpids == NULL)
         return -1;
@@ -85,7 +97,12 @@ int main(int argc, char *argv[])
     for(i = 0; i < n; i++)
         cpids[i] = startArithmeticProgression(h, i, n, a0 + d * i, d * n, k);
 
-    wait(NULL);
+    for(i = 0; i < n; i++) {
+        waitpid(cpids[i], &status, 0);
+        if (WIFEXITED(status)) continue;	//return WEXITSTATUS(status);
+        else return EXIT_FAILURE;
+    }
+//    wait(NULL);
 
     free(cpids);
 

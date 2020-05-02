@@ -4,10 +4,11 @@ function myrun {
 	./mainseek $@
 	if ! ./check $@
 	then
-		echo $?
+#		echo $?
 		echo $@
 		ls -la $2
-		hexdump -d $2
+#		hexdump -d $2
+		hexdump -d $2 |diff - $2.good.txt
 		echo
 	fi
 }
