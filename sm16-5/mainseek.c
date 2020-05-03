@@ -1,4 +1,6 @@
 #define DEBUG 0
+#define NN 10
+#define _GNU_SOURCE 1
 
 #include <signal.h>
 #include <sys/types.h>
@@ -9,18 +11,57 @@
 #include <string.h>
 #include <malloc.h>
 #include <fcntl.h>
+#include <sys/file.h>
 
 int startArithmeticProgression(int h, int i, int n, int a0, int d, int k) { //pid
     pid_t cpid;
     int a, j;
+    off_t off;
+    size_t siz;
+    int nn, nnn;
+
     cpid = fork();
     if (cpid == 0)
     {
-        a = a0;
         for(j = 0; j < k; j++)
         {
-            lseek(h, (i + j * n) * sizeof(int), SEEK_SET);
-            write(h, &a, sizeof(int));
+            for(nn=0;nn<NN;nn++) {
+                printf(" j%d",j);
+                if(flock(h, LOCK_EX))
+                    usleep(10);
+                else
+                    break;
+            }
+            if(nn==NN){
+            }
+            for(nnn=0;nnn<NN;nnn++) {
+                off=(i + j * n) * sizeof(int);
+                for(nn=0;nn<NN;nn++)
+                    if(lseek(h, off, SEEK_SET)==off)
+                        break;
+                if(nn==NN){
+                }
+                a = a0+j*d;
+                siz=sizeof(int);
+                for(nn=0;nn<NN;nn++) {
+                    printf(" w%d",j);
+                    if(write(h, &a, siz)==siz)
+                        break;
+                }
+                if(nn==NN){
+                }
+            }
+            sync();
+//            syncfs(h);
+            for(nn=0;nn<NN;nn++) {
+                printf(" J%d",j);
+                if(flock(h, LOCK_UN))
+                    usleep(10);
+                else
+                    break;
+            }
+            if(nn==NN){
+            }
             a += d;
         }
         _exit(EXIT_SUCCESS);

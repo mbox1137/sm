@@ -24,21 +24,15 @@ LDFLAGS	= -no-pie -m32 $(GDB)
 #LDFLAGS	= -m elf_i386
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
-EXEC	= main mainseek check
-OBJS	= main.o mainseek.o check.o
-SCDRY	= main.s mainseek.s check.s
+EXEC	= main
+OBJS	= main.o mysys.o
+SCDRY	= main.s mysys.s
 
 .SECONDARY: $(SCDRY)
 ALL : $(EXEC)
 
-main : main.o Makefile
-	$(LD) $(LDFLAGS) -o main main.o
-
-check : check.o Makefile
-	$(LD) $(LDFLAGS) -o check check.o
-
-mainseek : mainseek.o Makefile
-	$(LD) $(LDFLAGS) -o mainseek mainseek.o
+main : main.o mysys.o Makefile
+	$(LD) $(LDFLAGS) -o main main.o mysys.o
 
 #$(EXEC) : $(OBJS) Makefile
 #	$(LD) $(LDFLAGS) $(GDB) -o $@ $(OBJS)
