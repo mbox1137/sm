@@ -47,7 +47,10 @@ int main(int argc, char *argv[])
                 if (exitstatus)
                 {
                     if (mypid==getpid())
+                    {
                         printf("-1\n");
+                        exit(EXIT_SUCCESS);
+                    }
                     exit(EXIT_FAILURE);
                 }
             }
