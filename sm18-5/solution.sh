@@ -1,17 +1,20 @@
 #!/bin/bash
 #./solution 3 out.bin 4 2 4
-CMD1="ls"
-CMD2="cat"
-CMD3="wc"
 INF=in.tst
 TMPF=tmp.txt
 FILE=out.txt
 function myrun {
 	echo $@
-	./solution $1 $2 $3 >$FILE
-	$1 |$2 |$3 >$TMPF
+	./solution $@ >$FILE
+	cmd="( $1"
+	shift
+	for c in $@
+	do
+		cmd="$cmd | $c"
+	done
+	cmd="$cmd ) 2>&1"
+	bash -c "$cmd >$TMPF"
 	cmp $FILE $TMPF
 }
 
-myrun $CMD1 $CMD2 $CMD3
-
+myrun ls cat wc
