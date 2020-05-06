@@ -10,15 +10,18 @@
 #include <unistd.h>
 
 int main() {
-    int fd[2];
-    pipe(fd);
+    int fd12[2], fd21[2];
+    pipe(fd12);
+    pipe(fd21);
 
-    FILE* write_file = fdopen(fd[1], "w");
-    FILE* read_file = fdopen(fd[0], "r");
+    FILE* wf12 = fdopen(fd12[1], "w");
+    FILE* rf12 = fdopen(fd12[0], "r");
+    FILE* wf21 = fdopen(fd21[1], "w");
+    FILE* rf21 = fdopen(fd21[0], "r");
     int x = 0;
-    fprintf(write_file, "%d\n", 100);
-    fflush(write_file);
-    fscanf(read_file, "%d", &x);
+    fprintf(wf12, "%d\n", 100);
+    fflush(wf12);
+    fscanf(rf12, "%d", &x);
 
     printf("%d\n", x);
 }
