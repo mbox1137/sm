@@ -9,8 +9,27 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+int startPingPong(FILE* newstdin, FILE* newstdout, int n, const int *n0) {	//pid
+    pid_t pid;
+    pid=fork();
+    if(pid == -1) {
+        perror("fork");
+        fclose(newstdin);
+        fclose(newstdout);
+        exit(EXIT_FAILURE);
+    }
+    if(pid==0) {	//child
+        exit(EXIT_SUCCESS);
+    } else {		//parent
+        return(pid);
+    }
+}
+
 int main() {
     int fd12[2], fd21[2];
+    int cpids[2];
+    const int dummy=1;
+
     pipe(fd12);
     pipe(fd21);
 
@@ -18,6 +37,10 @@ int main() {
     FILE* rf12 = fdopen(fd12[0], "r");
     FILE* wf21 = fdopen(fd21[1], "w");
     FILE* rf21 = fdopen(fd21[0], "r");
+
+    cpids[0]=startPingPong(rf21, wf12, 1, &dummy);
+    cpids[1]=startPingPong(rf12, wf21, 2, NULL);
+
     int x = 0;
     fprintf(wf12, "%d\n", 100);
     fflush(wf12);
