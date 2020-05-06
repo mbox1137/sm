@@ -9,8 +9,18 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-int main(int argc, char *argv[])
-{
+int main() {
+    int fd[2];
+    pipe(fd);
+
+    FILE* write_file = fdopen(fd[1], "w");
+    FILE* read_file = fdopen(fd[0], "r");
+    int x = 0;
+    fprintf(write_file, "%d\n", 100);
+    fflush(write_file);
+    fscanf(read_file, "%d", &x);
+
+    printf("%d\n", x);
 }
 
 /*
