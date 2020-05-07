@@ -23,15 +23,15 @@ int startPingPong(FILE* fin, FILE* fout, int n, int nn, const int *pn0) {
             fprintf(fout, "%d\n", 1);
             fflush(fout);
             }
-        if(fscanf(fin, "%d", &x)==1) {
-            printf("%d %d\n", n, x);
-            if(x>0) {
+        while(fscanf(fin, "%d", &x)==1) {
+            if(x>=nn || feof(fin)) {
+                fclose(fin);
+                fclose(fout);
+                _exit(EXIT_SUCCESS);
             }
+            printf("%d %d\n", n, x);
             fprintf(fout, "%d\n", x+1);
             fflush(fout);
-        } else {
-            if(feof(fin)) {
-            }
         }
         fclose(fin);
         fclose(fout);
@@ -56,7 +56,6 @@ int main(int argc, char** argv) {
 #if DEBUG
     printf("nn=%d\n",nn);
 #endif
-    return(0);
 
     pipe(fd12);
     pipe(fd21);
@@ -74,6 +73,7 @@ int main(int argc, char** argv) {
         if (WIFEXITED(status)) continue;	//return WEXITSTATUS(status);
         else return EXIT_FAILURE;
     }
+    printf("Done\n");
 }
 
 /*
