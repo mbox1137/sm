@@ -1,80 +1,35 @@
 #define DEBUG 1
 
-#include <stdio.h>
 #include "mysys.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <fcntl.h>
 
-int mysys(const char *str) {
+int mysys(const char *str)
+{
+    int wstatus;
 #if DEBUG
     fprintf(stderr,"cmd=\"%s\"\n",str);
 #endif
-    return(0);
-}
+    pid_t child = fork();
 
-/*
-#define _POSIX_C_SOURCE 200101L
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <fcntl.h>
-#include <unistd.h>
+    if (child < 0)
+        return -1;
 
-int main(int argc, char *argv[])
-{
-    char *cmd;
-    int outfd, infd;
-    int k;
-    int status;
-    pid_t pid;
+    if (child)
+    {
+        waitpid(child, &wstatus, 0);
 
-    if(argc != 4) {
-        for(k=1;k<argc;k++)
-            fprintf(stderr,"%d %s\n", k, argv[k]);
-        fprintf(stderr,"./prog wc in.txt out.txt\n");
-        return(1);
+        if (WIFSIGNALED(wstatus))
+            return 128 + WTERMSIG(wstatus);
+        else
+            return WEXITSTATUS(wstatus);
     } else {
-        cmd=argv[1];
-        infd = open(argv[2], O_RDONLY);
-        outfd = open(argv[3], O_CREAT|O_WRONLY|O_TRUNC, 0644);
-    }
-
-    if (!infd)
-    {
-        perror("open infd");
-        return EXIT_FAILURE;
-    }
-    if (!outfd)
-    {
-        perror("open outfd");
-        return EXIT_FAILURE;
-    }
-    pid = fork();
-    if (pid < 0)
-    {
-        close(infd);
-        close(outfd);
-        perror("fork");
-        return EXIT_FAILURE;
-    }
-
-    if(!pid)
-    {
-        // child code
-        dup2(infd, 0); // replace stdin
-        close(infd);
-        dup2(outfd, 1); // replace stdout
-        close(outfd);
-        execlp(cmd, "-", NULL);
-    }
-    else
-    {
-        // parent code
-        close(infd);
-        close(outfd);
-        waitpid(pid, &status, 0);
-        if (WIFEXITED(status)) return WEXITSTATUS(status);
-        else return EXIT_FAILURE;
+        execlp("/bin/sh", "sh", "-c", str, NULL);
+        _exit(127);
     }
 }
-*/
+
+// man waitpid
