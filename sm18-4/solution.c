@@ -9,18 +9,28 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-int startPingPong(FILE* newstdin, FILE* newstdout, int n, const int *n0) {	//pid
+int startPingPong(FILE* fin, FILE* fout, int n, const int *n0) {	//pid
     pid_t pid;
+    int x;
+
     pid=fork();
     if(pid == -1) {
         perror("fork");
-        fclose(newstdin);
-        fclose(newstdout);
         exit(EXIT_FAILURE);
     }
-    if(pid==0) {	//child
-        exit(EXIT_SUCCESS);
-    } else {		//parent
+    if (pid == 0) {
+/*
+               while (read(pipefd[0], &buf, 1) > 0)
+                   write(STDOUT_FILENO, &buf, 1);
+
+*/
+        fprintf(fout, "%d\n", 100);
+        fflush(fout);
+        fscanf(fin, "%d", &x);
+        fclose(fin);
+        fclose(fout);
+        _exit(EXIT_SUCCESS);
+    } else {
         return(pid);
     }
 }
@@ -29,6 +39,8 @@ int main() {
     int fd12[2], fd21[2];
     int cpids[2];
     const int dummy=1;
+    int k;
+    int status;
 
     pipe(fd12);
     pipe(fd21);
@@ -41,10 +53,13 @@ int main() {
     cpids[0]=startPingPong(rf21, wf12, 1, &dummy);
     cpids[1]=startPingPong(rf12, wf21, 2, NULL);
 
+    for(k=0; k<2; k++) {
+        waitpid(cpids[k], &status, 0);
+        if (WIFEXITED(status)) continue;	//return WEXITSTATUS(status);
+        else return EXIT_FAILURE;
+    }
+
     int x = 0;
-    fprintf(wf12, "%d\n", 100);
-    fflush(wf12);
-    fscanf(rf12, "%d", &x);
 
     printf("%d\n", x);
 }
