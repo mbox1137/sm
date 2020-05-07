@@ -58,10 +58,6 @@ int main() {
         if (WIFEXITED(status)) continue;	//return WEXITSTATUS(status);
         else return EXIT_FAILURE;
     }
-
-    int x = 0;
-
-    printf("%d\n", x);
 }
 
 /*
