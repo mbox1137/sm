@@ -9,7 +9,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-int startPingPong(FILE* fin, FILE* fout, int n, const int *n0) {	//pid
+int startPingPong(FILE* fin, FILE* fout, int n, int nn, const int *pn0) {
     pid_t pid;
     int x;
 
@@ -19,14 +19,20 @@ int startPingPong(FILE* fin, FILE* fout, int n, const int *n0) {	//pid
         exit(EXIT_FAILURE);
     }
     if (pid == 0) {
-/*
-               while (read(pipefd[0], &buf, 1) > 0)
-                   write(STDOUT_FILENO, &buf, 1);
-
-*/
-        fprintf(fout, "%d\n", 100);
-        fflush(fout);
-        fscanf(fin, "%d", &x);
+        if(pn0) {
+            fprintf(fout, "%d\n", 1);
+            fflush(fout);
+            }
+        if(fscanf(fin, "%d", &x)==1) {
+            printf("%d %d\n", n, x);
+            if(x>0) {
+            }
+            fprintf(fout, "%d\n", x+1);
+            fflush(fout);
+        } else {
+            if(feof(fin)) {
+            }
+        }
         fclose(fin);
         fclose(fout);
         _exit(EXIT_SUCCESS);
@@ -35,12 +41,22 @@ int startPingPong(FILE* fin, FILE* fout, int n, const int *n0) {	//pid
     }
 }
 
-int main() {
+int main(int argc, char** argv) {
     int fd12[2], fd21[2];
     int cpids[2];
     const int dummy=1;
     int k;
     int status;
+    int nn;
+    
+    if(argc!=2 || sscanf(argv[1],"%d",&nn)!=1) {
+        fprintf(stderr, "%s 5\n", argv[0]);
+        return(-1);
+    }
+#if DEBUG
+    printf("nn=%d\n",nn);
+#endif
+    return(0);
 
     pipe(fd12);
     pipe(fd21);
@@ -50,8 +66,8 @@ int main() {
     FILE* wf21 = fdopen(fd21[1], "w");
     FILE* rf21 = fdopen(fd21[0], "r");
 
-    cpids[0]=startPingPong(rf21, wf12, 1, &dummy);
-    cpids[1]=startPingPong(rf12, wf21, 2, NULL);
+    cpids[0]=startPingPong(rf21, wf12, 1, nn, &dummy);
+    cpids[1]=startPingPong(rf12, wf21, 2, nn, NULL);
 
     for(k=0; k<2; k++) {
         waitpid(cpids[k], &status, 0);
