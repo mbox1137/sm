@@ -6,3 +6,4 @@ check
 check.s
 ideal
 ideal.s
+*.bin*

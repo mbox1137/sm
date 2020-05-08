@@ -42,7 +42,8 @@ int main(int argc, char *argv[])
 #if DEBUG
     printf("N=%d F=%s A0=%d D=%d K=%d\n", n, f, a0, d, k);
 #endif
-    h = open(f, O_WRONLY|O_CREAT|O_TRUNC, 0644);
+//    h = open(f, O_WRONLY|O_CREAT|O_TRUNC, 0644);
+    h = creat(f, 0644);
     i=0;
     retval=0;
     for(i=0;i<n*k;i++) {

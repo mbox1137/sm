@@ -26,17 +26,10 @@ int startArithmeticProgression(int h, int i, int n, int a0, int d, int k) { //pi
         a = a0;
         for(j = 0; j < k; j++)
         {
-            while(flock(h, LOCK_EX)) ;
-            lseek(h, (i + j * n) * sizeof(int), SEEK_SET);
-            write(h, &a, sizeof(int));
-            fdatasync(h);
-            flock(h, LOCK_UN);
+            pwrite(h, &a, sizeof(int), (i + j * n) * sizeof(int));
             a += d;
-//            usleep(1000);
         }
-//        while(flock(h, LOCK_EX)) ;
         close(h);
-//        flock(h, LOCK_UN);
         exit(EXIT_SUCCESS);
     } else
         return(cpid);
@@ -88,24 +81,8 @@ int main(int argc, char *argv[])
     for(i = 0; i < n; i++)
         cpids[i] = startArithmeticProgression(h, i, n, a0 + d * i, d * n, k);
 
-    //wait(NULL);
     for(i = 0; i < n; i++)
-    {
         waitpid(cpids[i], &pstat, 0);
-        /*if (WIFEXITED(pstat))
-        {
-            exitstatus = WEXITSTATUS(pstat);
-            if (exitstatus)
-            {
-                if (mypid==getpid())
-                {
-                    printf("-1\n");
-                    exit(EXIT_SUCCESS);
-                }
-                exit(EXIT_FAILURE);
-            }
-        }*/
-    }
 
     free(cpids);
 
