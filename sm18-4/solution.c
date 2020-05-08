@@ -23,19 +23,14 @@ int startPingPong(FILE* fin, FILE* fout, int n, int nn, const int *pn0) {
             fprintf(fout, "%d\n", 1);
             fflush(fout);
             }
-        while(fscanf(fin, "%d", &x)==1) {
-            if(x>=nn || feof(fin)) {
-                fclose(fin);
-                fclose(fout);
-                _exit(EXIT_SUCCESS);
-            }
+        while(!feof(fin) && fscanf(fin, "%d", &x)==1 && x<nn) {
             printf("%d %d\n", n, x);
             fprintf(fout, "%d\n", x+1);
             fflush(fout);
         }
-        fclose(fin);
-        fclose(fout);
-        _exit(EXIT_SUCCESS);
+//        fclose(fin);
+//        fclose(fout);
+        exit(EXIT_SUCCESS);
     } else {
         return(pid);
     }
@@ -65,15 +60,25 @@ int main(int argc, char** argv) {
     FILE* wf21 = fdopen(fd21[1], "w");
     FILE* rf21 = fdopen(fd21[0], "r");
 
-    cpids[0]=startPingPong(rf21, wf12, 1, nn, &dummy);
-    cpids[1]=startPingPong(rf12, wf21, 2, nn, NULL);
+    cpids[0]=startPingPong(rf21, wf12, 1, nn, NULL);
+    cpids[1]=startPingPong(rf12, wf21, 2, nn, &dummy);
+    
+    close(fd12[0]);
+    close(fd12[1]);
+    close(fd21[0]);
+    close(fd21[1]);
+
+#if DEBUG
+    printf("cpid[0]=%d cpid[1]=%d\n",cpids[0], cpids[1]);
+#endif
 
     for(k=0; k<2; k++) {
         waitpid(cpids[k], &status, 0);
         if (WIFEXITED(status)) continue;	//return WEXITSTATUS(status);
         else return EXIT_FAILURE;
     }
-    printf("Done\n");
+//    printf("Done\n");
+    fprintf(stderr, "Done\n");
 }
 
 /*
