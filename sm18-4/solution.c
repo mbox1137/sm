@@ -54,14 +54,14 @@ int main(int argc, char** argv) {
 
     pipe(fd12);
     pipe(fd21);
-
+/*
     FILE* wf12 = fdopen(fd12[1], "w");
     FILE* rf12 = fdopen(fd12[0], "r");
     FILE* wf21 = fdopen(fd21[1], "w");
     FILE* rf21 = fdopen(fd21[0], "r");
-
-    cpids[0]=startPingPong(rf21, wf12, 1, nn, NULL);
-    cpids[1]=startPingPong(rf12, wf21, 2, nn, &dummy);
+*/
+    cpids[0]=startPingPong(fd21, fd12, 1, nn, NULL);
+    cpids[1]=startPingPong(fd12, fd21, 2, nn, &dummy);
 /*
     fclose(wf12);
     fclose(rf12);
