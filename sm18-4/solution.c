@@ -62,12 +62,17 @@ int main(int argc, char** argv) {
 
     cpids[0]=startPingPong(rf21, wf12, 1, nn, NULL);
     cpids[1]=startPingPong(rf12, wf21, 2, nn, &dummy);
+/*
+    fclose(wf12);
+    fclose(rf12);
+    fclose(wf21);
+    fclose(rf21);
     
     close(fd12[0]);
     close(fd12[1]);
     close(fd21[0]);
     close(fd21[1]);
-
+*/
 #if DEBUG
     printf("cpid[0]=%d cpid[1]=%d\n",cpids[0], cpids[1]);
 #endif
