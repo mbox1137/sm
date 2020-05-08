@@ -14,12 +14,6 @@ int startArithmeticProgression(int h, int i, int n, int a0, int d, int k) { //pi
     pid_t cpid;
     int a, j;
     cpid = fork();
-    if (cpid < 0)
-    {
-        close(h);
-        perror("fork");
-        return EXIT_FAILURE;
-    }
     if (cpid == 0)
     {
         a = a0;
@@ -28,7 +22,6 @@ int startArithmeticProgression(int h, int i, int n, int a0, int d, int k) { //pi
             lseek(h, (i + j * n) * sizeof(int), SEEK_SET);
             write(h, &a, sizeof(int));
             a += d;
-//            usleep(1000);
         }
         _exit(EXIT_SUCCESS);
     } else
@@ -68,12 +61,9 @@ int main(int argc, char *argv[])
 #if DEBUG
     printf("N=%d F=%s A0=%d D=%d K=%d\n", n, f, a0, d, k);
 #endif
-    if((h=creat(f, S_IRUSR|S_IWUSR| S_IRGRP| S_IROTH))==0) 
-        return(-3);
-    if(ftruncate(h,n*k*sizeof(int))) {
-        perror("ftruncate");
-        return(-2);
-    }
+    h = creat(f, S_IRUSR|S_IWUSR| S_IRGRP| S_IROTH);
+    ftruncate(h, n * k * sizeof(int));
+
     cpids = malloc(n * sizeof(pid_t));
     if(cpids == NULL)
         return -1;

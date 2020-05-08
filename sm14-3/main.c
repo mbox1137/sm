@@ -240,6 +240,7 @@ void traverse(char *path, char *name)
             strerror_r(errno, tmpp, PATH_MAX);
             fprintf(stderr, "Err: opendir (%d=%s) %s\n", errno, tmpp, path);
             return;
+//???            return(-1);
         }
     while((de=readdir(dir)) != NULL)
     {
@@ -291,14 +292,7 @@ void traverse(char *path, char *name)
 
 int main(int argc, char *argv[])
 {
-    char *fn = "a";
     if (argc == 2)
-        fn=argv[1];
-    else if (argc != 1)
-    {
-        fprintf(stderr, "%s [dir]\n",argv[0]);
-        return -1;
-    }
-    traverse(fn, NULL);
+        traverse(argv[1], NULL);
     return 0;
 }

@@ -10,6 +10,12 @@
 
 int main(int argc, char *argv[])
 {
+    return 0;
+}
+
+
+int main_(int argc, char *argv[])
+{
     char *cmd;
     int outfd, infd;
     //int status;

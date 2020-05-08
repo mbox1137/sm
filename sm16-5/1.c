@@ -14,12 +14,6 @@ int startArithmeticProgression(int h, int i, int n, int a0, int d, int k) { //pi
     pid_t cpid;
     int a, j;
     cpid = fork();
-    if (cpid < 0)
-    {
-        close(h);
-        perror("fork");
-        return EXIT_FAILURE;
-    }
     if (cpid == 0)
     {
         a = a0;
@@ -28,7 +22,6 @@ int startArithmeticProgression(int h, int i, int n, int a0, int d, int k) { //pi
             lseek(h, (i + j * n) * sizeof(int), SEEK_SET);
             write(h, &a, sizeof(int));
             a += d;
-//            usleep(1000);
         }
         _exit(EXIT_SUCCESS);
     } else
@@ -41,7 +34,6 @@ int main(int argc, char *argv[])
     int h;
     char f[132];
     pid_t *cpids;
-    int pstat;
 
     if (argc == 1)
     {
@@ -68,12 +60,8 @@ int main(int argc, char *argv[])
 #if DEBUG
     printf("N=%d F=%s A0=%d D=%d K=%d\n", n, f, a0, d, k);
 #endif
-    if((h=creat(f, S_IRUSR|S_IWUSR| S_IRGRP| S_IROTH))==0) 
-        return(-3);
-    if(ftruncate(h,n*k*sizeof(int))) {
-        perror("ftruncate");
-        return(-2);
-    }
+    h = creat(f, S_IRUSR|S_IWUSR| S_IRGRP| S_IROTH);
+
     cpids = malloc(n * sizeof(pid_t));
     if(cpids == NULL)
         return -1;
@@ -81,24 +69,7 @@ int main(int argc, char *argv[])
     for(i = 0; i < n; i++)
         cpids[i] = startArithmeticProgression(h, i, n, a0 + d * i, d * n, k);
 
-    //wait(NULL);
-    for(i = 0; i < n; i++)
-    {
-        waitpid(cpids[i], &pstat, 0);
-        /*if (WIFEXITED(pstat))
-        {
-            exitstatus = WEXITSTATUS(pstat);
-            if (exitstatus)
-            {
-                if (mypid==getpid())
-                {
-                    printf("-1\n");
-                    exit(EXIT_SUCCESS);
-                }
-                exit(EXIT_FAILURE);
-            }
-        }*/
-    }
+    wait(NULL);
 
     free(cpids);
 
