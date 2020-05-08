@@ -16,7 +16,6 @@ int main(int argc, char *argv[])
     int n, a, retval, a0, d, k, i;
     int h;
     char f[132];
-    int nn;
 
     if (argc == 1)
     {
@@ -43,27 +42,15 @@ int main(int argc, char *argv[])
 #if DEBUG
     printf("N=%d F=%s A0=%d D=%d K=%d\n", n, f, a0, d, k);
 #endif
-    h = open(f, O_RDONLY);
+    h = open(f, O_WRONLY|O_CREAT|O_TRUNC, 0644);
     i=0;
     retval=0;
-    for(;;) {
-        for(nn=0; nn<NN; nn++) {
-            lseek(h, i*sizeof(int), SEEK_SET);
-            if(read(h,&a,sizeof(int))==sizeof(int))
-                break;
-        }
-        if(nn==NN)
-            break;
-        if(a!=a0+i*d) {
-            retval=1;
-            break;
-        }
-//        printf("i=%d\n",i);
-        i++;
+    for(i=0;i<n*k;i++) {
+        a=a0+i*d;
+        lseek(h, i*sizeof(int), SEEK_SET);
+        write(h, &a, sizeof(int));
     }
     close(h);
-    if(i!=n*k)
-        retval=2;
     return(retval);
 }
 

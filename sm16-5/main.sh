@@ -1,15 +1,13 @@
 #!/bin/bash
 #./main 3 out.bin 4 2 4
+#	mv $2 $(basename $2 .bin).ideal
 function myrun {
+	./ideal $1 "$2".ideal $3 $4 $5
+	hexdump -d "$2".ideal >"$2".ideal.txt
 	./mainseek $@
-	if ! ./check $@
+	if ! cmp $2 "$2".ideal
 	then
-#		echo $?
-		echo $@
-		ls -la $2
-#		hexdump -d $2
-		hexdump -d $2 |diff - $2.good.txt
-		echo
+		hexdump -d $2 |diff - "$2".ideal.txt
 	fi
 }
 
