@@ -9,6 +9,7 @@
 #include <string.h>
 #include <malloc.h>
 #include <fcntl.h>
+#include <sys/file.h>
 
 int startArithmeticProgression(int h, int i, int n, int a0, int d, int k) { //pid
     pid_t cpid;
@@ -25,12 +26,18 @@ int startArithmeticProgression(int h, int i, int n, int a0, int d, int k) { //pi
         a = a0;
         for(j = 0; j < k; j++)
         {
+            while(flock(h, LOCK_EX)) ;
             lseek(h, (i + j * n) * sizeof(int), SEEK_SET);
             write(h, &a, sizeof(int));
+            fdatasync(h);
+            flock(h, LOCK_UN);
             a += d;
 //            usleep(1000);
         }
-        _exit(EXIT_SUCCESS);
+//        while(flock(h, LOCK_EX)) ;
+        close(h);
+//        flock(h, LOCK_UN);
+        exit(EXIT_SUCCESS);
     } else
         return(cpid);
 }
