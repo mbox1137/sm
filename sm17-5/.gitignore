@@ -2,3 +2,4 @@ main
 mysystem
 main.s
 mysystem.s
+*.log

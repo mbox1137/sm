@@ -67,7 +67,7 @@ int mysystem(const char *str) {
     int status;
     pid_t pid;
     CTRLN ctrln;
-    char delim[]=" \t";
+    char delim[]=" \f\n\r\t\v";
     char *cp;
     char **args;
     int k;
@@ -81,13 +81,15 @@ int mysystem(const char *str) {
     ctrln.pnames=NULL;
     addname(&ctrln, NULL);	//init
     cp = strtok((char*)str, delim);
+    if(!cp)
+        return(-1);
     while(cp) {
         addname(&ctrln, cp);
         cp=strtok(NULL, delim);
     }
     args=malloc((ctrln.kpn+1)*sizeof(char*));
     if(args==NULL) {
-        exit(-2);
+        return(-2);
     }
     for (k = 0; k < ctrln.kpn; k++)
         args[k]=&ctrln.names[ctrln.pnames[k]];
@@ -107,46 +109,15 @@ int mysystem(const char *str) {
     if (!pid)
     {
         execvp(cmd, args);
-        exit(EXIT_FAILURE);
+        exit(1);
     } else {
         free(args);
         addname(&ctrln, NULL);	//finit
         waitpid(pid, &status, 0);
-        if (WIFEXITED(status)) exit(WEXITSTATUS(status));
-        else exit(EXIT_FAILURE);
+        if (WIFEXITED(status)) return(WEXITSTATUS(status));
+        else if(WIFSIGNALED(status)) return(1024+WTERMSIG(status));
+        else if(WIFSTOPPED(status)) return(1000000+WSTOPSIG(status));
+        else if(WIFCONTINUED(status)) return(65535);
+        return(0);
     }
-    return(0);
 }
-
-/*
-#define DEBUG 0
-
-int main(int argc, char *argv[])
-{
-    int outfd, infd;
-
-    if (argc != 4)
-    {
-        exit(EXIT_FAILURE);
-    }
-
-    cmd = argv[1];
-
-    infd = open(argv[2], O_RDONLY);
-    if (!infd)
-    {
-        perror("open infd");
-        exit(EXIT_FAILURE);
-    }
-
-    outfd = open(argv[3], O_CREAT|O_WRONLY|O_TRUNC, 0666);
-    if (!outfd)
-    {
-        perror("open outfd");
-        exit(EXIT_FAILURE);
-    }
-
-
-    return 0;
-}
-*/

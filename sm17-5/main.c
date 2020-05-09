@@ -6,7 +6,7 @@
 
 int main(int argc, char *argv[])
 {
-    char *cmd;
+    char *cmd, str[1000];
     char dummy[]=" 11111  222222   3333333 ";
 //    cmd=NULL;
     cmd=dummy;
@@ -16,5 +16,6 @@ int main(int argc, char *argv[])
         fprintf(stderr,"./main %s\n", cmd);
         return(1);
     }
-    mysystem(cmd);
+    strcpy(str, cmd);
+    printf("mysystem(\"%s\")=%d\n", cmd, mysystem(str));
 }
