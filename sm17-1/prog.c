@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 {
     char *cmd;
     int outfd, infd;
-    int status;
+    int wstatus;
     pid_t pid;
 
     if (argc != 4)
@@ -55,12 +55,13 @@ int main(int argc, char *argv[])
         close(outfd);
 
         execlp(cmd, cmd, NULL);
-        exit(EXIT_SUCCESS);
-    } else {
+        exit(EXIT_FAILURE);
+    } else
+    {
         close(infd);
         close(outfd);
-        waitpid(pid, &status, 0);
-        if (WIFEXITED(status)) exit(WEXITSTATUS(status));
+        waitpid(pid, &wstatus, 0);
+        if (WIFEXITED(wstatus)) exit(WEXITSTATUS(wstatus));
         else exit(EXIT_FAILURE);
     }
 
