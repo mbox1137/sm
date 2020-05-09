@@ -9,5 +9,7 @@ function myrun {
 }
 
 ./main
+echo
 ./main " qq ww ee rr tt yy "
+echo
 ./main "ls -la"

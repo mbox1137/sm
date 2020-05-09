@@ -74,7 +74,7 @@ int mysystem(const char *str) {
 
 #if DEBUG
     if(str)
-        fprintf(stderr,"cmd=\"%s\"\n",str);
+        fprintf(stderr,"str=\"%s\"\n",str);
 #endif
 
     ctrln.names=NULL;
@@ -93,11 +93,12 @@ int mysystem(const char *str) {
         args[k]=&ctrln.names[ctrln.pnames[k]];
     args[k]=NULL;
     cmd=args[0];
-    printf("cmd=%s\n", cmd);
+#if DEBUG
+    printf("cmd=\"%s\"\n", cmd);
     for (k = 0; args[k]; k++) {
-        printf("%d)\t\"%s\"\n", k, args[k]);
+        printf("argv[%d]=\t\"%s\"\n", k, args[k]);
     }
-
+#endif
     free(args);
     exit(0);
 
