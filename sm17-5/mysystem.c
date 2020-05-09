@@ -99,26 +99,22 @@ int mysystem(const char *str) {
         printf("argv[%d]=\t\"%s\"\n", k, args[k]);
     }
 #endif
-    free(args);
-    exit(0);
-
     pid = fork();
-
     if (pid < 0)
     {
         return(1);
     }
-
     if (!pid)
     {
-        execlp(cmd, cmd, NULL);
-        exit(EXIT_SUCCESS);
+        execvp(cmd, args);
+        exit(EXIT_FAILURE);
     } else {
+        free(args);
+        addname(&ctrln, NULL);	//finit
         waitpid(pid, &status, 0);
         if (WIFEXITED(status)) exit(WEXITSTATUS(status));
         else exit(EXIT_FAILURE);
     }
-    addname(&ctrln, NULL);	//finit
     return(0);
 }
 

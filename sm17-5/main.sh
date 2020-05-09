@@ -8,8 +8,8 @@ function myrun {
 	cmp $3 $TMPF
 }
 
-./main
-echo
-./main " qq ww ee rr tt yy "
-echo
+#./main
+#echo
+#./main " qq ww ee rr tt yy "
+#echo
 ./main "ls -la"
