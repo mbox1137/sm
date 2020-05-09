@@ -8,4 +8,6 @@ function myrun {
 	cmp $3 $TMPF
 }
 
+./main
+./main " qq ww ee rr tt yy "
 ./main "ls -la"

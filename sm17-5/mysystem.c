@@ -72,27 +72,34 @@ int mysystem(const char *str) {
     char **args;
     int k;
 
-    ctrln.names=NULL;
-    ctrln.pnames=NULL;
-    addname(&ctrln, NULL);	//init
-    cp = strtok((char*)str, delim);
-    do {
-        addname(&ctrln, cp);
-    } while(cp=strtok(NULL, delim));
-    args=malloc((ctrln.kpn+2)*sizeof(char*));
-    if(args==NULL) {
-    }
-    args[0]=&ctrln.names[ctrln.pnames[0]];
-    for (k = 0; k < ctrln.kpn; k++)
-        args[k+1]=&ctrln.names[ctrln.pnames[k]];
-    args[k+1]=NULL;
-    free(args);
-
-
 #if DEBUG
     if(str)
         fprintf(stderr,"cmd=\"%s\"\n",str);
 #endif
+
+    ctrln.names=NULL;
+    ctrln.pnames=NULL;
+    addname(&ctrln, NULL);	//init
+    cp = strtok((char*)str, delim);
+    while(cp) {
+        addname(&ctrln, cp);
+        cp=strtok(NULL, delim);
+    }
+    args=malloc((ctrln.kpn+1)*sizeof(char*));
+    if(args==NULL) {
+        exit(-2);
+    }
+    for (k = 0; k < ctrln.kpn; k++)
+        args[k]=&ctrln.names[ctrln.pnames[k]];
+    args[k]=NULL;
+    cmd=args[0];
+    printf("cmd=%s\n", cmd);
+    for (k = 0; args[k]; k++) {
+        printf("%d)\t\"%s\"\n", k, args[k]);
+    }
+
+    free(args);
+    exit(0);
 
     pid = fork();
 
