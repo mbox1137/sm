@@ -8,4 +8,4 @@ function myrun {
 	cmp $3 $TMPF
 }
 
-./main "ls -la"
+./main "pwd"
