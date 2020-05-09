@@ -44,13 +44,15 @@ int main(int argc, char *argv[])
 #endif
 //    h = open(f, O_WRONLY|O_CREAT|O_TRUNC, 0644);
     h = creat(f, 0644);
-    i=0;
-    retval=0;
-    for(i=0;i<n*k;i++) {
-        a=a0+i*d;
+    i = 0;
+    retval = 0;
+    for(i = 0; i < n * k; i++)
+    {
+        a = a0 + i * d;
         lseek(h, i*sizeof(int), SEEK_SET);
         write(h, &a, sizeof(int));
     }
+
     close(h);
     return(retval);
 }

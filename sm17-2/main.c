@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
 {
     char *cmd;
 
-    cmd="ls -la";
+    cmd="pwd";
     if(argc == 2) {
         cmd=argv[1];
     } else if(argc!=1) {

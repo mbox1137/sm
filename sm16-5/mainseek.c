@@ -11,7 +11,8 @@
 #include <fcntl.h>
 #include <sys/file.h>
 
-int startArithmeticProgression(int h, int i, int n, int a0, int d, int k) { //pid
+int startArithmeticProgression(int h, int i, int n, int a0, int d, int k) //pid
+{
     pid_t cpid;
     int a, j;
     cpid = fork();
@@ -50,7 +51,8 @@ int main(int argc, char *argv[])
         a0 = 4;
         d = 2;
         k = 4;
-    } else if (argc == 6) {
+    } else if (argc == 6)
+    {
         if(sscanf(argv[1], "%d", &n) != 1)
             exit(1);
         if(sscanf(argv[2], "%s", f) != 1)
@@ -61,16 +63,18 @@ int main(int argc, char *argv[])
             exit(1);
         if(sscanf(argv[5], "%d", &k) != 1)
             exit(1);
-    } else {
+    } else
+    {
         fprintf(stderr, "%s: 3 out.bin 4 2 4", argv[0]);
         exit(1);
     }
 #if DEBUG
     printf("N=%d F=%s A0=%d D=%d K=%d\n", n, f, a0, d, k);
 #endif
-    if((h=creat(f, S_IRUSR|S_IWUSR| S_IRGRP| S_IROTH))==0) 
+    if ((h = creat(f, S_IRUSR|S_IWUSR| S_IRGRP| S_IROTH)) == 0)
         return(-3);
-    if(ftruncate(h,n*k*sizeof(int))) {
+    if (ftruncate(h, n * k * sizeof(int)))
+    {
         perror("ftruncate");
         return(-2);
     }

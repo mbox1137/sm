@@ -1,4 +1,4 @@
-#define DEBUG 1
+#define DEBUG 0
 
 #include "mysys.h"
 #include <stdio.h>
@@ -13,23 +13,23 @@ int mysys(const char *str)
 #if DEBUG
     fprintf(stderr,"cmd=\"%s\"\n",str);
 #endif
-    pid_t child = fork();
+    pid_t pros = fork();
 
-    if (child < 0)
+    if (pros < 0)
         return -1;
 
-    if (child)
+    if (!pros)
     {
-        waitpid(child, &wstatus, 0);
-
-        if (WIFSIGNALED(wstatus))
-            return 128 + WTERMSIG(wstatus);
-        else
-            return WEXITSTATUS(wstatus);
-    } else {
         execlp("/bin/sh", "sh", "-c", str, NULL);
         _exit(127);
     }
+
+    waitpid(pros, &wstatus, 0);
+
+    if (WIFSIGNALED(wstatus))
+        return 128 + WTERMSIG(wstatus);
+
+    return WEXITSTATUS(wstatus);
 }
 
 // man waitpid
