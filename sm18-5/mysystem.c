@@ -12,8 +12,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include "addname.h"
 #include "mysystem.h"
-
 
 int mysystem(const char *str) {
     char *cmd;

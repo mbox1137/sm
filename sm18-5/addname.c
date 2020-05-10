@@ -1,3 +1,7 @@
+#include <string.h>
+#include <malloc.h>
+#include "addname.h"
+
 void addname(CTRLN *z, char *name) {
     int n;
     if(!name) {

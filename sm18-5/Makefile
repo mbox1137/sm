@@ -4,7 +4,7 @@ GDB	= -g
 
 CC	= gcc
 #clang
-CFLAGS	= -m32 -fverbose-asm -Wunused-variable -Werror=return-type
+CFLAGS	= -m32 -fverbose-asm -Wunused-variable -Werror=return-type -Werror=dangling-else
 #CFLAGS	= -m32 -fverbose-asm -msse3 -nostdlib
 # -std=c99
 
@@ -24,15 +24,15 @@ LDFLAGS	= -no-pie -m32 $(GDB)
 #LDFLAGS	= -m elf_i386
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
-EXEC	= solution
-OBJS	= solution.o
-SCDRY	= solution.s
+EXEC	= main
+OBJS	= main.o mysystem.o addname.o
+SCDRY	= main.s mysystem.s addname.s
 
 .SECONDARY: $(SCDRY)
 ALL : $(EXEC)
 
-solution : solution.o Makefile
-	$(LD) $(LDFLAGS) -o solution solution.o
+main : main.o mysystem.o addname.o Makefile
+	$(LD) $(LDFLAGS) -o main main.o mysystem.o addname.o
 
 #$(EXEC) : $(OBJS) Makefile
 #	$(LD) $(LDFLAGS) $(GDB) -o $@ $(OBJS)
