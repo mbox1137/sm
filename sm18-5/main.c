@@ -3,19 +3,13 @@
 #include <stdio.h>
 #include <string.h>
 #include "solution.h"
+#include "addname.h"
 
 int main(int argc, char *argv[])
 {
-    char *cmd, str[1000];
-    char dummy[]=" 11111  222222   3333333 ";
-//    cmd=NULL;
-    cmd=dummy;
-    if(argc == 2) {
-        cmd=argv[1];
-    } else if(argc!=1) {
-        fprintf(stderr,"./main %s\n", cmd);
+    if(argc==1) {
+        fprintf(stderr,"%s cmd1 cmd2 cmd3 ...\n", argv[0]);
         return(1);
     }
-    strcpy(str, cmd);
-    printf("solution(\"%s\")=%d\n", cmd, solution(str));
+    solution(argc-1, &argv[1]);
 }

@@ -1,1 +1,1 @@
-int solution(const char *str);
+int solution (int argc, char *argv[]);

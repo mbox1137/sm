@@ -1,7 +1,7 @@
 //(17-1) + (17-5) + ...
 
 /*			sm17-5 (solution.c)	*/
-#define DEBUG 1
+#define DEBUG 0
 
 #include <stdio.h>
 #include <string.h>
@@ -15,7 +15,8 @@
 #include "addname.h"
 #include "solution.h"
 
-int solution(const char *str) {
+int solution (int argc, char *argv[]) {
+    char *str;
     char *cmd;
     int status;
     pid_t pid;
