@@ -21,8 +21,8 @@ int process(char *cmd)
 
     waitpid(proc, &wstatus, 0);
 
-    if (WIFEXITED(wstatus))
-        return 1 && !WEXITSTATUS(wstatus);
+    if (WIFEXITED(wstatus) && WEXITSTATUS(wstatus) == 0)
+        return 1;
     else
         return 0;
 }
