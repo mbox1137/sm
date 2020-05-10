@@ -10,13 +10,12 @@
 
 int main(int argc, char *argv[])
 {
+    int pipefd[2];
+    int fdin, fdout;
+    char *cmd1 = argv[1], *cmd2 = argv[2];
+
     if (argc != 3)
         exit(EXIT_FAILURE);
-
-    int pipefd[2];
-    pid_t cpid;
-    int fdin, fdout;
-    char *cmd = argv[1];
 
     if (pipe(pipefd) == -1)
         exit(EXIT_FAILURE);
@@ -28,17 +27,16 @@ int main(int argc, char *argv[])
 
     if (!fdin)
     {
-        dup2(pepifd[1], 1);
+        dup2(pipefd[1], 1);
 
         close(pipefd[0]);
         close(pipefd[1]);
 
-        execlp(cmd, cmd, (char *) NULL);
+        execlp(cmd1, cmd1, (char *) NULL);
 
         _exit(1);
     }
 
-    cmd = argv[2];
     fdout = fork();
 
     if (fdout == -1)
@@ -48,16 +46,16 @@ int main(int argc, char *argv[])
     {
         dup2(pipefd[0], 0);
 
-        close(fd[0]);
-        close(fd[1]);
+        close(pipefd[0]);
+        close(pipefd[1]);
 
-        execlp(cmd, cmd, (char *) NULL);
+        execlp(cmd2, cmd2, (char *) NULL);
 
         _exit(1);
     }
 
-    close(fd[0]);
-    close(fd[1]);
+    close(pipefd[0]);
+    close(pipefd[1]);
 
     wait(NULL);
     wait(NULL);
