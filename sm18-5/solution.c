@@ -24,11 +24,11 @@ int runItem(int *lp, int *rp, char* cmd) {
             close(lp[0]);
             lp[0]=0;
         }
-/*        if(lp[1]) {
+        if(lp[1]) {
             close(lp[1]);
             lp[1]=0;
         }
-*/        if(rp[1]) {
+        if(rp[1]) {
             dup2(rp[1], 1);
             close(rp[1]);
             rp[1]=0;
@@ -40,11 +40,11 @@ int runItem(int *lp, int *rp, char* cmd) {
             close(lp[0]);
             lp[0]=0;
         }
-/*        if(lp[1]) {
+        if(lp[1]) {
             close(lp[1]);
             lp[1]=0;
         }
-*/        if(rp[1]) {
+        if(rp[1]) {
             close(rp[1]);
             rp[1]=0;
         }
@@ -80,6 +80,9 @@ int solution (int argc, char *argv[]) {
         pids[k]=runItem(lp, rp, argv[k]);
 
     for (k = 0; k<argc; k++) {
+#if DEBUG
+        printf("Waiting for %d (%d)\n", k, pids[k]);
+#endif
         waitpid(pids[k], &status, 0);
         if (WIFEXITED(status))
             continue;

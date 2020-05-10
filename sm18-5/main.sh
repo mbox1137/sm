@@ -1,8 +1,8 @@
 #!/bin/bash
 #./solution 3 out.bin 4 2 4
 INF=in.tst
-TMPF=tmp.txt
-FILE=out.txt
+TMPF=tmp.log
+FILE=out.log
 function myrun {
 	echo ./main $@
 	./main $@ >$FILE
