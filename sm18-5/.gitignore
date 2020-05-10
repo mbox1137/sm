@@ -2,3 +2,4 @@ solution.s
 addname.s
 main
 main.s
+*.log
