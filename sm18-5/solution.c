@@ -1,28 +1,6 @@
-#define DEBUG 1
-//#define _POSIX_C_SOURCE 200101L
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <fcntl.h>
-#include <unistd.h>
+//(17-1) + (17-5) + ...
 
-int main() {
-    int fd[2];
-    pipe(fd);
-
-    FILE* write_file = fdopen(fd[1], "w");
-    FILE* read_file = fdopen(fd[0], "r");
-    int x = 0;
-    fprintf(write_file, "%d\n", 100);
-    fflush(write_file);
-    fscanf(read_file, "%d", &x);
-
-    printf("%d\n", x);
-}
-
-/*			sm17-5 (mysystem.c)
+/*			sm17-5 (mysystem.c)	*/
 #define DEBUG 1
 
 #include <stdio.h>
@@ -146,7 +124,7 @@ int mysystem(const char *str) {
         return(0);
     }
 }
-*/
+
 
 /*			sm17-1 (prog.c)
 #define DEBUG 0
