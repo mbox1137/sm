@@ -62,23 +62,31 @@ int solution (int argc, char *argv[]) {
         printf("argv[%d]=\t\"%s\"\n", k, argv[k]);
     }
 #endif
-    if(argc<2)
+    if(argc<1)
         return(0);
     pids=malloc(argc*sizeof(pid_t));
-    lp[0]=0;
-    lp[1]=0;
-    for (k = 0; k<argc-1; k++) {
-        pipe(rp);
-        pids[k]=runItem(lp, rp, argv[k]);
-        lp[0]=rp[0];
-        lp[1]=rp[1];
-    }
+    if(argc>1) {
+        lp[0]=0;
+        lp[1]=0;
+        for (k = 0; k<argc-1; k++) {
+            pipe(rp);
+            pids[k]=runItem(lp, rp, argv[k]);
+            lp[0]=rp[0];
+            lp[1]=rp[1];
+        }
         lp[0]=rp[0];
         lp[1]=rp[1];
         rp[0]=0;
         rp[1]=0; 
         pids[k]=runItem(lp, rp, argv[k]);
-
+    } else {
+        k=0;
+        lp[0]=0;
+        lp[1]=0;
+        rp[0]=0;
+        rp[1]=0; 
+        pids[k]=runItem(lp, rp, argv[k]);
+    }
     for (k = 0; k<argc; k++) {
 #if DEBUG
         printf("Waiting for %d (%d)\n", k, pids[k]);

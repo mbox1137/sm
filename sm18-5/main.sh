@@ -5,20 +5,27 @@ TMPF=tmp.log
 FILE=out.log
 function myrun {
 	echo ./main $@
-	./main $@ >$FILE
-	cmd="( $1"
-	shift
-	for c in $@
-	do
-		cmd="$cmd | $c"
-	done
-	cmd="$cmd ) 2>&1"
-	bash -c "$cmd >$TMPF"
-	if ! cmp $FILE $TMPF
+	if [ .$1 == . ]
 	then
-		echo main:	pipe:
-		diff -y $FILE $TMPF
+		exit
+	else
+		./main $@ >$FILE
+		cmd="( $1"
+		shift
+		for c in $@
+		do
+			cmd="$cmd | $c"
+		done
+		cmd="$cmd ) 2>&1"
+		bash -c "$cmd >$TMPF"
+		if ! cmp $FILE $TMPF
+		then
+			echo main:	pipe:
+			diff -y $FILE $TMPF
+		fi
 	fi
 }
 
 myrun ls cat wc
+myrun ls
+myrun
