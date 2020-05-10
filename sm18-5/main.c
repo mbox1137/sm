@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "mysystem.h"
+#include "solution.h"
 
 int main(int argc, char *argv[])
 {
@@ -17,5 +17,5 @@ int main(int argc, char *argv[])
         return(1);
     }
     strcpy(str, cmd);
-    printf("mysystem(\"%s\")=%d\n", cmd, mysystem(str));
+    printf("solution(\"%s\")=%d\n", cmd, solution(str));
 }

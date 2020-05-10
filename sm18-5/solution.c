@@ -1,6 +1,6 @@
 //(17-1) + (17-5) + ...
 
-/*			sm17-5 (mysystem.c)	*/
+/*			sm17-5 (solution.c)	*/
 #define DEBUG 1
 
 #include <stdio.h>
@@ -13,9 +13,9 @@
 #include <unistd.h>
 
 #include "addname.h"
-#include "mysystem.h"
+#include "solution.h"
 
-int mysystem(const char *str) {
+int solution(const char *str) {
     char *cmd;
     int status;
     pid_t pid;

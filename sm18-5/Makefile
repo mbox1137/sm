@@ -25,14 +25,14 @@ LDFLAGS	= -no-pie -m32 $(GDB)
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
 EXEC	= main
-OBJS	= main.o mysystem.o addname.o
-SCDRY	= main.s mysystem.s addname.s
+OBJS	= main.o solution.o addname.o
+SCDRY	= main.s solution.s addname.s
 
 .SECONDARY: $(SCDRY)
 ALL : $(EXEC)
 
-main : main.o mysystem.o addname.o Makefile
-	$(LD) $(LDFLAGS) -o main main.o mysystem.o addname.o
+main : main.o solution.o addname.o Makefile
+	$(LD) $(LDFLAGS) -o main main.o solution.o addname.o
 
 #$(EXEC) : $(OBJS) Makefile
 #	$(LD) $(LDFLAGS) $(GDB) -o $@ $(OBJS)
