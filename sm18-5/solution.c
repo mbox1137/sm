@@ -1,6 +1,3 @@
-//(17-1) + (17-5) + ...
-
-/*			sm17-5 (solution.c)	*/
 #define DEBUG 0
 
 #include <stdio.h>
@@ -15,65 +12,80 @@
 #include "addname.h"
 #include "solution.h"
 
-int solution (int argc, char *argv[]) {
-    char *str;
-    char *cmd;
-    int status;
+int runItem(int *lp, int *rp, char* cmd) {
     pid_t pid;
-    CTRLN ctrln;
-    char delim[]=" \f\n\r\t\v";
-    char *cp;
-    char **args;
-    int k;
-
-#if DEBUG
-    if(str)
-        fprintf(stderr,"str=\"%s\"\n",str);
-#endif
-
-    ctrln.names=NULL;
-    ctrln.pnames=NULL;
-    addname(&ctrln, NULL);	//init
-    cp = strtok((char*)str, delim);
-    if(!cp)
-        return(-1);
-    while(cp) {
-        addname(&ctrln, cp);
-        cp=strtok(NULL, delim);
-    }
-    args=malloc((ctrln.kpn+1)*sizeof(char*));
-    if(args==NULL) {
-        return(-2);
-    }
-    for (k = 0; k < ctrln.kpn; k++)
-        args[k]=&ctrln.names[ctrln.pnames[k]];
-    args[k]=NULL;
-    cmd=args[0];
-#if DEBUG
-    printf("cmd=\"%s\"\n", cmd);
-    for (k = 0; args[k]; k++) {
-        printf("argv[%d]=\t\"%s\"\n", k, args[k]);
-    }
-#endif
     pid = fork();
     if (pid < 0)
-    {
-        return(1);
-    }
+        return(-1);
     if (!pid)
     {
-        execvp(cmd, args);
-        exit(1);
+        if(lp[0]) {
+            dup2(lp[0], 0);
+            close(lp[0]);
+            lp[0]=0;
+        }
+/*        if(lp[1]) {
+            close(lp[1]);
+            lp[1]=0;
+        }
+*/        if(rp[1]) {
+            dup2(rp[1], 1);
+            close(rp[1]);
+            rp[1]=0;
+        }
+        execlp(cmd, cmd, NULL);
+        exit(EXIT_FAILURE);
     } else {
-        free(args);
-        addname(&ctrln, NULL);	//finit
-        waitpid(pid, &status, 0);
-        if (WIFEXITED(status)) return(WEXITSTATUS(status));
-        else if(WIFSIGNALED(status)) return(1024+WTERMSIG(status));
-        else if(WIFSTOPPED(status)) return(1000000+WSTOPSIG(status));
-        else if(WIFCONTINUED(status)) return(65535);
-        return(0);
+        if(lp[0]) {
+            close(lp[0]);
+            lp[0]=0;
+        }
+/*        if(lp[1]) {
+            close(lp[1]);
+            lp[1]=0;
+        }
+*/        if(rp[1]) {
+            close(rp[1]);
+            rp[1]=0;
+        }
+        return(pid);
     }
+}
+
+int solution (int argc, char *argv[]) {
+    pid_t *pids;
+    int k;
+    int status;
+    int lp[2], rp[2];
+#if DEBUG
+    for (k = 0; k<argc; k++) {
+        printf("argv[%d]=\t\"%s\"\n", k, argv[k]);
+    }
+#endif
+    if(argc<2)
+        return(0);
+    pids=malloc(argc*sizeof(pid_t));
+    lp[0]=0;
+    lp[1]=0;
+    for (k = 0; k<argc-1; k++) {
+        pipe(rp);
+        pids[k]=runItem(lp, rp, argv[k]);
+        lp[0]=rp[0];
+        lp[1]=rp[1];
+    }
+        lp[0]=rp[0];
+        lp[1]=rp[1];
+        rp[0]=0;
+        rp[1]=0; 
+        pids[k]=runItem(lp, rp, argv[k]);
+
+    for (k = 0; k<argc; k++) {
+        waitpid(pids[k], &status, 0);
+        if (WIFEXITED(status))
+            continue;
+    }
+    free(pids);
+    return(0);
 }
 
 

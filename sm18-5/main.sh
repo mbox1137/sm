@@ -4,8 +4,8 @@ INF=in.tst
 TMPF=tmp.txt
 FILE=out.txt
 function myrun {
-	echo $@
-	./solution $@ >$FILE
+	echo ./main $@
+	./main $@ >$FILE
 	cmd="( $1"
 	shift
 	for c in $@
@@ -14,7 +14,11 @@ function myrun {
 	done
 	cmd="$cmd ) 2>&1"
 	bash -c "$cmd >$TMPF"
-	cmp $FILE $TMPF
+	if ! cmp $FILE $TMPF
+	then
+		echo main:	pipe:
+		diff -y $FILE $TMPF
+	fi
 }
 
 myrun ls cat wc
