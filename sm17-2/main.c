@@ -14,5 +14,5 @@ int main(int argc, char *argv[])
         fprintf(stderr,"./main %s\n", cmd);
         return(1);
     }
-    mysys(cmd);
+    printf("%d\n", mysys(cmd));
 }
