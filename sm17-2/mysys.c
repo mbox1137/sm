@@ -1,6 +1,6 @@
 #define DEBUG 0
 
-#include "mysys.h"
+//#include "mysys.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -11,22 +11,25 @@ int mysys(const char *str)
 {
     int wstatus;
 #if DEBUG
-    fprintf(stderr,"cmd=\"%s\"\n",str);
+    fprintf(stderr,"cmd=\"%s\"\n", str);
 #endif
-    pid_t pros = fork();
+    pid_t proc = fork();
 
-    if (pros < 0)
+    if (proc < 0)
         return -1;
 
-    if (!pros)
+    if (!proc)
     {
         execlp("/bin/sh", "sh", "-c", str, NULL);
         _exit(127);
     }
 
-    waitpid(pros, &wstatus, 0);
+    waitpid(proc, &wstatus, 0);
 
-    if (WIFSIGNALED(wstatus))
+    if (WIFEXITED(wstatus))
+        return WEXITSTATUS(wstatus);
+
+    else if (WIFSIGNALED(wstatus))
         return 128 + WTERMSIG(wstatus);
 
     return WEXITSTATUS(wstatus);

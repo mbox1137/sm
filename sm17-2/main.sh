@@ -8,4 +8,11 @@ function myrun {
 	cmp $3 $TMPF
 }
 
-./main "pwd"
+./main "ls -la"
+echo
+./main "sleep 10" >main.log 2>&1 &
+sleep 1
+killall sleep
+cat main.log
+
+
