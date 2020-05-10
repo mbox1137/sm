@@ -4,12 +4,14 @@ INF=in.tst
 TMPF=tmp.log
 FILE=out.log
 function myrun {
-	echo ./main $@
+	echo -n ./main $@
+	truncate -s 0 $FILE
+	truncate -s 0 $TMPF
+	tee stdin.log |./main $@ >$FILE
 	if [ .$1 == . ]
 	then
-		exit
+		echo "	Ok"
 	else
-		./main $@ >$FILE
 		cmd="( $1"
 		shift
 		for c in $@
@@ -17,15 +19,22 @@ function myrun {
 			cmd="$cmd | $c"
 		done
 		cmd="$cmd ) 2>&1"
-		bash -c "$cmd >$TMPF"
-		if ! cmp $FILE $TMPF
+		cat stdin.log |bash -c "$cmd >$TMPF"
+		if cmp $FILE $TMPF
 		then
-			echo main:	pipe:
+			echo "	Ok"
+		else
+			echo
+			echo main:			pipe:
+			echo --------------------------------------
 			diff -y $FILE $TMPF
 		fi
 	fi
 }
 
-myrun ls cat wc
-myrun ls
-myrun
+echo "" |myrun ls cat cat wc
+echo "" |myrun ls cat wc
+echo "" |myrun ls cat
+echo "" |myrun ls
+echo "" |myrun
+find .. |myrun wc

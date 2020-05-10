@@ -7,11 +7,11 @@
 
 int main(int argc, char *argv[])
 {
+#if DEBUG
     if(argc==1) {
         fprintf(stderr,"%s cmd1 cmd2 cmd3 ...\n", argv[0]);
         return(1);
     }
-#if DEBUG
     printf("%d\n", solution(argc-1, &argv[1]));
 #else
     solution(argc-1, &argv[1]);
