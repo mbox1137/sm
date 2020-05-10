@@ -1,4 +1,3 @@
-int mysystem(const char *str);
 typedef struct {
     char *names;
     int *pnames;
