@@ -1,6 +1,5 @@
 #define DEBUG 1
-//https://stackoverflow.com/questions/43349397/why-fprintf-and-fscanf-does-not-work-with-pipe
-#define _POSIX_C_SOURCE 200101L
+//#define _POSIX_C_SOURCE 200101L
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -23,84 +22,200 @@ int main() {
     printf("%d\n", x);
 }
 
-/*
-PIPE(2)                    Linux Programmer's Manual                   PIPE(2)
+/*			sm17-5 (mysystem.c)
+#define DEBUG 1
 
-NAME
-       pipe, pipe2 - create pipe
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <fcntl.h>
+#include <unistd.h>
 
-SYNOPSIS
-       #include <unistd.h>
+#include "mysystem.h"
 
-       struct fd_pair {
-           long fd[2];
-       };
-       struct fd_pair pipe();
+void addname(CTRLN *z, char *name) {
+    int n;
+    if(!name) {
+        if(z->names)
+            free(z->names);
+        if(z->pnames)
+            free(z->pnames);
+        z->kn=0;
+        z->nn=0;
+        z->kpn=0;
+        z->npn=0;
+        return;
+    }
+    n=strlen(name);
+    if(n==0) {
+        z->kn=0;
+        z->kpn=0;
+        return;
+    }
+    if((z->kn+n+1) >= (z->nn)) {
+        if(!z->names) {
+            z->nn = 1<<13;
+            z->names = malloc(z->nn);
+            if(z->names == NULL)
+                z->names = NULL;
+        } else {
+            z->nn *= 2;
+            z->names = realloc(z->names, z->nn);
+            if(z->names == NULL)
+                z->names = NULL;
+        }
+    }
+    if((z->kpn) >= (z->npn)) {
+        if(!z->pnames) {
+            z->npn = 1<<10;
+            z->pnames = malloc((z->npn) * sizeof(int));
+            if(z->pnames == NULL)
+                z->pnames = NULL;
+        } else {
+            z->npn *= 2;
+            z->pnames = realloc(z->pnames, z->npn*sizeof(int));
+            if(z->pnames == NULL)
+                z->pnames = NULL;
+        }
+    }
+    (z->pnames)[z->kpn]=z->kn;
+    strcpy(&((z->names)[z->kn]),name);
+    z->kn += n+1;
+    z->kpn++;
+}
 
-       int pipe(int pipefd[2]);
+int mysystem(const char *str) {
+    char *cmd;
+    int status;
+    pid_t pid;
+    CTRLN ctrln;
+    char delim[]=" \f\n\r\t\v";
+    char *cp;
+    char **args;
+    int k;
 
-       #define _GNU_SOURCE
-       #include <fcntl.h>
-       #include <unistd.h>
+#if DEBUG
+    if(str)
+        fprintf(stderr,"str=\"%s\"\n",str);
+#endif
 
-       int pipe2(int pipefd[2], int flags);
+    ctrln.names=NULL;
+    ctrln.pnames=NULL;
+    addname(&ctrln, NULL);	//init
+    cp = strtok((char*)str, delim);
+    if(!cp)
+        return(-1);
+    while(cp) {
+        addname(&ctrln, cp);
+        cp=strtok(NULL, delim);
+    }
+    args=malloc((ctrln.kpn+1)*sizeof(char*));
+    if(args==NULL) {
+        return(-2);
+    }
+    for (k = 0; k < ctrln.kpn; k++)
+        args[k]=&ctrln.names[ctrln.pnames[k]];
+    args[k]=NULL;
+    cmd=args[0];
+#if DEBUG
+    printf("cmd=\"%s\"\n", cmd);
+    for (k = 0; args[k]; k++) {
+        printf("argv[%d]=\t\"%s\"\n", k, args[k]);
+    }
+#endif
+    pid = fork();
+    if (pid < 0)
+    {
+        return(1);
+    }
+    if (!pid)
+    {
+        execvp(cmd, args);
+        exit(1);
+    } else {
+        free(args);
+        addname(&ctrln, NULL);	//finit
+        waitpid(pid, &status, 0);
+        if (WIFEXITED(status)) return(WEXITSTATUS(status));
+        else if(WIFSIGNALED(status)) return(1024+WTERMSIG(status));
+        else if(WIFSTOPPED(status)) return(1000000+WSTOPSIG(status));
+        else if(WIFCONTINUED(status)) return(65535);
+        return(0);
+    }
+}
+*/
 
-EXAMPLE
-       The  following  program  creates  a pipe, and then fork(2)s to create a
-       child process; the child inherits a duplicate set of  file  descriptors
-       that  refer  to  the same pipe.  After the fork(2), each process closes
-       the file descriptors that it doesn't need for the pipe  (see  pipe(7)).
-       The  parent  then writes the string contained in the program's command-
-       line argument to the pipe, and the child reads this string a byte at  a
-       time from the pipe and echoes it on standard output.
+/*			sm17-1 (prog.c)
+#define DEBUG 0
 
-   Program source
-       #include <sys/types.h>
-       #include <sys/wait.h>
-       #include <stdio.h>
-       #include <stdlib.h>
-       #include <unistd.h>
-       #include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <fcntl.h>
+#include <unistd.h>
 
-       int
-       main(int argc, char *argv[])
-       {
-           int pipefd[2];
-           pid_t cpid;
-           char buf;
+int main(int argc, char *argv[])
+{
+    char *cmd;
+    int outfd, infd;
+    int wstatus;
+    pid_t pid;
 
-           if (argc != 2) {
-               fprintf(stderr, "Usage: %s <string>\n", argv[0]);
-               exit(EXIT_FAILURE);
-           }
+    if (argc != 4)
+    {
+        exit(EXIT_FAILURE);
+    }
 
-           if (pipe(pipefd) == -1) {
-               perror("pipe");
-               exit(EXIT_FAILURE);
-           }
+    cmd = argv[1];
 
-           cpid = fork();
-           if (cpid == -1) {
-               perror("fork");
-               exit(EXIT_FAILURE);
-           }
+    infd = open(argv[2], O_RDONLY);
+    if (!infd)
+    {
+        perror("open infd");
+        exit(EXIT_FAILURE);
+    }
 
-           if (cpid == 0) {
-               close(pipefd[1]);
+    outfd = open(argv[3], O_CREAT|O_WRONLY|O_TRUNC, 0666);
+    if (!outfd)
+    {
+        perror("open outfd");
+        exit(EXIT_FAILURE);
+    }
 
-               while (read(pipefd[0], &buf, 1) > 0)
-                   write(STDOUT_FILENO, &buf, 1);
+    pid = fork();
 
-               write(STDOUT_FILENO, "\n", 1);
-               close(pipefd[0]);
-               _exit(EXIT_SUCCESS);
+    if (pid < 0)
+    {
+        close(infd);
+        close(outfd);
+        perror("fork");
+        exit(EXIT_FAILURE);
+    }
 
-           } else {
-               close(pipefd[0]);
-               write(pipefd[1], argv[1], strlen(argv[1]));
-               close(pipefd[1]);
-               wait(NULL);
-               exit(EXIT_SUCCESS);
-           }
-       }
+    if (!pid)
+    {
+        dup2(infd, 0);
+        close(infd);
+
+        dup2(outfd, 1);
+        close(outfd);
+
+        execlp(cmd, cmd, NULL);
+        exit(EXIT_FAILURE);
+    } else
+    {
+        close(infd);
+        close(outfd);
+        waitpid(pid, &wstatus, 0);
+        if (WIFEXITED(wstatus)) exit(WEXITSTATUS(wstatus));
+        else exit(EXIT_FAILURE);
+    }
+
+    return 0;
+}
 */
