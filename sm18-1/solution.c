@@ -11,7 +11,7 @@
 int main(int argc, char *argv[])
 {
     int pipefd[2];
-    int fdin, fdout;
+    pid_t pid1, pid2;
     char *cmd1 = argv[1], *cmd2 = argv[2];
 
     if (argc != 3)
@@ -20,36 +20,36 @@ int main(int argc, char *argv[])
     if (pipe(pipefd) == -1)
         exit(EXIT_FAILURE);
 
-    fdin = fork();
+    pid1 = fork();
 
-    if (fdin == -1)
+    if (pid1 == -1)
         exit(EXIT_FAILURE);
 
-    if (!fdin)
+    if (!pid1)
     {
-        dup2(pipefd[1], 1);
+        dup2(pipefd[0], 0);
 
-        close(pipefd[0]);
-        close(pipefd[1]);
+//        close(pipefd[0]);
+//        close(pipefd[1]);
 
-        execlp(cmd1, cmd1, (char *) NULL);
+        execlp("/bin/sh", "sh", "-c", cmd2, NULL);
 
         _exit(1);
     }
 
-    fdout = fork();
+    pid2 = fork();
 
-    if (fdout == -1)
+    if (pid2 == -1)
         exit(EXIT_FAILURE);
 
-    if (!fdout)
+    if (!pid2)
     {
-        dup2(pipefd[0], 0);
+        dup2(pipefd[1], 1);
 
-        close(pipefd[0]);
-        close(pipefd[1]);
+//        close(pipefd[0]);
+//        close(pipefd[1]);
 
-        execlp(cmd2, cmd2, (char *) NULL);
+        execlp("/bin/sh", "sh", "-c", cmd1, NULL);
 
         _exit(1);
     }
@@ -57,8 +57,8 @@ int main(int argc, char *argv[])
     close(pipefd[0]);
     close(pipefd[1]);
 
-    wait(NULL);
-    wait(NULL);
+    waitpid(pid1, 0, 0);
+    waitpid(pid2, 0, 0);
 
     return 0;
 }
