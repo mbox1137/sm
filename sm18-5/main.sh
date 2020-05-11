@@ -4,13 +4,14 @@ INF=in.tst
 TMPF=tmp.log
 FILE=out.log
 function myrun {
-	echo -n ./main $@
+	echo -n "./main $@; "
 	truncate -s 0 $FILE
 	truncate -s 0 $TMPF
 	tee stdin.log |./main $@ >$FILE
+	retval=$?
 	if [ .$1 == . ]
 	then
-		echo "	Ok"
+		echo "	Ok ($retval)"
 	else
 		cmd="( $1"
 		shift
@@ -22,7 +23,7 @@ function myrun {
 		cat stdin.log |bash -c "$cmd >$TMPF"
 		if cmp $FILE $TMPF
 		then
-			echo "	Ok"
+			echo "	Ok ($retval)"
 		else
 			echo
 			echo main:			pipe:
@@ -32,9 +33,10 @@ function myrun {
 	fi
 }
 
-echo "" |myrun ls cat cat wc
-echo "" |myrun ls cat wc
-echo "" |myrun ls cat
-echo "" |myrun ls
-echo "" |myrun
+myrun ls cat cat wc	</dev/null
+myrun ls cat wc		</dev/null
+myrun ls cat		</dev/null
+myrun ls		</dev/null
+myrun			</dev/null
 find .. |myrun wc
+myrun ./sleep.sh	</dev/null

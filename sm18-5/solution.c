@@ -1,4 +1,5 @@
 #define DEBUG 0
+#define ERRTEST 0
 
 #include <stdio.h>
 #include <string.h>
@@ -54,8 +55,8 @@ int runItem(int *lp, int *rp, char* cmd) {
 
 int solution (int argc, char *argv[]) {
     pid_t *pids;
-    int k;
-    int status;
+    int k, k0;
+    int status, retval;
     int lp[2], rp[2];
 #if DEBUG
     for (k = 0; k<argc; k++) {
@@ -64,7 +65,10 @@ int solution (int argc, char *argv[]) {
 #endif
     if(argc<1)
         return(0);
+    k=-1;
     pids=malloc(argc*sizeof(pid_t));
+    if(!pids)
+        goto closeAll;
     if(argc>1) {
         lp[0]=0;
         lp[1]=0;
@@ -73,12 +77,16 @@ int solution (int argc, char *argv[]) {
             pids[k]=runItem(lp, rp, argv[k]);
             lp[0]=rp[0];
             lp[1]=rp[1];
+            if(pids[k]==-1)
+                goto closeAll;
         }
         lp[0]=rp[0];
         lp[1]=rp[1];
         rp[0]=0;
         rp[1]=0; 
         pids[k]=runItem(lp, rp, argv[k]);
+        if(pids[k]==-1)
+            goto closeAll;
     } else {
         k=0;
         lp[0]=0;
@@ -86,8 +94,23 @@ int solution (int argc, char *argv[]) {
         rp[0]=0;
         rp[1]=0; 
         pids[k]=runItem(lp, rp, argv[k]);
+#if ERRTEST
+        goto closeAll;
+#else
+        if(pids[k]==-1)
+            goto closeAll;
+#endif
     }
-    for (k = 0; k<argc; k++) {
+    k0=k+1;
+    retval = 0;
+    goto closeExit;
+closeAll:
+    k0=k+1;
+    retval = 1;
+    for (k = 0; k<k0; k++)
+        kill(pids[k], SIGKILL);
+closeExit:    
+    for (k = 0; k<k0; k++) {
 #if DEBUG
         printf("Waiting for %d (%d)\n", k, pids[k]);
 #endif
@@ -96,78 +119,5 @@ int solution (int argc, char *argv[]) {
             continue;
     }
     free(pids);
-    return(0);
+    return(retval);
 }
-
-
-/*			sm17-1 (prog.c)
-#define DEBUG 0
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <fcntl.h>
-#include <unistd.h>
-
-int main(int argc, char *argv[])
-{
-    char *cmd;
-    int outfd, infd;
-    int wstatus;
-    pid_t pid;
-
-    if (argc != 4)
-    {
-        exit(EXIT_FAILURE);
-    }
-
-    cmd = argv[1];
-
-    infd = open(argv[2], O_RDONLY);
-    if (!infd)
-    {
-        perror("open infd");
-        exit(EXIT_FAILURE);
-    }
-
-    outfd = open(argv[3], O_CREAT|O_WRONLY|O_TRUNC, 0666);
-    if (!outfd)
-    {
-        perror("open outfd");
-        exit(EXIT_FAILURE);
-    }
-
-    pid = fork();
-
-    if (pid < 0)
-    {
-        close(infd);
-        close(outfd);
-        perror("fork");
-        exit(EXIT_FAILURE);
-    }
-
-    if (!pid)
-    {
-        dup2(infd, 0);
-        close(infd);
-
-        dup2(outfd, 1);
-        close(outfd);
-
-        execlp(cmd, cmd, NULL);
-        exit(EXIT_FAILURE);
-    } else
-    {
-        close(infd);
-        close(outfd);
-        waitpid(pid, &wstatus, 0);
-        if (WIFEXITED(wstatus)) exit(WEXITSTATUS(wstatus));
-        else exit(EXIT_FAILURE);
-    }
-
-    return 0;
-}
-*/
