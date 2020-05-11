@@ -7,13 +7,16 @@
 
 int main(int argc, char *argv[])
 {
+    int retval;
 #if DEBUG
     if(argc==1) {
         fprintf(stderr,"%s cmd1 cmd2 cmd3 ...\n", argv[0]);
         return(1);
     }
-    printf("%d\n", solution(argc-1, &argv[1]));
+    retval=solution(argc-1, &argv[1]);
+    printf("%d\n", retval);
 #else
-    solution(argc-1, &argv[1]);
+    retval=solution(argc-1, &argv[1]);
 #endif
+    return(retval);
 }
