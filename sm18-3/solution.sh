@@ -1,7 +1,7 @@
 #!/bin/bash
 #./solution 3 out.bin 4 2 4
 CMD1="ls"
-CMD2="ls -la"
+CMD2="pwd"
 CMD3="wc"
 INF=in.tst
 TMPF=tmp.txt
