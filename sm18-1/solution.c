@@ -21,8 +21,10 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
 
     pid1 = fork();
+
     if (pid1 == -1)
         exit(EXIT_FAILURE);
+
     if (!pid1)
     {
         dup2(pipefd[0], 0);
@@ -33,14 +35,15 @@ int main(int argc, char *argv[])
     }
 
     close(pipefd[0]);
-    
+
     pid2 = fork();
+
     if (pid2 == -1)
         exit(EXIT_FAILURE);
+
     if (!pid2)
     {
         dup2(pipefd[1], 1);
-//        close(pipefd[0]);
         close(pipefd[1]);
         execlp("/bin/sh", "sh", "-c", cmd1, NULL);
         exit(1);
