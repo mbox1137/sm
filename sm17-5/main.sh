@@ -18,3 +18,10 @@ echo
 sleep 1
 killall sleep
 cat main.log
+echo
+./main "        "
+echo
+./main "                ls             "
+echo
+./main ""
+
