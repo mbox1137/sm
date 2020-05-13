@@ -3,6 +3,7 @@
 function myrun {
 	echo ./solution $@
 	./solution $@
+	echo '$?='$?
 	echo
 }
 
@@ -12,3 +13,4 @@ myrun 0
 myrun
 myrun -1
 myrun qq
+myrun 7 8
