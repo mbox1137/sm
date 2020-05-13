@@ -1,19 +1,14 @@
 #!/bin/bash
 #./solution 3 out.bin 4 2 4
-CMD1="ls"
-CMD2="ls -la"
-CMD3="wc"
-INF=in.tst
-TMPF=tmp.txt
-FILE=out.txt
 function myrun {
-	echo $@
-	./solution $1 $2 >$FILE
-	$1 |$2 >$TMPF
-	cmp $FILE $TMPF
+	echo ./solution $@
+	./solution $@
+	echo
 }
 
-./solution 5
-./solution 1
-./solution 0
-./solution
+myrun 5
+myrun 1
+myrun 0
+myrun
+myrun -1
+myrun qq

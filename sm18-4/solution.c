@@ -51,8 +51,7 @@ int main(int argc, char** argv) {
     int nn;
     
     if(argc!=2 || sscanf(argv[1],"%d",&nn)!=1) {
-        fprintf(stderr, "%s 5\n", argv[0]);
-        return(-1);
+        return(0);
     }
 #if DEBUG
     printf("nn=%d\n",nn);
