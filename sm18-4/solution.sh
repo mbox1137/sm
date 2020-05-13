@@ -14,3 +14,6 @@ function myrun {
 }
 
 ./solution 5
+./solution 1
+./solution 0
+./solution
