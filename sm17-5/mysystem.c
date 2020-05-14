@@ -1,4 +1,4 @@
-#define DEBUG 0
+#define DEBUG 1
 
 #include <stdio.h>
 #include <string.h>
@@ -126,9 +126,7 @@ int mysystem(const char *str)
 #endif
     pid = fork();
     if (pid < 0)
-    {
-        return 1;
-    }
+        return -1;
     if (!pid)
     {
         execvp(cmd, args);
