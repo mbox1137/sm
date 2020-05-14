@@ -1,73 +1,81 @@
 #define DEBUG 1
 
-#define _POSIX_C_SOURCE 200101L
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <string.h>
+#include <time.h>
+#include <errno.h>
+#include <limits.h>
 #include <fcntl.h>
 #include <unistd.h>
 
 int main(int argc, char *argv[])
 {
-}
-/*
-int main(int argc, char *argv[])
-{
-    char *cmd;
-    int outfd, infd;
-    int k;
-    int status;
-    pid_t pid;
+    if (argc < 2)
+        exit(EXIT_FAILURE);
 
-    if(argc != 4) {
-        for(k=1;k<argc;k++)
-            fprintf(stderr,"%d %s\n", k, argv[k]);
-        fprintf(stderr,"./main wc in.txt out.txt\n");
-        return(1);
-    } else {
-        cmd=argv[1];
-        infd = open(argv[2], O_RDONLY);
-        outfd = open(argv[3], O_CREAT|O_WRONLY|O_TRUNC, 0644);
-    }
+    char path[PATH_MAX];
+    char temp[20];
+    int outfd, i;
+    char *dir = getenv("XDG_RUNTIME_DIR");
 
-    if (!infd)
-    {
-        perror("open infd");
-        return EXIT_FAILURE;
-    }
-    if (!outfd)
-    {
-        perror("open outfd");
-        return EXIT_FAILURE;
-    }
-    pid = fork();
-    if (pid < 0)
-    {
-        close(infd);
-        close(outfd);
-        perror("fork");
-        return EXIT_FAILURE;
-    }
+    if (!dir)
+        dir = getenv("TMPDIR");
 
-    if(!pid)
-    {
-        // child code
-        dup2(infd, 0); // replace stdin
-        close(infd);
-        dup2(outfd, 1); // replace stdout
-        close(outfd);
-        execlp(cmd, "-", NULL);
-    }
+    if (!dir)
+        strcpy(path, "/tmp/");
     else
     {
-        // parent code
-        close(infd);
-        close(outfd);
-        waitpid(pid, &status, 0);
-        if (WIFEXITED(status)) return WEXITSTATUS(status);
-        else return EXIT_FAILURE;
+        strcpy(path, dir);
+        strcat(path, "/");
     }
+
+#if DEBUG
+    printf("%s\n", path);
+#endif
+
+    time_t t;
+    time(&t);
+
+    sprintf(temp, "%ld", t);
+
+    strcat(path, temp);
+
+#if DEBUG
+    printf("%s\n", path);
+#endif
+
+    srand(time(NULL));
+    sprintf(temp, "%d", rand() % 100000000);
+    strcat(path, temp);
+    strcat(path, ".py");
+
+#if DEBUG
+    printf("%s\n", path);
+#endif
+
+    outfd = creat(path, 0700);
+
+    write(outfd, "#!/usr/bin/env python3\n", 23 * sizeof(char));
+    write(outfd, "from sys import argv\n", 21 * sizeof(char));
+    write(outfd, "from os import remove\n", 22 * sizeof(char));
+    write(outfd, "print(", 6 * sizeof(char));
+    for (i = 1; i < argc - 1; ++i)
+    {
+        write(outfd, argv[i], sizeof(char) * strlen(argv[i]));
+        write(outfd, "*", sizeof(char));
+    }
+    write(outfd, argv[i], sizeof(char) * strlen(argv[i]));
+    write(outfd, ")\n", 2 * sizeof(char));
+    write(outfd, "remove(argv[0])\n", 16 * sizeof(char));
+
+    close(outfd);
+
+    execlp("/bin/sh", "sh", "-c", path, NULL);
+
+    exit(EXIT_SUCCESS);
 }
-*/
+
