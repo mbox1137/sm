@@ -24,14 +24,19 @@ int startPingPong(int* fd, int n, int nn, const int *pn0) {
 
     int sign(pid_t pid, int sfd) {
         siginfo_t siginfo;
+#if DEBUG
+        printf(".");
+        fflush(stdout);
+        usleep(100000);
+#endif
         if(read(sfd, &siginfo, sizeof(siginfo))==sizeof(siginfo))
-            return siginfo.si_pid == pid;
+            return 1;	//(siginfo.si_pid == pid);
         return 0;
     }
 
     sigemptyset(&mask);
     sigaddset(&mask, MYSIG); 
-    fdx=signalfd(-1, &mask, 0);
+    fdx=signalfd(-1, &mask, SFD_NONBLOCK);
 
     pid=fork();
     if(pid == -1) {
@@ -49,10 +54,17 @@ int startPingPong(int* fd, int n, int nn, const int *pn0) {
             fscanf(fin, "%d", &otherpid); fgets(str, NSTR-1, fin);
             fprintf(fout, "%d\n", getpid()); fflush(fout);
         }
-        while(	sign(otherpid, fdx) &&
-                !feof(fin) && 
-                fscanf(fin, "%d", &x)==1 && 
-                x<nn) {
+#if DEBUG
+        printf("-- n=%d\n",n);
+#endif
+        while(!feof(fin)) {
+#if DEBUG
+        printf(",");
+        fflush(stdout);
+#endif
+            while(!sign(otherpid, fdx)) ;
+            if(fscanf(fin, "%d", &x)!=1) break;
+            if(x>=nn) break;
             printf("%d %d\n", n, x);
             fprintf(fout, "%d\n", x+1); fflush(fout);
             kill(otherpid, MYSIG);
@@ -91,7 +103,6 @@ int main(int argc, char** argv) {
 #if DEBUG
     printf("cpid[0]=%d cpid[1]=%d\n",cpids[0], cpids[1]);
 #endif
-
     for(k=0; k<2; k++) {
         waitpid(cpids[k], &status, 0);
         if (WIFEXITED(status)) continue;	//return WEXITSTATUS(status);
