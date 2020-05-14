@@ -14,29 +14,25 @@
 #define NSTR 132
 #define MYSIG (SIGUSR1)
 
-int startPingPong(int* fd, int n, int nn, const int *pn0) {
+int startPingPong(int* fd, int fdx, int n, int nn, const int *pn0) {
     pid_t pid, otherpid;
     int x;
     FILE *fin, *fout;
     char str[NSTR];
-    int fdx;
-    sigset_t mask;
 
     int sign(pid_t pid, int sfd) {
         siginfo_t siginfo;
+        int res;
+        res=read(sfd, &siginfo, sizeof(siginfo));
 #if DEBUG
-        printf(".");
+        printf(" %d", res);
         fflush(stdout);
         usleep(100000);
 #endif
-        if(read(sfd, &siginfo, sizeof(siginfo))==sizeof(siginfo))
+        if(res==sizeof(siginfo))
             return 1;	//(siginfo.si_pid == pid);
         return 0;
     }
-
-    sigemptyset(&mask);
-    sigaddset(&mask, MYSIG); 
-    fdx=signalfd(-1, &mask, SFD_NONBLOCK);
 
     pid=fork();
     if(pid == -1) {
@@ -49,21 +45,32 @@ int startPingPong(int* fd, int n, int nn, const int *pn0) {
         if(pn0) {
             fprintf(fout, "%d\n", getpid()); fflush(fout);
             fscanf(fin, "%d", &otherpid); fgets(str, NSTR-1, fin);
+#if DEBUG
+            printf("str1=%s\n",str);
+#endif
             fprintf(fout, "%d\n", 1); fflush(fout);
+            kill(otherpid, MYSIG);
         } else {
             fscanf(fin, "%d", &otherpid); fgets(str, NSTR-1, fin);
+#if DEBUG
+            printf("str1=%s\n",str);
+#endif
             fprintf(fout, "%d\n", getpid()); fflush(fout);
         }
 #if DEBUG
-        printf("-- n=%d\n",n);
+        printf("-- n=%d pid=%d otherpid=%d\n",n,getpid(),otherpid);
 #endif
         while(!feof(fin)) {
 #if DEBUG
-        printf(",");
-        fflush(stdout);
+            printf(",");
+            fflush(stdout);
 #endif
             while(!sign(otherpid, fdx)) ;
             if(fscanf(fin, "%d", &x)!=1) break;
+            fgets(str, NSTR-1, fin);
+#if DEBUG
+            printf("str2=%s\n",str);
+#endif
             if(x>=nn) break;
             printf("%d %d\n", n, x);
             fprintf(fout, "%d\n", x+1); fflush(fout);
@@ -84,6 +91,8 @@ int main(int argc, char** argv) {
     int k;
     int status;
     int nn;
+    sigset_t mask;
+    int fdx;
     
     if(argc!=2 || sscanf(argv[1],"%d",&nn)!=1) return(0);
     if(nn<0) return 0;
@@ -93,11 +102,17 @@ int main(int argc, char** argv) {
     printf("nn=%d\n",nn);
 #endif
 
+    sigemptyset(&mask);
+    sigaddset(&mask, MYSIG); 
+//    sigfillset(&mask); 
+    fdx=signalfd(-1, &mask, SFD_NONBLOCK);
+
     pipe(fd);
 
-    cpids[0]=startPingPong(fd, 1, nn, NULL);
-    cpids[1]=startPingPong(fd, 2, nn, &dummy);
+    cpids[0]=startPingPong(fd, fdx, 1, nn, NULL);
+    cpids[1]=startPingPong(fd, fdx, 2, nn, &dummy);
 
+    close(fdx);
     close(fd[0]);
     close(fd[1]);
 #if DEBUG
