@@ -1,4 +1,4 @@
-#define DEBUG 1
+#define DEBUG 0
 
 #include <stdio.h>
 #include <string.h>
@@ -130,7 +130,7 @@ int mysystem(const char *str)
     if (!pid)
     {
         execvp(cmd, args);
-        exit(1);
+        _exit(1);
     } else {
         free(args);
         addname(&ctrln, NULL);	//finit
