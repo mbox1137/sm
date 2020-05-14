@@ -8,12 +8,30 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <signal.h>
+#include <sys/signalfd.h>
+
+#define NSTR 132
+#define MYSIG (SIGUSR1)
 
 int startPingPong(int* fd, int n, int nn, const int *pn0) {
-    pid_t pid;
+    pid_t pid, otherpid;
     int x;
-    FILE* fin;
-    FILE* fout;
+    FILE *fin, *fout;
+    char str[NSTR];
+    int fdx;
+    sigset_t mask;
+
+    int sign(pid_t pid, int sfd) {
+        siginfo_t siginfo;
+        if(read(sfd, &siginfo, sizeof(siginfo))==sizeof(siginfo))
+            return siginfo.si_pid == pid;
+        return 0;
+    }
+
+    sigemptyset(&mask);
+    sigaddset(&mask, MYSIG); 
+    fdx=signalfd(-1, &mask, 0);
 
     pid=fork();
     if(pid == -1) {
@@ -24,13 +42,20 @@ int startPingPong(int* fd, int n, int nn, const int *pn0) {
         fin = fdopen(fd[0], "r");
         fout = fdopen(fd[1], "w");
         if(pn0) {
-            fprintf(fout, "%d\n", 1);
-            fflush(fout);
-            }
-        while(!feof(fin) && fscanf(fin, "%d", &x)==1 && x<nn) {
+            fprintf(fout, "%d\n", getpid()); fflush(fout);
+            fscanf(fin, "%d", &otherpid); fgets(str, NSTR-1, fin);
+            fprintf(fout, "%d\n", 1); fflush(fout);
+        } else {
+            fscanf(fin, "%d", &otherpid); fgets(str, NSTR-1, fin);
+            fprintf(fout, "%d\n", getpid()); fflush(fout);
+        }
+        while(	sign(otherpid, fdx) &&
+                !feof(fin) && 
+                fscanf(fin, "%d", &x)==1 && 
+                x<nn) {
             printf("%d %d\n", n, x);
-            fprintf(fout, "%d\n", x+1);
-            fflush(fout);
+            fprintf(fout, "%d\n", x+1); fflush(fout);
+            kill(otherpid, MYSIG);
         }
         fclose(fin);
         fclose(fout);
@@ -72,5 +97,5 @@ int main(int argc, char** argv) {
         if (WIFEXITED(status)) continue;	//return WEXITSTATUS(status);
         else return EXIT_FAILURE;
     }
-    printf("Done\n");
+//    printf("Done\n");
 }
