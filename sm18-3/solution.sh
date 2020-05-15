@@ -1,7 +1,9 @@
 #!/bin/bash
+#alias ll="ls -l"
+#shopt -s expand_aliases
 
-FILE=out.log
-TMPF=tmp.log
+FILE=/tmp/out.log
+TMPF=/tmp/tmp.log
 function myrun {
 	echo $@
 	./solution $@
@@ -12,5 +14,6 @@ function myrun {
 	fi
 }
 
-myrun ls pwd wc $FILE
-myrun ls pwd cat $FILE
+myrun ./l1.sh pwd wc $FILE
+myrun ./l1.sh pwd cat $FILE
+myrun ./l1.sh ./ll.sh cat $FILE
