@@ -13,10 +13,15 @@
 #include "addname.h"
 #include "solution.h"
 
+//https://stackoverflow.com/questions/16639275/grouping-child-processes-with-setgpid
+
 int runItem(int *lp, int *rp, char* cmd) {
-    pid_t pid;
+    pid_t pid, pgid;
     pid = fork();
     if (pid < 0)
+        return(-1);
+    pgid=setpgid(getpid(), getpgid(getppid()));
+    if (pgid < 0)
         return(-1);
     if (!pid)
     {
@@ -54,7 +59,7 @@ int runItem(int *lp, int *rp, char* cmd) {
 }
 
 int solution (int argc, char *argv[]) {
-    pid_t *pids;
+    pid_t *pids, pgid;
     int k, k0;
     int status, retval;
     int lp[2], rp[2];
@@ -70,6 +75,9 @@ int solution (int argc, char *argv[]) {
     if(!pids)
         goto closeAll;
     if(argc>1) {
+        pgid=setpgid(getpid(), getpid());
+        if (pgid < 0)
+            goto closeAll;
         lp[0]=0;
         lp[1]=0;
         for (k = 0; k<argc-1; k++) {
