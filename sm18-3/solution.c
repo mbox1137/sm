@@ -39,6 +39,8 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
+    waitpid(pid1, 0, 0);
+
     pid2 = fork();
 
     if (pid2 == -1)
@@ -46,13 +48,14 @@ int main(int argc, char *argv[])
 
     if (!pid2)
     {
-        waitpid(pid1, 0, 0);
         close(pipefd[0]);
         dup2(pipefd[1], 1);
         close(pipefd[1]);
         execlp("/bin/sh", "sh", "-c", cmd2, NULL);
         exit(1);
     }
+
+    waitpid(pid2, 0, 0);
 
     pid3 = fork();
 

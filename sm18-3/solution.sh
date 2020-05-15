@@ -17,3 +17,4 @@ function myrun {
 myrun ./l1.sh pwd wc $FILE
 myrun ./l1.sh pwd cat $FILE
 myrun ./l1.sh ./ll.sh cat $FILE
+myrun ./l1.sh ./ll.sh wc $FILE
