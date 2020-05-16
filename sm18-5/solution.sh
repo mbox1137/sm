@@ -1,5 +1,6 @@
 #!/bin/bash
 #./solution 3 out.bin 4 2 4
+#./solution ls$(printf ' cat%.0s' {1..100})
 INF=in.tst
 TMPF=tmp.log
 FILE=out.log
@@ -39,4 +40,4 @@ myrun ls cat		</dev/null
 myrun ls		</dev/null
 myrun			</dev/null
 find .. |myrun wc
-myrun ./sleep.sh	</dev/null
+myrun ls$(printf ' cat%.0s' {1..100})	</dev/null
