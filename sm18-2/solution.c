@@ -22,9 +22,15 @@ int main(int argc, char *argv[])
 
     pid_t pid1 = fork(); // child
 
+    if (pid1 == -1)
+        exit(EXIT_FAILURE);
+
     if (!pid1)
     {
         pid_t pid2 = fork();  // grand child
+
+        if (pid2 == -1)
+            exit(EXIT_FAILURE);
 
         if (!pid2)
         {
@@ -36,7 +42,6 @@ int main(int argc, char *argv[])
             close(pipefd[0]);
 
             printf("%lld\n", sum);
-//            fflush(stdout);
 
             exit(EXIT_SUCCESS);
 
