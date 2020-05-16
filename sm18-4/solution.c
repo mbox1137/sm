@@ -39,6 +39,7 @@ int startPingPong(int* fdin, int* fdout, int n, int nn, const int *pn0)
         while(!feof(fin) && fscanf(fin, "%d", &x) == 1 && x < nn)
         {
             printf("%d %d\n", n, x);
+            fflush(stdout);
             fprintf(fout, "%d\n", x+1);
             fflush(fout);
         }

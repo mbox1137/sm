@@ -3,8 +3,8 @@
 function myrun {
 	echo ./solution $@
 	./solution $@
-	echo '$?='$?
-	echo
+#	echo '$?='$?
+#	echo
 }
 
 myrun 5
