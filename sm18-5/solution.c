@@ -154,8 +154,14 @@ closeExit:
         printf("Waiting for %d (%d)\n", k, pids[k]);
 #endif
         waitpid(pids[k], &status, 0);
-        if (WIFEXITED(status))
-            continue;
+        if (WIFEXITED(status)) retval|=WEXITSTATUS(status)?1:0;
+        else if (WIFSIGNALED(status)) retval|=WTERMSIG(status)?1:0;
+/*
+        if (WIFEXITED(status)) return(WEXITSTATUS(status));
+        else if (WIFSIGNALED(status)) return(1024+WTERMSIG(status));
+        else if (WIFSTOPPED(status)) return(1024+WSTOPSIG(status));
+        else if (WIFCONTINUED(status)) return(1024+SIGCONT);
+*/
     }
     free(pids);
     return retval;
