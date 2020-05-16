@@ -25,37 +25,33 @@ int main(int argc, char *argv[])
     if (pipe(pipefd) == -1)
         exit(EXIT_FAILURE);
 
-    pid1 = fork();
-
-    if (pid1 == -1)
-        exit(EXIT_FAILURE);
-
-    if (!pid1)
-    {
-        close(pipefd[0]);
-        dup2(pipefd[1], 1);
-        close(pipefd[1]);
-        execlp("/bin/sh", "sh", "-c", cmd1, NULL);
-        exit(1);
-    }
-
-    waitpid(pid1, 0, 0);
-
     pid2 = fork();
 
     if (pid2 == -1)
         exit(EXIT_FAILURE);
 
-    if (!pid2)
+    if(!pid2)
     {
+        pid1 = fork();
+
+        if (pid1 == -1)
+            exit(EXIT_FAILURE);
+
+        if (!pid1)
+        {
+            close(pipefd[0]);
+            dup2(pipefd[1], 1);
+            close(pipefd[1]);
+            execlp("/bin/sh", "sh", "-c", cmd1, NULL);
+            _exit(1);
+        }
         close(pipefd[0]);
         dup2(pipefd[1], 1);
         close(pipefd[1]);
+        waitpid(pid1, 0, 0);
         execlp("/bin/sh", "sh", "-c", cmd2, NULL);
-        exit(1);
+        _exit(1);
     }
-
-//    waitpid(pid2, 0, 0);
 
     pid3 = fork();
 
@@ -74,7 +70,7 @@ int main(int argc, char *argv[])
         close(pipefd[0]);
         close(pipefd[1]);
         execlp("/bin/sh", "sh", "-c", cmd3, NULL);
-        exit(1);
+        _exit(1);
     }
 
     close(pipefd[0]);
