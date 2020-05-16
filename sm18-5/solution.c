@@ -89,9 +89,8 @@ int solution (int argc, char *argv[])
 
     k = -1;
     pids = malloc(argc * sizeof(pid_t));
-
     if (!pids)
-        goto closeAll;
+        return 1;
 
     if (argc > 1)
     {
@@ -137,7 +136,7 @@ int solution (int argc, char *argv[])
     }
 
     k0 = k + 1;
-    retval = 0;
+    retval=0;
     goto closeExit;
 
 closeAll:
@@ -166,7 +165,6 @@ closeExit:
     free(pids);
     return retval;
 }
-
 
 int main(int argc, char *argv[])
 {

@@ -41,3 +41,4 @@ myrun ls		</dev/null
 myrun			</dev/null
 find .. |myrun wc
 myrun ls$(printf ' cat%.0s' {1..100})	</dev/null
+myrun ls qq		</dev/null
