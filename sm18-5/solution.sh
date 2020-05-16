@@ -4,10 +4,10 @@ INF=in.tst
 TMPF=tmp.log
 FILE=out.log
 function myrun {
-	echo -n "./main $@; "
+	echo -n "./solution $@; "
 	truncate -s 0 $FILE
 	truncate -s 0 $TMPF
-	tee stdin.log |./main $@ >$FILE
+	tee stdin.log |./solution $@ >$FILE
 	retval=$?
 	if [ .$1 == . ]
 	then

@@ -10,8 +10,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "addname.h"
-#include "solution.h"
+//#include "addname.h"
+//#include "solution.h"
 
 //https://stackoverflow.com/questions/16639275/grouping-child-processes-with-setgpid
 
@@ -75,12 +75,17 @@ int runItem(int *lp, int *rp, char* cmd)
     }
 }
 
-int solution (int argc, char *argv[])
+int solution (int myargc, char *myargv[])
 {
+    int argc;
+    char **argv;
     pid_t *pids, pgid;
     int k, k0;
     int status, retval;
     int lp[2], rp[2];
+
+    argc = myargc;
+    argv = &myargv[0];
 
 #if DEBUG
     for (k = 0; k < argc; k++)
@@ -162,4 +167,23 @@ closeExit:
     }
     free(pids);
     return retval;
+}
+
+
+int main(int argc, char *argv[])
+{
+    int retval;
+#if DEBUG
+    if(argc==1)
+    {
+        fprintf(stderr,"%s cmd1 cmd2 cmd3 ...\n", argv[0]);
+        return(1);
+    }
+
+    retval=solution(argc-1, &argv[1]);
+    printf("%d\n", retval);
+#else
+    retval=solution(argc-1, &argv[1]);
+#endif
+    return(retval);
 }
