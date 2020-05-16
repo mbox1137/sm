@@ -1,0 +1,26 @@
+Вывод человека, у которого прошла задача в системе:
+./solution 5
+1 1
+2 2
+1 3
+2 4
+Done
+./solution 1
+Done
+./solution 0
+Done
+./solution
+./solution.sh: строка 3:  7551 Ошибка сегментирования                   (стек памяти сброшен на диск)
+./solution -1
+Done
+./solution qq
+Done
+./solution 7 8
+1 1
+2 2
+1 3
+2 4
+1 5
+2 6
+Done
+
