@@ -10,9 +10,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-//#include "addname.h"
-//#include "solution.h"
-
 //https://stackoverflow.com/questions/16639275/grouping-child-processes-with-setgpid
 
 int runItem(int *lp, int *rp, char* cmd)
@@ -144,7 +141,7 @@ int solution (int argc, char *argv[])
     goto closeExit;
 
 closeAll:
-    k0 = k+1;
+    k0 = k + 1;
     retval = 1;
     for (k = 0; k < k0; k++)
         kill(pids[k], SIGKILL);
@@ -169,7 +166,7 @@ int main(int argc, char *argv[])
 {
     int retval;
 #if DEBUG
-    if(argc==1)
+    if (argc==1)
     {
         fprintf(stderr,"%s cmd1 cmd2 cmd3 ...\n", argv[0]);
         return(1);
