@@ -27,14 +27,12 @@ int main(int argc, char *argv[])
 
     if (!pid1)
     {
-        dup2(pipefd[0], 0);
+        dup2(pipefd[1], 1);
         close(pipefd[0]);
         close(pipefd[1]);
-        execlp("/bin/sh", "sh", "-c", cmd2, NULL);
-        exit(1);
+        execlp("/bin/sh", "sh", "-c", cmd1, NULL);
+        _exit(1);
     }
-
-    close(pipefd[0]);
 
     pid2 = fork();
 
@@ -43,12 +41,14 @@ int main(int argc, char *argv[])
 
     if (!pid2)
     {
-        dup2(pipefd[1], 1);
+        dup2(pipefd[0], 0);
+        close(pipefd[0]);
         close(pipefd[1]);
-        execlp("/bin/sh", "sh", "-c", cmd1, NULL);
-        exit(1);
+        execlp("/bin/sh", "sh", "-c", cmd2, NULL);
+        _exit(1);
     }
 
+    close(pipefd[0]);
     close(pipefd[1]);
 
     waitpid(pid1, 0, 0);
@@ -57,4 +57,4 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-// man pipe
+// https://github.com/blackav/hse-caos-2019/blob/master/18-pipe/sem18.pdf
