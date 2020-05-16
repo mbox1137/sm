@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    waitpid(pid2, 0, 0);
+//    waitpid(pid2, 0, 0);
 
     pid3 = fork();
 
