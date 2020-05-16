@@ -75,17 +75,12 @@ int runItem(int *lp, int *rp, char* cmd)
     }
 }
 
-int solution (int myargc, char *myargv[])
+int solution (int argc, char *argv[])
 {
-    int argc;
-    char **argv;
     pid_t *pids, pgid;
     int k, k0;
     int status, retval;
     int lp[2], rp[2];
-
-    argc = myargc;
-    argv = &myargv[0];
 
 #if DEBUG
     for (k = 0; k < argc; k++)
