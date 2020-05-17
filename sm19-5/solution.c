@@ -15,12 +15,12 @@
 #define MYSIG (SIGUSR1)
 
 int startPingPong(int* fd, int fdx, int n, int nn, const int *pn0) {
-    pid_t pid, otherpid;
+    pid_t pid, mypid, otherpid;
     int x;
     FILE *fin, *fout;
     char str[NSTR];
 
-    int sign(pid_t pid, int sfd) {
+    int sign(int sfd) {
         siginfo_t siginfo;
         int res;
         res=read(sfd, &siginfo, sizeof(siginfo));
@@ -29,21 +29,23 @@ int startPingPong(int* fd, int fdx, int n, int nn, const int *pn0) {
         fflush(stdout);
         usleep(100000);
 #endif
-        if(res==sizeof(siginfo))
-            return 1;	//(siginfo.si_pid == pid);
-        return 0;
+        return res==sizeof(siginfo)?1:0;
+//(siginfo.si_pid == pid);
     }
 
     pid=fork();
     if(pid == -1) {
         perror("fork");
-        exit(EXIT_FAILURE);
+        return(-1);
     }
     if (pid == 0) {
+        mypid=getpid();
         fin = fdopen(fd[0], "r");
         fout = fdopen(fd[1], "w");
         if(pn0) {
-            fprintf(fout, "%d\n", getpid()); fflush(fout);
+            usleep(1000);
+            fprintf(fout, "%d\n", mypid); fflush(fout);
+            while(!sign(fdx)) ;
             fgets(str, NSTR-1, fin);
 #if DEBUG
             printf("%d: str1=%s",n, str); fflush(stdout);
@@ -57,7 +59,9 @@ int startPingPong(int* fd, int fdx, int n, int nn, const int *pn0) {
             printf("(%d): str1=%s",n,str); fflush(stdout);
 #endif
             sscanf(str, "%d", &otherpid);
-            fprintf(fout, "%d\n", getpid()); fflush(fout);
+            fprintf(fout, "%d\n", mypid); fflush(fout);
+            usleep(100);
+            kill(otherpid, MYSIG);
         }
 #if DEBUG
         printf("-- n=%d pid=%d otherpid=%d\n",n,getpid(),otherpid); fflush(stdout);
@@ -66,7 +70,7 @@ int startPingPong(int* fd, int fdx, int n, int nn, const int *pn0) {
 #if DEBUG
             printf(","); fflush(stdout);
 #endif
-            while(!sign(otherpid, fdx)) ;
+            while(!sign(fdx)) ;
             fgets(str, NSTR-1, fin);
             if(sscanf(str, "%d", &x)!=1) break;
 #if DEBUG
@@ -91,23 +95,31 @@ int solution(int nn, int fdx) {
     const int dummy=1;
     int k;
     int status;
-    pipe(fd);
+    int rv;
 
+    usleep(1000);
+    pipe(fd);
     cpids[0]=startPingPong(fd, fdx, 1, nn, NULL);
     cpids[1]=startPingPong(fd, fdx, 2, nn, &dummy);
-
     close(fd[0]);
     close(fd[1]);
 #if DEBUG
     printf("cpid[0]=%d cpid[1]=%d\n",cpids[0], cpids[1]); fflush(stdout);
 #endif
+    rv=0;
     for(k=0; k<2; k++) {
         waitpid(cpids[k], &status, 0);
-        if (WIFEXITED(status)) continue;	//return WEXITSTATUS(status);
-        else return EXIT_FAILURE;
+        if (WIFEXITED(status)) rv |= WEXITSTATUS(status);
+        else if (WIFSIGNALED(status)) rv |= 1024+WTERMSIG(status);
+/*
+        if (WIFEXITED(status)) return(WEXITSTATUS(status));
+        else if (WIFSIGNALED(status)) return(1024+WTERMSIG(status));
+        else if (WIFSTOPPED(status)) return(1024+WSTOPSIG(status));
+        else if (WIFCONTINUED(status)) return(1024+SIGCONT);
+*/
     }
 //    printf("Done\n");
-    return 0;
+    return rv;
 }
 
 int main(int argc, char** argv) {
