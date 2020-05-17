@@ -22,14 +22,19 @@ function myrun {
 		done
 		cmd="$cmd ) 2>&1"
 		cat stdin.log |bash -c "$cmd >$TMPF"
-		if cmp $FILE $TMPF
+		if [ $retval == '0' ]
 		then
-			echo "	Ok ($retval)"
+			if cmp $FILE $TMPF
+			then
+				echo "	Ok ($retval)"
+			else
+				echo
+				echo main:			pipe:
+				echo --------------------------------------
+				diff -y $FILE $TMPF
+			fi
 		else
-			echo
-			echo main:			pipe:
-			echo --------------------------------------
-			diff -y $FILE $TMPF
+			echo "	Faled ($retval)"
 		fi
 	fi
 }
@@ -41,4 +46,9 @@ myrun ls		</dev/null
 myrun			</dev/null
 find .. |myrun wc
 myrun ls$(printf ' cat%.0s' {1..100})	</dev/null
-myrun ls qq		</dev/null
+myrun ls qq cat		</dev/null
+myrun ls cat qq		</dev/null
+myrun qq ls cat		</dev/null
+myrun ls false		</dev/null
+myrun ls false cat	</dev/null
+myrun false ls cat	</dev/null

@@ -48,7 +48,7 @@ int runItem(int *lp, int *rp, char* cmd)
         }
 
         execlp(cmd, cmd, NULL);
-        exit(EXIT_FAILURE);
+        _exit(EXIT_FAILURE);
     } else {
         if (lp[0])
         {
