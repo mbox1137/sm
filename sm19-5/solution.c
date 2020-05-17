@@ -44,17 +44,19 @@ int startPingPong(int* fd, int fdx, int n, int nn, const int *pn0) {
         fout = fdopen(fd[1], "w");
         if(pn0) {
             fprintf(fout, "%d\n", getpid()); fflush(fout);
-            fscanf(fin, "%d", &otherpid); fgets(str, NSTR-1, fin);
+            fgets(str, NSTR-1, fin);
 #if DEBUG
-            printf("%d: str1=%s\n",n, str); fflush(stdout);
+            printf("%d: str1=%s",n, str); fflush(stdout);
 #endif
+            sscanf(str, "%d", &otherpid);
             fprintf(fout, "%d\n", 1); fflush(fout);
             kill(otherpid, MYSIG);
         } else {
-            fscanf(fin, "%d", &otherpid); fgets(str, NSTR-1, fin);
+            fgets(str, NSTR-1, fin);
 #if DEBUG
-            printf("(%d): str1=%s\n",n,str); fflush(stdout);
+            printf("(%d): str1=%s",n,str); fflush(stdout);
 #endif
+            sscanf(str, "%d", &otherpid);
             fprintf(fout, "%d\n", getpid()); fflush(fout);
         }
 #if DEBUG
@@ -65,10 +67,10 @@ int startPingPong(int* fd, int fdx, int n, int nn, const int *pn0) {
             printf(","); fflush(stdout);
 #endif
             while(!sign(otherpid, fdx)) ;
-            if(fscanf(fin, "%d", &x)!=1) break;
             fgets(str, NSTR-1, fin);
+            if(sscanf(str, "%d", &x)!=1) break;
 #if DEBUG
-            printf("%d: str2=%s\n",n,str); fflush(stdout);
+            printf("%d: str2=%s",n,str); fflush(stdout);
 #endif
             if(x>=nn) break;
             printf("%d send %d\n", n, x); fflush(stdout);
