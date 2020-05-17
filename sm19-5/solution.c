@@ -46,33 +46,32 @@ int startPingPong(int* fd, int fdx, int n, int nn, const int *pn0) {
             fprintf(fout, "%d\n", getpid()); fflush(fout);
             fscanf(fin, "%d", &otherpid); fgets(str, NSTR-1, fin);
 #if DEBUG
-            printf("str1=%s\n",str);
+            printf("%d: str1=%s\n",n, str); fflush(stdout);
 #endif
             fprintf(fout, "%d\n", 1); fflush(fout);
             kill(otherpid, MYSIG);
         } else {
             fscanf(fin, "%d", &otherpid); fgets(str, NSTR-1, fin);
 #if DEBUG
-            printf("str1=%s\n",str);
+            printf("(%d): str1=%s\n",n,str); fflush(stdout);
 #endif
             fprintf(fout, "%d\n", getpid()); fflush(fout);
         }
 #if DEBUG
-        printf("-- n=%d pid=%d otherpid=%d\n",n,getpid(),otherpid);
+        printf("-- n=%d pid=%d otherpid=%d\n",n,getpid(),otherpid); fflush(stdout);
 #endif
         while(!feof(fin)) {
 #if DEBUG
-            printf(",");
-            fflush(stdout);
+            printf(","); fflush(stdout);
 #endif
             while(!sign(otherpid, fdx)) ;
             if(fscanf(fin, "%d", &x)!=1) break;
             fgets(str, NSTR-1, fin);
 #if DEBUG
-            printf("str2=%s\n",str);
+            printf("%d: str2=%s\n",n,str); fflush(stdout);
 #endif
             if(x>=nn) break;
-            printf("%d %d\n", n, x);
+            printf("%d send %d\n", n, x); fflush(stdout);
             fprintf(fout, "%d\n", x+1); fflush(fout);
             kill(otherpid, MYSIG);
         }
@@ -84,28 +83,20 @@ int startPingPong(int* fd, int fdx, int n, int nn, const int *pn0) {
     }
 }
 
-int main(int argc, char** argv) {
+int solution(int nn) {
     int fd[2];
     int cpids[2];
     const int dummy=1;
     int k;
     int status;
-    int nn;
     sigset_t mask;
     int fdx;
     
-    if(argc!=2 || sscanf(argv[1],"%d",&nn)!=1) return(0);
-    if(nn<0) return 0;
-    else if(nn==0) return 0;
-    else if(nn==1) return 0;
-#if DEBUG
-    printf("nn=%d\n",nn);
-#endif
-
     sigemptyset(&mask);
     sigaddset(&mask, MYSIG); 
 //    sigfillset(&mask); 
-    fdx=signalfd(-1, &mask, SFD_NONBLOCK);
+    fdx = signalfd(-1, &mask, 0);
+//    fdx = signalfd(-1, &mask, SFD_NONBLOCK);
 
     pipe(fd);
 
@@ -116,7 +107,7 @@ int main(int argc, char** argv) {
     close(fd[0]);
     close(fd[1]);
 #if DEBUG
-    printf("cpid[0]=%d cpid[1]=%d\n",cpids[0], cpids[1]);
+    printf("cpid[0]=%d cpid[1]=%d\n",cpids[0], cpids[1]); fflush(stdout);
 #endif
     for(k=0; k<2; k++) {
         waitpid(cpids[k], &status, 0);
@@ -124,4 +115,18 @@ int main(int argc, char** argv) {
         else return EXIT_FAILURE;
     }
 //    printf("Done\n");
+    return 0;
+}
+
+int main(int argc, char** argv) {
+    int nn;
+    
+    if(argc!=2 || sscanf(argv[1],"%d",&nn)!=1) return(0);
+    if(nn<0) return 0;
+    else if(nn==0) return 0;
+    else if(nn==1) return 0;
+#if DEBUG
+    printf("nn=%d\n",nn);  fflush(stdout);
+#endif
+    return solution(nn);
 }
