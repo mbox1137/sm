@@ -85,27 +85,17 @@ int startPingPong(int* fd, int fdx, int n, int nn, const int *pn0) {
     }
 }
 
-int solution(int nn) {
+int solution(int nn, int fdx) {
     int fd[2];
     int cpids[2];
     const int dummy=1;
     int k;
     int status;
-    sigset_t mask;
-    int fdx;
-    
-    sigemptyset(&mask);
-    sigaddset(&mask, MYSIG); 
-//    sigfillset(&mask); 
-    fdx = signalfd(-1, &mask, 0);
-//    fdx = signalfd(-1, &mask, SFD_NONBLOCK);
-
     pipe(fd);
 
     cpids[0]=startPingPong(fd, fdx, 1, nn, NULL);
     cpids[1]=startPingPong(fd, fdx, 2, nn, &dummy);
 
-    close(fdx);
     close(fd[0]);
     close(fd[1]);
 #if DEBUG
@@ -122,7 +112,10 @@ int solution(int nn) {
 
 int main(int argc, char** argv) {
     int nn;
-    
+    int fdx;
+    int rv;
+    sigset_t mask;
+
     if(argc!=2 || sscanf(argv[1],"%d",&nn)!=1) return(0);
     if(nn<0) return 0;
     else if(nn==0) return 0;
@@ -130,5 +123,13 @@ int main(int argc, char** argv) {
 #if DEBUG
     printf("nn=%d\n",nn);  fflush(stdout);
 #endif
-    return solution(nn);
+
+    sigemptyset(&mask);
+    sigaddset(&mask, MYSIG); 
+//    sigfillset(&mask); 
+    fdx = signalfd(-1, &mask, 0);
+//    fdx = signalfd(-1, &mask, SFD_NONBLOCK);
+    rv=solution(nn, fdx);
+    close(fdx);
+    return rv;
 }
