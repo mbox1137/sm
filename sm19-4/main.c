@@ -1,3 +1,5 @@
+#define DEBUG 1
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -21,6 +23,14 @@ void func(int signo)
 
 int main(int argc, char *argv[])
 {
+    int k;
+#if DEBUG
+    for(k=1; k<argc; k++) {
+        printf("%s\n", argv[k]);
+    }
+#endif
+    return(0);
+
 //    printf("%d\n", getpid());
 //    fflush(stdout);
 
