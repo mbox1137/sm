@@ -10,9 +10,36 @@
 #include <unistd.h>
 #include <signal.h>
 #include <sys/signalfd.h>
+#include <string.h> 
 
 #define NSTR 132
 #define MYSIG (SIGUSR1)
+
+//https://www.linuxprogrammingblog.com/code-examples/signalfd
+
+int waitSIG (int sfd, int sig){
+	sigset_t mask; 	/* We will handle SIGTERM and SIGINT. */
+	struct signalfd_siginfo si;
+	ssize_t res;
+
+	sigemptyset (&mask);
+	sigaddset (&mask, sig);
+
+/* Block the signals thet we handle using signalfd(), so they don't
+ * cause signal handlers or default signal actions to execute. */
+	if (sigprocmask(SIG_BLOCK, &mask, NULL) < 0) {
+		return -1;
+	}
+
+	res = read (sfd, &si, sizeof(si));
+	if (res < 0) {
+		return -2;
+	}
+	if (res != sizeof(si)) {
+		return -3;
+	}
+	return(si.ssi_signo == sig?1:0);
+}
 
 int startPingPong(int* fd, int fdx, int n, int nn, const int *pn0) {
     pid_t pid, mypid, otherpid;
