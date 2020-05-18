@@ -7,7 +7,7 @@ volatile int counter = 0;
 
 void func(int signo)
 {
-    (void)signo;
+//    (void)signo;
 
     if (counter == 4)
         _exit(EXIT_SUCCESS);
@@ -21,22 +21,22 @@ void func(int signo)
 
 int main(int argc, char *argv[])
 {
+//    printf("%d\n", getpid());
+//    fflush(stdout);
+
     struct sigaction sa = {}; // инициализируем нулями
     sa.sa_flags = SA_RESTART; // restartable system calls
     sa.sa_handler = func;     // обработчик сигнала
-
     sigaction(SIGINT, &sa, 0);
 
-    sigset_t set;
-    sigemptyset(&set);
-    sigaddset(&set, SIGINT);
+    sigset_t mask;
+    sigemptyset(&mask);
+    sigaddset(&mask, SIGINT);
 
-    sigprocmask(SIG_BLOCK, &set, 0);
-
+    sigprocmask(SIG_BLOCK, &mask, 0);
     printf("%d\n", getpid());
     fflush(stdout);
-
-    sigprocmask(SIG_UNBLOCK, &set, NULL);
+    sigprocmask(SIG_UNBLOCK, &mask, NULL);
 
     while (1)
         pause();
@@ -56,4 +56,7 @@ struct sigaction
 };
 
 int sigaction(int signo, const struct sigaction *act, struct sigaction *oldact);
+
+
+https://github.com/blackav/hse-caos-2019/blob/master/19-signal1/sem-signals.pdf
 */

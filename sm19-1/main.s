@@ -141,22 +141,22 @@ main:
 	movl	%gs:20, %eax	#, tmp104
 	movl	%eax, -28(%ebp)	# tmp104, D.3350
 	xorl	%eax, %eax	# tmp104
-# main.c:24:     struct sigaction sa = {}; // инициализируем нулями
-	.loc 1 24 0
+# main.c:27:     struct sigaction sa = {}; // инициализируем нулями
+	.loc 1 27 0
 	leal	-168(%ebp), %edx	#, tmp92
 	movl	$0, %eax	#, tmp93
 	movl	$35, %ecx	#, tmp94
 	movl	%edx, %edi	# tmp92, tmp92
 	rep stosl
-# main.c:25:     sa.sa_flags = SA_RESTART; // restartable system calls
-	.loc 1 25 0
+# main.c:28:     sa.sa_flags = SA_RESTART; // restartable system calls
+	.loc 1 28 0
 	movl	$268435456, -36(%ebp)	#, sa.sa_flags
-# main.c:26:     sa.sa_handler = func;     // обработчик сигнала
-	.loc 1 26 0
+# main.c:29:     sa.sa_handler = func;     // обработчик сигнала
+	.loc 1 29 0
 	leal	func@GOTOFF(%ebx), %eax	#, tmp95
 	movl	%eax, -168(%ebp)	# tmp95, sa.__sigaction_handler.sa_handler
-# main.c:28:     sigaction(SIGINT, &sa, 0);
-	.loc 1 28 0
+# main.c:30:     sigaction(SIGINT, &sa, 0);
+	.loc 1 30 0
 	subl	$4, %esp	#,
 	pushl	$0	#
 	leal	-168(%ebp), %eax	#, tmp96
@@ -164,23 +164,23 @@ main:
 	pushl	$2	#
 	call	sigaction@PLT	#
 	addl	$16, %esp	#,
-# main.c:31:     sigemptyset(&set);
-	.loc 1 31 0
+# main.c:33:     sigemptyset(&mask);
+	.loc 1 33 0
 	subl	$12, %esp	#,
 	leal	-296(%ebp), %eax	#, tmp97
 	pushl	%eax	# tmp97
 	call	sigemptyset@PLT	#
 	addl	$16, %esp	#,
-# main.c:32:     sigaddset(&set, SIGINT);
-	.loc 1 32 0
+# main.c:34:     sigaddset(&mask, SIGINT);
+	.loc 1 34 0
 	subl	$8, %esp	#,
 	pushl	$2	#
 	leal	-296(%ebp), %eax	#, tmp98
 	pushl	%eax	# tmp98
 	call	sigaddset@PLT	#
 	addl	$16, %esp	#,
-# main.c:34:     sigprocmask(SIG_BLOCK, &set, 0);
-	.loc 1 34 0
+# main.c:36:     sigprocmask(SIG_BLOCK, &mask, 0);
+	.loc 1 36 0
 	subl	$4, %esp	#,
 	pushl	$0	#
 	leal	-296(%ebp), %eax	#, tmp99
@@ -188,8 +188,8 @@ main:
 	pushl	$0	#
 	call	sigprocmask@PLT	#
 	addl	$16, %esp	#,
-# main.c:36:     printf("%d\n", getpid());
-	.loc 1 36 0
+# main.c:37:     printf("%d\n", getpid());
+	.loc 1 37 0
 	call	getpid@PLT	#
 	subl	$8, %esp	#,
 	pushl	%eax	# _1
@@ -197,15 +197,15 @@ main:
 	pushl	%eax	# tmp100
 	call	printf@PLT	#
 	addl	$16, %esp	#,
-# main.c:37:     fflush(stdout);
-	.loc 1 37 0
+# main.c:38:     fflush(stdout);
+	.loc 1 38 0
 	movl	stdout@GOT(%ebx), %eax	#, tmp101
 	movl	(%eax), %eax	# stdout, stdout.4_2
 	subl	$12, %esp	#,
 	pushl	%eax	# stdout.4_2
 	call	fflush@PLT	#
 	addl	$16, %esp	#,
-# main.c:39:     sigprocmask(SIG_UNBLOCK, &set, NULL);
+# main.c:39:     sigprocmask(SIG_UNBLOCK, &mask, NULL);
 	.loc 1 39 0
 	subl	$4, %esp	#,
 	pushl	$0	#
@@ -255,10 +255,10 @@ __x86.get_pc_thunk.bx:
 	.long	.Ldebug_abbrev0
 	.byte	0x4
 	.uleb128 0x1
-	.long	.LASF117
-	.byte	0xc
 	.long	.LASF118
+	.byte	0xc
 	.long	.LASF119
+	.long	.LASF120
 	.long	.Ltext0
 	.long	.Letext0-.Ltext0
 	.long	.Ldebug_line0
@@ -537,7 +537,7 @@ __x86.get_pc_thunk.bx:
 	.byte	0x6c
 	.byte	0
 	.uleb128 0xc
-	.long	.LASF120
+	.long	.LASF121
 	.byte	0x4
 	.byte	0x9a
 	.uleb128 0x9
@@ -589,7 +589,7 @@ __x86.get_pc_thunk.bx:
 	.byte	0x27
 	.byte	0
 	.uleb128 0xf
-	.long	.LASF121
+	.long	.LASF122
 	.uleb128 0x10
 	.long	.LASF52
 	.byte	0x4
@@ -672,7 +672,7 @@ __x86.get_pc_thunk.bx:
 	.byte	0x7
 	.long	0x366
 	.uleb128 0x14
-	.long	.LASF122
+	.long	.LASF123
 	.byte	0x4
 	.byte	0x9
 	.byte	0x18
@@ -1118,7 +1118,7 @@ __x86.get_pc_thunk.bx:
 	.byte	0x3
 	.long	counter
 	.uleb128 0x1c
-	.long	.LASF123
+	.long	.LASF124
 	.byte	0x1
 	.byte	0x16
 	.long	0x5a
@@ -1146,22 +1146,22 @@ __x86.get_pc_thunk.bx:
 	.uleb128 0x1e
 	.string	"sa"
 	.byte	0x1
-	.byte	0x18
+	.byte	0x1b
 	.long	0x636
 	.uleb128 0x3
 	.byte	0x75
 	.sleb128 -168
-	.uleb128 0x1e
-	.string	"set"
+	.uleb128 0x1f
+	.long	.LASF116
 	.byte	0x1
-	.byte	0x1e
+	.byte	0x20
 	.long	0x371
 	.uleb128 0x3
 	.byte	0x75
 	.sleb128 -296
 	.byte	0
-	.uleb128 0x1f
-	.long	.LASF124
+	.uleb128 0x20
+	.long	.LASF125
 	.byte	0x1
 	.byte	0x8
 	.long	.LFB5
@@ -1169,7 +1169,7 @@ __x86.get_pc_thunk.bx:
 	.uleb128 0x1
 	.byte	0x9c
 	.uleb128 0x1d
-	.long	.LASF116
+	.long	.LASF117
 	.byte	0x1
 	.byte	0x8
 	.long	0x5a
@@ -1551,6 +1551,21 @@ __x86.get_pc_thunk.bx:
 	.byte	0
 	.byte	0
 	.uleb128 0x1f
+	.uleb128 0x34
+	.byte	0
+	.uleb128 0x3
+	.uleb128 0xe
+	.uleb128 0x3a
+	.uleb128 0xb
+	.uleb128 0x3b
+	.uleb128 0xb
+	.uleb128 0x49
+	.uleb128 0x13
+	.uleb128 0x2
+	.uleb128 0x18
+	.byte	0
+	.byte	0
+	.uleb128 0x20
 	.uleb128 0x2e
 	.byte	0x1
 	.uleb128 0x3f
@@ -1611,7 +1626,7 @@ __x86.get_pc_thunk.bx:
 	.string	"_IO_2_1_stderr_"
 .LASF25:
 	.string	"_IO_buf_base"
-.LASF117:
+.LASF118:
 	.string	"GNU C11 7.5.0 -m32 -mtune=generic -march=i686 -g -fstack-protector-strong"
 .LASF98:
 	.string	"__sighandler_t"
@@ -1667,9 +1682,11 @@ __x86.get_pc_thunk.bx:
 	.string	"sigset_t"
 .LASF7:
 	.string	"__uint32_t"
+.LASF116:
+	.string	"mask"
 .LASF14:
 	.string	"__off64_t"
-.LASF122:
+.LASF123:
 	.string	"sigval"
 .LASF66:
 	.string	"si_pid"
@@ -1685,7 +1702,7 @@ __x86.get_pc_thunk.bx:
 	.string	"si_utime"
 .LASF3:
 	.string	"long unsigned int"
-.LASF121:
+.LASF122:
 	.string	"_IO_FILE_plus"
 .LASF23:
 	.string	"_IO_write_ptr"
@@ -1705,7 +1722,7 @@ __x86.get_pc_thunk.bx:
 	.string	"_IO_save_base"
 .LASF63:
 	.string	"sival_int"
-.LASF118:
+.LASF119:
 	.string	"main.c"
 .LASF16:
 	.string	"__clock_t"
@@ -1731,17 +1748,17 @@ __x86.get_pc_thunk.bx:
 	.string	"_sigpoll"
 .LASF110:
 	.string	"optind"
-.LASF119:
+.LASF120:
 	.string	"/home/asus/sm/sm19-1"
 .LASF96:
 	.string	"_sifields"
 .LASF24:
 	.string	"_IO_write_end"
-.LASF116:
+.LASF117:
 	.string	"signo"
 .LASF101:
 	.string	"sigaction"
-.LASF120:
+.LASF121:
 	.string	"_IO_lock_t"
 .LASF47:
 	.string	"_IO_FILE"
@@ -1781,7 +1798,7 @@ __x86.get_pc_thunk.bx:
 	.string	"optopt"
 .LASF17:
 	.string	"char"
-.LASF124:
+.LASF125:
 	.string	"func"
 .LASF114:
 	.string	"argc"
@@ -1833,7 +1850,7 @@ __x86.get_pc_thunk.bx:
 	.string	"sival_ptr"
 .LASF81:
 	.string	"si_band"
-.LASF123:
+.LASF124:
 	.string	"main"
 .LASF22:
 	.string	"_IO_write_base"
