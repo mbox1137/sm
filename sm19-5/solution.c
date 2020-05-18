@@ -1,4 +1,5 @@
-#define DEBUG 1
+#define DEBUG 0
+
 //https://stackoverflow.com/questions/43349397/why-fprintf-and-fscanf-does-not-work-with-pipe
 //#define _POSIX_C_SOURCE 200101L
 #include <stdlib.h>
@@ -46,19 +47,10 @@ int startPingPong(int* fd, int fdx, int n, int nn, const int *pn0) {
     int x;
     FILE *fin, *fout;
     char str[NSTR];
-
-    int sign(int sfd) {
-        siginfo_t siginfo;
-        int res;
-        res=read(sfd, &siginfo, sizeof(siginfo));
+    int  eof, wsig, gs, scan;
 #if DEBUG
-        printf(" %d", res);
-        fflush(stdout);
-        usleep(100000);
+    char *tabs[] = { "", "\t", "\t\t\t" };
 #endif
-        return res==sizeof(siginfo)?1:0;
-//(siginfo.si_pid == pid);
-    }
 
     pid=fork();
     if(pid == -1) {
@@ -70,12 +62,11 @@ int startPingPong(int* fd, int fdx, int n, int nn, const int *pn0) {
         fin = fdopen(fd[0], "r");
         fout = fdopen(fd[1], "w");
         if(pn0) {
-            usleep(1000);
             fprintf(fout, "%d\n", mypid); fflush(fout);
             while(!waitSIG(fdx, MYSIG)) ;
             fgets(str, NSTR-1, fin);
 #if DEBUG
-            printf("%d: str1=%s",n, str); fflush(stdout);
+            printf("%d:%s str1=%s", n, tabs[n], str); fflush(stdout);
 #endif
             sscanf(str, "%d", &otherpid);
             fprintf(fout, "%d\n", 1); fflush(fout);
@@ -83,7 +74,7 @@ int startPingPong(int* fd, int fdx, int n, int nn, const int *pn0) {
         } else {
             fgets(str, NSTR-1, fin);
 #if DEBUG
-            printf("(%d): str1=%s",n,str); fflush(stdout);
+            printf("%d:%s str1=%s",n,tabs[n],str); fflush(stdout);
 #endif
             sscanf(str, "%d", &otherpid);
             fprintf(fout, "%d\n", mypid); fflush(fout);
@@ -91,25 +82,55 @@ int startPingPong(int* fd, int fdx, int n, int nn, const int *pn0) {
             kill(otherpid, MYSIG);
         }
 #if DEBUG
-        printf("-- n=%d pid=%d otherpid=%d\n",n,getpid(),otherpid); fflush(stdout);
+        printf("%d:%s pid=%d otherpid=%d\n",n,tabs[n],getpid(),otherpid); fflush(stdout);
 #endif
-        while(!feof(fin)) {
+        while(1) {
 #if DEBUG
-            printf(","); fflush(stdout);
+            printf("%d:%s \n",n,tabs[n]); fflush(stdout);
 #endif
-            while(!waitSIG(fdx, MYSIG)) ;
-            fgets(str, NSTR-1, fin);
-            if(sscanf(str, "%d", &x)!=1) break;
+            eof=feof(fin);
 #if DEBUG
-            printf("%d: str2=%s",n,str); fflush(stdout);
+            printf("%d:%s eof=%d\n",n,tabs[n],eof); fflush(stdout);
 #endif
-            if(x>=nn) break;
-            printf("%d send %d\n", n, x); fflush(stdout);
+            if(eof) break;
+//----------
+            wsig=waitSIG(fdx, MYSIG);
+#if DEBUG
+            printf("%d:%s wsig=%d\n",n,tabs[n],wsig); fflush(stdout);
+#endif
+            if(!wsig) break;
+//----------
+#if DEBUG
+            printf("%d:%s gets=...\n",n,tabs[n]); fflush(stdout);
+#endif
+            gs = (fgets(str, NSTR-1, fin) != NULL);
+#if DEBUG
+            printf("%d:%s str=%s",n,tabs[n],str); fflush(stdout);
+#endif
+#if DEBUG
+            printf("%d:%s gs=%d\n",n,tabs[n],gs); fflush(stdout);
+#endif
+            if(!gs) break;
+//----------
+            scan =  sscanf(str, "%d", &x);
+#if DEBUG
+            printf("%d:%s scan=%d x=%d\n",n,tabs[n],scan, x); fflush(stdout);
+#endif
+            if(! ((scan==1)&&(x<nn)) ) break;
+#if DEBUG
+            printf("%d:%s -> (%d)\n", n,tabs[n], x+1); fflush(stdout);
+#else
+            printf("%d %d\n", n, x); fflush(stdout);
+#endif
             fprintf(fout, "%d\n", x+1); fflush(fout);
             kill(otherpid, MYSIG);
         }
+        fprintf(fout, "\n"); fflush(fout);
+        kill(otherpid, MYSIG);
         fclose(fin);
         fclose(fout);
+        close(fd[0]);
+        close(fd[1]);
         exit(EXIT_SUCCESS);
     } else {
         return(pid);
@@ -172,8 +193,10 @@ int main(int argc, char** argv) {
         return 1;
     }
     fdx = signalfd(-1, &mask, 0);
+//    fdx = signalfd(-1, &mask, SFD_NONBLOCK);
+#if DEBUG
     printf("fdx=%d\n", fdx);
-    fdx = signalfd(-1, &mask, SFD_NONBLOCK);
+#endif
     rv=solution(nn, fdx);
     close(fdx);
     return rv;
