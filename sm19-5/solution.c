@@ -127,21 +127,29 @@ int main(int argc, char** argv) {
     int fdx;
     int rv;
     sigset_t mask;
+    siginfo_t siginfo;
 
     if(argc!=2 || sscanf(argv[1],"%d",&nn)!=1) return(0);
     if(nn<0) return 0;
     else if(nn==0) return 0;
     else if(nn==1) return 0;
 #if DEBUG
-    printf("nn=%d\n",nn);  fflush(stdout);
+    printf("nn=%d pid=%d\n",nn, getpid());  fflush(stdout);
 #endif
 
     sigemptyset(&mask);
-    sigaddset(&mask, MYSIG); 
+//    sigaddset(&mask, MYSIG); 
 //    sigfillset(&mask); 
+if (sigprocmask(SIG_BLOCK, &mask, NULL) < 0) {
+		perror ("sigprocmask");
+		return 1;
+	}
     fdx = signalfd(-1, &mask, 0);
+    printf("fdx=%d\n", fdx);
 //    fdx = signalfd(-1, &mask, SFD_NONBLOCK);
-    rv=solution(nn, fdx);
+    rv=read(fdx, &siginfo, sizeof(siginfo));
+    printf("rv=%d(%d)\n", rv, sizeof(siginfo));
+//    rv=solution(nn, fdx);
     close(fdx);
     return rv;
 }
