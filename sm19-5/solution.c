@@ -1,4 +1,4 @@
-#define DEBUG 0
+#define DEBUG 1
 
 //https://stackoverflow.com/questions/43349397/why-fprintf-and-fscanf-does-not-work-with-pipe
 //#define _POSIX_C_SOURCE 200101L
@@ -78,7 +78,7 @@ int startPingPong(int* fd, int fdx, int n, int nn, const int *pn0) {
 #endif
             sscanf(str, "%d", &otherpid);
             fprintf(fout, "%d\n", mypid); fflush(fout);
-            usleep(100);
+//            usleep(100);
             kill(otherpid, MYSIG);
         }
 #if DEBUG
@@ -145,7 +145,7 @@ int solution(int nn, int fdx) {
     int status;
     int rv;
 
-    usleep(1000);
+//    usleep(1000);
     pipe(fd);
     cpids[0]=startPingPong(fd, fdx, 1, nn, NULL);
     cpids[1]=startPingPong(fd, fdx, 2, nn, &dummy);
@@ -197,7 +197,7 @@ int main(int argc, char** argv) {
 #if DEBUG
     printf("fdx=%d\n", fdx);
 #endif
-    rv=solution(nn, fdx);
+    rv=solution(nn+1, fdx);
     close(fdx);
     return rv;
 }
