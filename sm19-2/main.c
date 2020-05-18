@@ -15,6 +15,7 @@ void func(int signo)
 
 int main(int argc, char *argv[])
 {
+    int num;
     struct sigaction sa = {};
     sa.sa_flags = SA_RESTART;
     sa.sa_handler = func;
@@ -22,10 +23,15 @@ int main(int argc, char *argv[])
     sigaction(SIGUSR1, &sa, 0);
     sigaction(SIGUSR2, &sa, 0);
 
+    sigset_t set;
+    sigemptyset(&set);
+    sigaddset(&set, SIGUSR1);
+    sigaddset(&set, SIGUSR2);
+
+    sigprocmask(SIG_BLOCK, &set, NULL);
     printf("%d\n", getpid());
     fflush(stdout);
-
-    int num;
+    sigprocmask(SIG_UNBLOCK, &set, NULL);
 
     while (scanf("%d", &num) == 1)
     {
