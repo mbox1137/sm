@@ -29,14 +29,14 @@ int main(int argc, char *argv[])
     sa.sa_handler = func;     // обработчик сигнала
     sigaction(SIGINT, &sa, 0);
 
-    sigset_t mask;
-    sigemptyset(&mask);
-    sigaddset(&mask, SIGINT);
+    sigset_t set;
+    sigemptyset(&set);
+    sigaddset(&set, SIGINT);
 
-    sigprocmask(SIG_BLOCK, &mask, 0);
+    sigprocmask(SIG_BLOCK, &set, 0);
     printf("%d\n", getpid());
     fflush(stdout);
-    sigprocmask(SIG_UNBLOCK, &mask, NULL);
+    sigprocmask(SIG_UNBLOCK, &set, NULL);
 
     while (1)
         pause();
