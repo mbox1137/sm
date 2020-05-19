@@ -3,12 +3,12 @@
 #include <signal.h>
 #include <unistd.h>
 
+#define MYSIG (SIGINT)
+
 volatile int counter = 0;
 
 void func(int signo)
 {
-//    (void)signo;
-
     if (counter == 4)
         _exit(EXIT_SUCCESS);
 
@@ -18,25 +18,23 @@ void func(int signo)
     fflush(stdout);
 }
 
-
 int main(int argc, char *argv[])
 {
-//    printf("%d\n", getpid());
-//    fflush(stdout);
-
+    pid_t mypid;
     struct sigaction sa = {}; // инициализируем нулями
     sa.sa_flags = SA_RESTART; // restartable system calls
     sa.sa_handler = func;     // обработчик сигнала
-    sigaction(SIGINT, &sa, 0);
+    sigaction(MYSIG, &sa, 0);
 
-    sigset_t set;
-    sigemptyset(&set);
-    sigaddset(&set, SIGINT);
+    sigset_t blockset;
+    sigemptyset(&blockset);
+    sigaddset(&blockset, MYSIG);
 
-    sigprocmask(SIG_BLOCK, &set, 0);
-    printf("%d\n", getpid());
+    sigprocmask(SIG_BLOCK, &blockset, 0);
+    mypid = getpid();
+    printf("%d\n", mypid);
     fflush(stdout);
-    sigprocmask(SIG_UNBLOCK, &set, NULL);
+    sigprocmask(SIG_UNBLOCK, &blockset, NULL);
 
     while (1)
         pause();
