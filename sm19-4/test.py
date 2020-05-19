@@ -1,5 +1,6 @@
 #!/usr/bin/python3
-import sys
+#https://stackabuse.com/handling-unix-signals-in-python/
+import os, sys
 import signal
 
 def getnum():
@@ -13,3 +14,5 @@ def getnum():
 
 for w in getnum():
     print(w)
+
+print(f"PID={os.getpid()}")
