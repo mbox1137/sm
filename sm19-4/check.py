@@ -9,11 +9,7 @@ proc = subprocess.Popen(args,
                         stderr=subprocess.PIPE,
                         bufsize=1,
                         universal_newlines=True)
- 
-#data = process.communicate()
-sys.stdout.write('1 2 3\n')
-proc.stdin.write('1 2 3\n')
-print(proc.stdin, 4,5,6)
+print(4,5,6, file=proc.stdin)
 proc.stdin.close()
 for line in proc.stdout:
 #    print(line.decode("utf-8").strip())
