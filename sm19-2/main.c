@@ -3,14 +3,17 @@
 #include <signal.h>
 #include <unistd.h>
 
-volatile int mode = 0;
+#define MSIG1 (SIGUSR1)
+#define MSIG2 (SIGUSR2)
+
+volatile int flag = 0;
 
 void func(int signo)
 {
-    if (signo == SIGUSR1)
-        mode = 0;
-    else if (signo == SIGUSR2)
-        mode = 1;
+    if (signo == MSIG1)
+        flag = 0;
+    else if (signo == MSIG2)
+        flag = 1;
 }
 
 int main(int argc, char *argv[])
@@ -20,22 +23,22 @@ int main(int argc, char *argv[])
     sa.sa_flags = SA_RESTART;
     sa.sa_handler = func;
 
-    sigaction(SIGUSR1, &sa, 0);
-    sigaction(SIGUSR2, &sa, 0);
+    sigaction(MSIG1, &sa, 0);
+    sigaction(MSIG2, &sa, 0);
 
-    sigset_t set;
-    sigemptyset(&set);
-    sigaddset(&set, SIGUSR1);
-    sigaddset(&set, SIGUSR2);
+    sigset_t mask;
+    sigemptyset(&mask);
+    sigaddset(&mask, MSIG1);
+    sigaddset(&mask, MSIG2);
 
-    sigprocmask(SIG_BLOCK, &set, NULL);
+    sigprocmask(SIG_BLOCK, &mask, 0);
     printf("%d\n", getpid());
     fflush(stdout);
-    sigprocmask(SIG_UNBLOCK, &set, NULL);
+    sigprocmask(SIG_UNBLOCK, &mask, 0);
 
     while (scanf("%d", &num) == 1)
     {
-        if (!mode)
+        if (!flag)
             printf("%d\n", -num);
         else
             printf("%d\n", num * num);
@@ -45,3 +48,5 @@ int main(int argc, char *argv[])
 
     exit(EXIT_SUCCESS);
 }
+
+// https://github.com/blackav/hse-caos-2019/blob/master/19-signal1/sem-signals.pdf
