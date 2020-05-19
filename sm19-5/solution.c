@@ -67,7 +67,7 @@ int startPingPong(int* fd, int fdx, int n, int nn, const int *pn0)
             fprintf(fout, "%d\n", mypid);
             fflush(fout);
             while(!waitSIG(fdx, MYSIG));
-            fgets(str, NSTR-1, fin);
+            fgets(str, NSTR - 1, fin);
 
 #if DEBUG
             printf("%d:%s str1=%s", n, tabs[n], str);
@@ -219,7 +219,6 @@ int solution(int nn, int fdx)
         else if (WIFCONTINUED(status)) return(1024+SIGCONT);
 */
     }
-//    printf("Done\n");
     return rv;
 }
 
@@ -236,8 +235,8 @@ int main(int argc, char** argv)
         return 0;
     else if (nn == 0)
         return 0;
-    else if (nn == 1)
-        return 0;
+//    else if (nn == 1)
+//        return 0;
 
 #if DEBUG
     printf("nn=%d pid=%d\n", nn, getpid());
@@ -246,7 +245,7 @@ int main(int argc, char** argv)
 
     sigemptyset(&mask);
     sigaddset(&mask, MYSIG);
-//    sigfillset(&mask);
+
     if (sigprocmask(SIG_BLOCK, &mask, NULL) < 0)
     {
 
@@ -258,7 +257,6 @@ int main(int argc, char** argv)
     }
 
     fdx = signalfd(-1, &mask, 0);
-//    fdx = signalfd(-1, &mask, SFD_NONBLOCK);
 
 #if DEBUG
     printf("fdx=%d\n", fdx);
