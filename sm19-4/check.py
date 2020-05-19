@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import sys
-import subprocess
+import signal, subprocess
 
 args = ["./test.py"]
 proc = subprocess.Popen(args, 

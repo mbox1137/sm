@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 import sys
+import signal
+
 def getnum():
     while 1:
         s=sys.stdin.readline()

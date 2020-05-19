@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     for(k = 1; k < argc; k++)
         printf("%s\n", argv[k]);
 #endif
-
+    printf("SIGRTMIN=%d\tSIGRTMAX=%d\n", SIGRTMIN, SIGRTMAX);
     return(0);
 
 //    printf("%d\n", getpid());
