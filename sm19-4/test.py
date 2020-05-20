@@ -18,6 +18,8 @@ def getnum():
             yield int(s)**2
 
 print(os.getpid())
-
+args=list(sys.argv)
+args.pop(0)
+print(f"args={args}")
 for w in getnum():
     print(w)

@@ -5,7 +5,7 @@ import signal, subprocess
 if len(sys.argv) < 2:
     print("./check.py ./test.py")
     sys.exit()
-args = sys.argv
+args = list(sys.argv)
 args.pop(0)
 proc = subprocess.Popen(args, 
                         stdin=subprocess.PIPE,
