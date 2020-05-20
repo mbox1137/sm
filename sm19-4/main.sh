@@ -21,4 +21,4 @@ function myrun {
 	echo
 }
 
-./check.py ./test.py aa bb cc
+./check.py ./test.py /tmp aa bb cc
