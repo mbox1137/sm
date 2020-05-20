@@ -23,7 +23,7 @@ rtsig = -1
 
 def receiveSignal(sig, frame):
     global work, rtsig
-    print('Received:', sig)
+#    print('Received:', sig)
     rtsig = -1
     if sig == signal.SIGTERM:
         work=False
@@ -45,7 +45,7 @@ def main():
         signal.signal(sig, receiveSignal)
     while work:
         if rtsig>=0:
-            print(f"rtsig={rtsig}")
+#            print(f"rtsig={rtsig}")
             rtsig=-1
         signal.pause()
 
