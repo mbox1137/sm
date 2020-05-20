@@ -15,8 +15,18 @@ tmpdir=os.path.join(sys.argv[2],os.getcwd().split('/')[-1])
 shutil.rmtree(tmpdir, ignore_errors=True)
 os.mkdir(tmpdir)
 tmp=args.pop(1)
-for k in range(1,len(args)):
-    os.mkfifo(os.path.join(tmpdir,args[k]))
+pnames=list(map(lambda x: os.path.join(tmpdir,x),args[1:]))
+print(pnames)
+list(map(os.mkfifo, pnames))
+pipes=list()
+for pname in pnames:
+    print(pname)
+    pipes.append(os.open(pname, os.O_WRONLY|os.O_NONBLOCK))
+#w = os.open( 'my_fifo', os.O_WRONLY )
+#r = os.open( 'my_fifo', os.O_RDONLY )
+for pipe in pipes:
+    close(pipe)
+sys.exit()
 
 proc = subprocess.Popen(args, 
                         stdin=subprocess.PIPE,
