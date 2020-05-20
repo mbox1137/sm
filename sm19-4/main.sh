@@ -9,10 +9,10 @@ function pf {
 	mkfifo $1
 }
 
-for pname in /tmp/pf{0..19}
-	do
-		echo $pname
-	done
+#for pname in /tmp/pf{0..19}
+#	do
+#		echo $pname
+#	done
 
 function myrun {
 	echo ./solution $@
@@ -21,3 +21,4 @@ function myrun {
 	echo
 }
 
+./check.py ./test.py aa bb cc
