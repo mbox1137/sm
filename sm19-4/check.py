@@ -20,11 +20,16 @@ cpid=int(proc.stdout.readline())
 print(f"CPID={cpid}")
 #print(4,5,6, file=proc.stdin)
 proc.stdin.close()
-for sig in range(signal.SIGRTMIN, signal.SIGRTMIN+5):
+for sig in range(signal.SIGRTMIN, signal.SIGRTMIN+len(args)-1):
     os.kill(cpid, sig)
     print(sig)
     time.sleep(0.3)
+print("SIGRT:")
+for k in range(len(args)-1):
+    line = proc.stdout.readline().strip()
+    print(line)
+print("SIGTERM:")
 os.kill(cpid, signal.SIGTERM)
-for line in proc.stdout:
-#    print(line.decode("utf-8").strip())
-    print(line.strip())
+for k in range(len(args)-1):
+    line = proc.stdout.readline().strip()
+    print(line)

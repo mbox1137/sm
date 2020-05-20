@@ -35,6 +35,10 @@ def receiveSignal(sig, frame):
 #    raise SystemExit('Exiting')
     return
 
+def pipesum(pipename):
+    s=0
+    return s
+
 def main():
     global work, rtsig
     print(os.getpid())
@@ -46,8 +50,11 @@ def main():
     while work:
         if rtsig>=0:
 #            print(f"rtsig={rtsig}")
+            print(pipesum(args[rtsig]))
             rtsig=-1
         signal.pause()
+    for pname in args:
+        print(pipesum(pname))
 
 if __name__ == '__main__':
     main()
