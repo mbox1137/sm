@@ -18,16 +18,6 @@ tmp=args.pop(1)
 pnames=list(map(lambda x: os.path.join(tmpdir,x),args[1:]))
 print(pnames)
 list(map(os.mkfifo, pnames))
-pipes=list()
-for pname in pnames:
-    print(pname)
-    pipes.append(os.open(pname, os.O_WRONLY|os.O_NONBLOCK))
-#w = os.open( 'my_fifo', os.O_WRONLY )
-#r = os.open( 'my_fifo', os.O_RDONLY )
-for pipe in pipes:
-    close(pipe)
-sys.exit()
-
 proc = subprocess.Popen(args, 
                         stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE,
@@ -37,6 +27,18 @@ proc = subprocess.Popen(args,
 cpid=int(proc.stdout.readline())
 print(f"CPID={cpid}")
 proc.stdin.close()
+
+time.sleep(1)
+
+pipes=list()
+for pname in pnames:
+    print(pname)
+    pipes.append(os.open(pname, os.O_WRONLY|os.O_NONBLOCK))
+
+k=0
+for pipe in pipes:
+    os.write(pipe, f"{k:15}\n".encode())
+    k+=1
 
 for sig in range(signal.SIGRTMIN, signal.SIGRTMIN+len(args)-1):
     os.kill(cpid, sig)

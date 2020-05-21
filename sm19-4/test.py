@@ -35,26 +35,41 @@ def receiveSignal(sig, frame):
 #    raise SystemExit('Exiting')
     return
 
-def pipesum(pipename):
+def pipesum(pipe):
     s=0
+    while True:
+        try:
+            str=os.read(pipe, 16)
+        except BlockingIOError:
+            break
+        if len(str)>0:
+            s+=int(str)
+        else:
+            break
     return s
 
 def main():
     global work, rtsig
     print(os.getpid())
     args=list(sys.argv)
-    args.pop(0)
+    exe=args.pop(0)
+    tmp=args.pop(0)
+    tmpdir=os.path.join(tmp,os.getcwd().split('/')[-1])
+    pnames=list(map(lambda x: os.path.join(tmpdir,x),args))
+    pipes=list();
+    for pname in pnames:
+        pipes.append(os.open(pname, os.O_NONBLOCK | os.O_RDONLY))
     signal.signal(signal.SIGTERM, receiveSignal)
     for sig in range(signal.SIGRTMIN, signal.SIGRTMIN+20):
         signal.signal(sig, receiveSignal)
     while work:
         if rtsig>=0:
 #            print(f"rtsig={rtsig}")
-            print(pipesum(args[rtsig]))
+            print(pipesum(pipes[rtsig]))
             rtsig=-1
         signal.pause()
-    for pname in args:
-        print(pipesum(pname))
+    for pipe in pipes:
+        print(pipesum(pipe))
 
 if __name__ == '__main__':
     main()
