@@ -42,8 +42,11 @@ def pipesum(pipe):
             str=os.read(pipe, 16)
         except BlockingIOError:
             break
+        str=str.decode("utf-8").strip()
         if len(str)>0:
-            s+=int(str)
+            sl=str.split()
+            for str in sl:
+                s+=int(str)
         else:
             break
     return s

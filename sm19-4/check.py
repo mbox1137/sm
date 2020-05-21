@@ -17,11 +17,12 @@ os.mkdir(tmpdir)
 tmp=args.pop(1)
 pnames=list(map(lambda x: os.path.join(tmpdir,x),args[1:]))
 print(pnames)
-list(map(os.mkfifo, pnames))
+for pname in pnames:
+    os.mkfifo(pname, mode = 0o666)
 proc = subprocess.Popen(args, 
                         stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE,
-                        stderr=subprocess.PIPE,
+                        stderr=subprocess.STDOUT,
                         bufsize=1,
                         universal_newlines=True)
 cpid=int(proc.stdout.readline())
@@ -33,7 +34,7 @@ time.sleep(1)
 pipes=list()
 for pname in pnames:
     print(pname)
-    pipes.append(os.open(pname, os.O_WRONLY|os.O_NONBLOCK))
+    pipes.append(os.open(pname, os.O_NONBLOCK|os.O_WRONLY))
 
 k=0
 for pipe in pipes:
