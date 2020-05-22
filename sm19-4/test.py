@@ -59,12 +59,13 @@ def main():
     tmp=args.pop(0)
     tmpdir=os.path.join(tmp,os.getcwd().split('/')[-1])
     pnames=list(map(lambda x: os.path.join(tmpdir,x),args))
-    pipes=list();
-    for pname in pnames:
-        pipes.append(os.open(pname, os.O_NONBLOCK | os.O_RDONLY))
     signal.signal(signal.SIGTERM, receiveSignal)
     for sig in range(signal.SIGRTMIN, signal.SIGRTMIN+20):
         signal.signal(sig, receiveSignal)
+    pipes=list();
+    for pname in pnames:
+#        pipes.append(os.open(pname, os.O_NONBLOCK | os.O_RDONLY))
+        pipes.append(os.open(pname, os.O_RDONLY))
     while work:
         if rtsig>=0:
 #            print(f"rtsig={rtsig}")

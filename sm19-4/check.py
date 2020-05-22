@@ -7,7 +7,7 @@ def print(*args, **kwargs):
     builtins.print("check:", *args, **kwargs)
 
 if len(sys.argv) < 2:
-    print("./check.py ./test.py")
+    print("./check.py ./test.py /tmp aa bb cc")
     sys.exit()
 args = list(sys.argv)
 args.pop(0)
@@ -34,7 +34,8 @@ time.sleep(1)
 pipes=list()
 for pname in pnames:
     print(pname)
-    pipes.append(os.open(pname, os.O_NONBLOCK|os.O_WRONLY))
+#    pipes.append(os.open(pname, os.O_NONBLOCK|os.O_WRONLY))
+    pipes.append(os.open(pname, os.O_WRONLY))
 
 k=0
 for pipe in pipes:
