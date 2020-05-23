@@ -7,9 +7,12 @@ import signal
 from functools import partial
 
 def print(*args, **kwargs):
-    builtins.print("test:", *args, **kwargs)
+    builtins.print(*args, **kwargs)
     sys.stdout.flush()
-#    time.sleep(0.1)
+
+def err(*args, **kwargs):
+    builtins.print(*args, **kwargs, file=sys.stderr)
+    sys.stderr.flush()
 
 def getnum():
     while 1:
@@ -25,7 +28,7 @@ rtsig = -1
 
 def receiveSignal(sig, frame):
     global work, rtsig
-#    print('Received:', sig)
+    err('Received:', sig)
     rtsig = -1
     if sig == signal.SIGTERM:
         work=False
@@ -33,13 +36,26 @@ def receiveSignal(sig, frame):
         smi=signal.SIGRTMIN
         sma=signal.SIGRTMIN+20
         rtsig=sig-smi if sig>=smi and sig<sma else -1
-#    print(f"rtsig={rtsig}")
+    err(f"rtsig={rtsig}")
 #    raise SystemExit('Exiting')
     return
 
 def pipesum(pipe):
     s=0
+    err("pipesum...")
+    for str in pipe:
+        err(f"str={str}")
+        str=str.strip()
+        try:
+            n=int(str)
+        except ValueError:
+            break
+        err(f"n={n}")
+        s+=n
+    err(f"s={s}")
+    return s
     for chunk in iter(partial(pipe.read, 16), b''):
+        err(f"chunk={chunk}")
         str=chunk.decode("utf-8").strip()
         try:
             n=int(str)
@@ -49,7 +65,9 @@ def pipesum(pipe):
 
 def main():
     global work, rtsig
-    builtins.print(os.getpid())
+
+    builtins.print(os.getpid()); sys.stdout.flush()
+
     args=list(sys.argv)
     exe=args.pop(0)
     tmp=args.pop(0)
@@ -62,11 +80,14 @@ def main():
     for pname in pnames:
 #        pipes.append(os.open(pname, os.O_NONBLOCK | os.O_RDONLY))
         pipes.append(open(pname, "r"))
-    print("Pipes done")
+    err("Pipes done")
     while work:
+        err(f"while work: rtsig={rtsig}")
         if rtsig>=0:
-#            print(f"rtsig={rtsig}")
-            print(pipesum(pipes[rtsig]))
+            err(f"pipesum({pipes[rtsig]})=...")
+            s=pipesum(pipes[rtsig])
+            err(f"pipesum={s}")
+            print(s)
             rtsig=-1
         signal.pause()
     for pipe in pipes:

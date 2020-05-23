@@ -16,6 +16,8 @@ shutil.rmtree(tmpdir, ignore_errors=True)
 os.mkdir(tmpdir)
 #tmp=args.pop(1)
 pnames=list(map(lambda x: os.path.join(tmpdir,x),args[2:]))
+lname=os.path.join(tmpdir, "test.log")
+log=open(lname,"w")
 print(pnames)
 for pname in pnames:
     os.mkfifo(pname, mode = 0o666)
@@ -23,7 +25,7 @@ print(args)
 proc = subprocess.Popen(args, 
                         stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE,
-                        stderr=subprocess.STDOUT,
+                        stderr=log,
                         bufsize=1,
                         universal_newlines=True)
 cpid=int(proc.stdout.readline())
@@ -42,18 +44,19 @@ time.sleep(1)
 
 k=0
 for pipe in pipes:
-    print(f"{k:15}\n".encode(), file=pipe)
+    print(f"{k:15}", file=pipe)
+    pipe.close()
     k+=1
 
-for sig in range(signal.SIGRTMIN, signal.SIGRTMIN+len(args)-1):
-    os.kill(cpid, sig)
-    print(sig)
-    time.sleep(0.3)
-
 print("SIGRT:")
-for k in range(len(args)-1):
-    line = proc.stdout.readline().strip()
-    print(line)
+for k in range(len(args)-2):
+    sig=signal.SIGRTMIN+k
+    print(sig)
+    os.kill(cpid, sig)
+    line=proc.stdout.readline()
+    line=line.strip()
+    print(f"line={line}")
+    time.sleep(0.3)
 
 print("SIGTERM:")
 os.kill(cpid, signal.SIGTERM)
