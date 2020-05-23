@@ -7,7 +7,7 @@ import signal
 from functools import partial
 
 def print(*args, **kwargs):
-    builtins.print(*args, **kwargs)
+    builtins.print("test:", *args, **kwargs)
     sys.stdout.flush()
 #    time.sleep(0.1)
 
@@ -49,7 +49,7 @@ def pipesum(pipe):
 
 def main():
     global work, rtsig
-    print(os.getpid())
+    builtins.print(os.getpid())
     args=list(sys.argv)
     exe=args.pop(0)
     tmp=args.pop(0)
@@ -61,7 +61,8 @@ def main():
     pipes=list();
     for pname in pnames:
 #        pipes.append(os.open(pname, os.O_NONBLOCK | os.O_RDONLY))
-        pipes.append(open(pname, "rb"))
+        pipes.append(open(pname, "r"))
+    print("Pipes done")
     while work:
         if rtsig>=0:
 #            print(f"rtsig={rtsig}")
