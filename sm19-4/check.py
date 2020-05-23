@@ -33,11 +33,12 @@ print(f"CPID={cpid}")
 proc.stdin.close()
 
 pipes=list()
+k=0
 for pname in pnames:
     print(pname)
 #    pipes.append(os.open(pname, os.O_NONBLOCK|os.O_WRONLY))
     pipes.append(open(pname, 'w'))
-    builtins.print(0,file=pipes[-1])
+    builtins.print(k,file=pipes[-1])
 
 print("Pipes done")
 time.sleep(1)
@@ -45,8 +46,10 @@ time.sleep(1)
 k=0
 for pipe in pipes:
     print(f"{k:15}", file=pipe)
-    pipe.close()
     k+=1
+
+for pipe in pipes:
+    pipe.close()
 
 print("SIGRT:")
 for k in range(len(args)-2):
