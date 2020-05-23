@@ -18,4 +18,4 @@ pipe=open(pname, 'w')
 
 k=0
 for k in range(10):
-    builtins.print(f"{k:15}", file=pipe)
+    print(f"{k:15}", file=pipe)
