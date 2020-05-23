@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 #https://stackabuse.com/handling-unix-signals-in-python/
+#https://stackoverflow.com/questions/29576982/pipe-no-such-file-or-directory
 
 import os, sys, builtins, time
 import signal
