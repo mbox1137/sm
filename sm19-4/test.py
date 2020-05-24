@@ -40,20 +40,28 @@ def receiveSignal(sig, frame):
 #    raise SystemExit('Exiting')
     return
 
+sums=dict()
+
 def pipesum(pipe):
-    s=0
+    global sums;
     err("pipesum...")
-    for str in pipe:
-        err(f"str={str}")
-        str=str.strip()
-        try:
-            n=int(str)
-        except ValueError:
-            break
-        err(f"n={n}")
-        s+=n
+    if pipe in sums:
+        s=sums[pipe]
+    else:
+        s=0
+        for str in pipe:
+            err(f"str={str}")
+            str=str.strip()
+            try:
+                n=int(str)
+            except ValueError:
+                break
+            err(f"n={n}")
+            s+=n
+        sums[pipe]=s
     err(f"s={s}")
     return s
+    """
     for chunk in iter(partial(pipe.read, 16), b''):
         err(f"chunk={chunk}")
         str=chunk.decode("utf-8").strip()
@@ -62,6 +70,7 @@ def pipesum(pipe):
         except ValueError:
             break
     return s
+    """
 
 def main():
     global work, rtsig
