@@ -21,16 +21,24 @@ int main(int argc, char *argv[])
 
     fd1 = fopen(argv[1], "r");
     fd2 = fopen(argv[2], "r");
+#if DEBUG
+    printf("fn1=%s (%p)\n", argv[1], fd1);
+    printf("fn2=%s (%p)\n", argv[2], fd2);
+#endif
 
     pid1 = fork();
 
-    if (pid1 == -1)
+    if(pid1 == -1)
         return 1;
 
-    if (!pid1)
+    if(!pid1)
     {
         sum1 = 0;
 
+#if DEBUG
+        printf("p1: fn1=%s (%p)\n", argv[1], fd1);
+        printf("p1: fn2=%s (%p)\n", argv[2], fd2);
+#endif
         if (fd1 == NULL)
             exit(EXIT_FAILURE);
 
@@ -44,21 +52,25 @@ int main(int argc, char *argv[])
             sum1 += num;
         }
 
-        fclose(fd1);
+//        fclose(fd1);
         fflush(stdout);
         exit(sum1);
     }
 
     pid2 = fork();
 
-    if (pid2 == -1)
+    if(pid2 == -1)
         return 1;
 
-    if (!pid2)
+    if(!pid2)
     {
         sum2 = 0;
 
-        if (fd2 == NULL)
+#if DEBUG
+        printf("p2: fn1=%s (%p)\n", argv[1], fd1);
+        printf("p2: fn2=%s (%p)\n", argv[2], fd2);
+#endif
+        if(!fd2)
             exit(EXIT_FAILURE);
 
         while(fscanf(fd1, "%d", &num) == 1 )
@@ -71,7 +83,7 @@ int main(int argc, char *argv[])
             sum2 += num;
         }
 
-        fclose(fd2);
+//        fclose(fd2);
         fflush(stdout);
         exit(sum2);
     }
