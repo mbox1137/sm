@@ -45,8 +45,8 @@ int main(int argc, char *argv[])
         }
 
         fclose(fd1);
-
-        _exit(sum1);
+        fflush(stdout);
+        exit(sum1);
     }
 
     pid2 = fork();
@@ -72,8 +72,8 @@ int main(int argc, char *argv[])
         }
 
         fclose(fd2);
-
-        _exit(sum2);
+        fflush(stdout);
+        exit(sum2);
     }
 
     waitpid(pid1, &wstatus1, 0);

@@ -10,7 +10,7 @@ OBJS	= main.o
 LDFLAGS	= -no-pie -lm -m32 $(GDB)
 AFLAGS	=
 #CFLAGS	= -fverbose-asm -O3
-CFLAGS	= -m32 -fverbose-asm -O3 -Wunused-variable -Werror=return-type -Werror=dangling-else
+CFLAGS	= -m32 -fverbose-asm -O3 $(GDB) -Wunused-variable -Werror=return-type -Werror=dangling-else
 #-Os
 
 ALL : $(EXEC)
