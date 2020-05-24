@@ -19,8 +19,8 @@ int main(int argc, char *argv[])
     if (argc != 3)
         return 1;
 
-    fd1 = fopen(argv[2], "r");
-    fd2 = fopen(argv[1], "r");
+    fd1 = fopen(argv[1], "r");
+    fd2 = fopen(argv[2], "r");
 
     pid1 = fork();
 
@@ -34,11 +34,11 @@ int main(int argc, char *argv[])
         if (fd1 == NULL)
             exit(EXIT_FAILURE);
 
-        while(fscanf(fd1, "%d", &num) != EOF)
+        while(fscanf(fd1, "%d", &num) == 1 )
         {
 
 #if DEBUG
-            printf("%d\n", num);
+            printf("p1: %d\n", num);
 #endif
 
             sum1 += num;
@@ -61,11 +61,11 @@ int main(int argc, char *argv[])
         if (fd2 == NULL)
             exit(EXIT_FAILURE);
 
-        while(fscanf(fd1, "%d", &num) != EOF)
+        while(fscanf(fd1, "%d", &num) == 1 )
         {
 
 #if DEBUG
-            printf("%d\n", num);
+            printf("p2: %d\n", num);
 #endif
 
             sum2 += num;
@@ -79,13 +79,16 @@ int main(int argc, char *argv[])
     waitpid(pid1, &wstatus1, 0);
     waitpid(pid2, &wstatus2, 0);
 
-    printf("sum1 = %d\n", wstatus1);
+    fclose(fd1);
+    fclose(fd2);
+#if DEBUG
     printf("sum2 = %d\n", wstatus2);
-
-//    fclose(fd1);
-//    fclose(fd2);
-
+    printf("sum1 = %d\n", wstatus1);
     printf("res = %d\n", wstatus1 + wstatus2);
-
+#else
+    printf("%d\n", wstatus2);
+    printf("%d\n", wstatus1);
+    printf("%d\n", wstatus1 + wstatus2);
+#endif
     exit(EXIT_SUCCESS);
 }
