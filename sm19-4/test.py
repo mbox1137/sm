@@ -1,13 +1,18 @@
 #!/usr/bin/python3
 #https://stackabuse.com/handling-unix-signals-in-python/
+#https://stackoverflow.com/questions/29576982/pipe-no-such-file-or-directory
 
 import os, sys, builtins, time
 import signal
+from functools import partial
 
 def print(*args, **kwargs):
     builtins.print(*args, **kwargs)
     sys.stdout.flush()
-#    time.sleep(0.1)
+
+def err(*args, **kwargs):
+    builtins.print(*args, **kwargs, file=sys.stderr)
+    sys.stderr.flush()
 
 def getnum():
     while 1:
@@ -23,7 +28,7 @@ rtsig = -1
 
 def receiveSignal(sig, frame):
     global work, rtsig
-#    print('Received:', sig)
+    err('Received:', sig)
     rtsig = -1
     if sig == signal.SIGTERM:
         work=False
@@ -31,29 +36,47 @@ def receiveSignal(sig, frame):
         smi=signal.SIGRTMIN
         sma=signal.SIGRTMIN+20
         rtsig=sig-smi if sig>=smi and sig<sma else -1
-#    print(f"rtsig={rtsig}")
+    err(f"rtsig={rtsig}")
 #    raise SystemExit('Exiting')
     return
 
+sums=dict()
+
 def pipesum(pipe):
-    s=0
-    while True:
+    global sums;
+    err("pipesum...")
+    if pipe in sums:
+        s=sums[pipe]
+    else:
+        s=0
+        for str in pipe:
+            err(f"str={str}")
+            str=str.strip()
+            try:
+                n=int(str)
+            except ValueError:
+                break
+            err(f"n={n}")
+            s+=n
+        sums[pipe]=s
+    err(f"s={s}")
+    return s
+    """
+    for chunk in iter(partial(pipe.read, 16), b''):
+        err(f"chunk={chunk}")
+        str=chunk.decode("utf-8").strip()
         try:
-            str=os.read(pipe, 16)
-        except BlockingIOError:
-            break
-        str=str.decode("utf-8").strip()
-        if len(str)>0:
-            sl=str.split()
-            for str in sl:
-                s+=int(str)
-        else:
+            n=int(str)
+        except ValueError:
             break
     return s
+    """
 
 def main():
     global work, rtsig
-    print(os.getpid())
+
+    builtins.print(os.getpid()); sys.stdout.flush()
+
     args=list(sys.argv)
     exe=args.pop(0)
     tmp=args.pop(0)
@@ -65,11 +88,15 @@ def main():
     pipes=list();
     for pname in pnames:
 #        pipes.append(os.open(pname, os.O_NONBLOCK | os.O_RDONLY))
-        pipes.append(os.open(pname, os.O_RDONLY))
+        pipes.append(open(pname, "r"))
+    err("Pipes done")
     while work:
+        err(f"while work: rtsig={rtsig}")
         if rtsig>=0:
-#            print(f"rtsig={rtsig}")
-            print(pipesum(pipes[rtsig]))
+            err(f"pipesum({pipes[rtsig]})=...")
+            s=pipesum(pipes[rtsig])
+            err(f"pipesum={s}")
+            print(s)
             rtsig=-1
         signal.pause()
     for pipe in pipes:
