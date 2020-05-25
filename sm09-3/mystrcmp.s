@@ -29,9 +29,9 @@ loop1:
 calc:
 	cmp	$0, %al
 	je	return
-	setns	%al
+	mov	$1, %al
 	jns	return
-	mov	$-1, %al
+	neg	%al
 return:
 	cbw
 	cwde
