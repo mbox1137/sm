@@ -14,17 +14,9 @@ def err(*args, **kwargs):
     builtins.print(*args, **kwargs, file=sys.stderr)
     sys.stderr.flush()
 
-def getnum():
-    while 1:
-        s=sys.stdin.readline()
-        if len(s)==0: break
-        s=s.strip()
-        sl=s.split()
-        for s in sl:
-            yield int(s)**2
-
 work = True
 rtsig = -1
+sums=dict()
 
 def receiveSignal(sig, frame):
     global work, rtsig
@@ -37,10 +29,7 @@ def receiveSignal(sig, frame):
         sma=signal.SIGRTMIN+20
         rtsig=sig-smi if sig>=smi and sig<sma else -1
     err(f"rtsig={rtsig}")
-#    raise SystemExit('Exiting')
     return
-
-sums=dict()
 
 def pipesum(pipe):
     global sums;
@@ -61,16 +50,6 @@ def pipesum(pipe):
         sums[pipe]=s
     err(f"s={s}")
     return s
-    """
-    for chunk in iter(partial(pipe.read, 16), b''):
-        err(f"chunk={chunk}")
-        str=chunk.decode("utf-8").strip()
-        try:
-            n=int(str)
-        except ValueError:
-            break
-    return s
-    """
 
 def main():
     global work, rtsig
@@ -87,7 +66,6 @@ def main():
         signal.signal(sig, receiveSignal)
     pipes=list();
     for pname in pnames:
-#        pipes.append(os.open(pname, os.O_NONBLOCK | os.O_RDONLY))
         pipes.append(open(pname, "r"))
     err("Pipes done")
     while work:
