@@ -21,16 +21,16 @@ mystrcmp:
 loop1:
 	lodsb
 	subb	(%edi), %al
-	jnz	calc
+	jnz	calc		;
 	cmpb	$0, (%edi)
-	jz	calc
+	jz	calc		;
 	incl	%edi
-	jmp	loop1
+	jmp	loop1		;
 calc:
 	cmp	$0, %al
-	je	return
+	je	return		;
 	mov	$1, %al
-	jns	return
+	jns	return		;
 	neg	%al
 return:
 	cbw
