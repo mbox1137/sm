@@ -1,23 +1,17 @@
-#!/usr/bin/python3
-#https://stackabuse.com/handling-unix-signals-in-python/
-#https://stackoverflow.com/questions/29576982/pipe-no-such-file-or-directory
+#define DEBUG 1
 
-import os, sys, builtins, time
-import signal
-from functools import partial
+#include <stdio.h>
+#include <stdlib.h>
+#include <signal.h>
+#include <unistd.h>
 
-def print(*args, **kwargs):
-    builtins.print(*args, **kwargs)
-    sys.stdout.flush()
-
-def err(*args, **kwargs):
-    builtins.print(*args, **kwargs, file=sys.stderr)
-    sys.stderr.flush()
-
+/*
 work = True
 rtsig = -1
 sums=dict()
+*/
 
+/*
 def receiveSignal(sig, frame):
     global work, rtsig
     err('Received:', sig)
@@ -30,7 +24,8 @@ def receiveSignal(sig, frame):
         rtsig=sig-smi if sig>=smi and sig<sma else -1
     err(f"rtsig={rtsig}")
     return
-
+*/
+/*
 def pipesum(pipe):
     global sums;
     err("pipesum...")
@@ -50,7 +45,8 @@ def pipesum(pipe):
         sums[pipe]=s
     err(f"s={s}")
     return s
-
+*/
+/*
 def main():
     global work, rtsig
 
@@ -79,6 +75,8 @@ def main():
         signal.pause()
     for pipe in pipes:
         print(pipesum(pipe))
+*/
 
-if __name__ == '__main__':
-    main()
+int main(int argc, char *argv[])
+{
+}
