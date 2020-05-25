@@ -16,39 +16,22 @@ mystrcmp:
 
 	movl	str1(%ebp), %esi
 	movl	str2(%ebp), %edi
+	cld
 
 loop1:
-	cmpb	$0, (%esi)
-	je	m2
-	cmpb	$0, (%edi)
-	je	m3
-
-	movb	(%esi), %al
-	cmpb	(%edi), %al
+	lodsb
+	subb	(%edi), %al
 	jnz	calc
-	incl	%esi
+	cmpb	$0, (%edi)
+	jz	calc
 	incl	%edi
 	jmp	loop1
-
-m2:
-	xorb	%al, %al
-	cmpb	$0, (%edi)
-	je	return
-m4:
-	movb	$-1, %al
-	jmp	return
-
-m3:
-	movb	$1, %al
-	jmp	return
-
 calc:
-	mov	(%esi), %al
-	sub	(%edi), %al
-//	cmp	$0, %al
-	jl	m4
-	jg	m3
-
+	cmp	$0, %al
+	je	return
+	setns	%al
+	jns	return
+	mov	$-1, %al
 return:
 	cbw
 	cwde
