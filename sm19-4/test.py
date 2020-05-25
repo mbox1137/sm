@@ -59,8 +59,11 @@ def main():
     args=list(sys.argv)
     exe=args.pop(0)
     tmp=args.pop(0)
+    """
     tmpdir=os.path.join(tmp,os.getcwd().split('/')[-1])
     pnames=list(map(lambda x: os.path.join(tmpdir,x),args))
+    """
+    pnames=list(args)
     signal.signal(signal.SIGTERM, receiveSignal)
     for sig in range(signal.SIGRTMIN, signal.SIGRTMIN+20):
         signal.signal(sig, receiveSignal)

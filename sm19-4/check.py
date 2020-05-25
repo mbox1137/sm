@@ -22,7 +22,9 @@ print(pnames)
 for pname in pnames:
     os.mkfifo(pname, mode = 0o666)
 print(args)
-proc = subprocess.Popen(args, 
+arun=[args[0],args[1],*pnames]
+print(arun)
+proc = subprocess.Popen(arun, 
                         stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE,
                         stderr=log,
