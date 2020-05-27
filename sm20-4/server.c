@@ -85,6 +85,8 @@ int main( int argc, char *argv[] ) {
       
       serial++;
 		
+      pid = fork();
+
       if (pid < 0) {
          perror("ERROR on fork");
          exit(1);
