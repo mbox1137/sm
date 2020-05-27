@@ -24,18 +24,18 @@ LDFLAGS	= -no-pie -m32 $(GDB)
 #LDFLAGS	= -m elf_i386
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
-EXEC	= main test
-OBJS	= main.o test.o
-SCDRY	= main.s test.s
+EXEC	= client server
+OBJS	= client.o server.o task.o
+SCDRY	= client.s server.s task.s
 
 .SECONDARY: $(SCDRY)
 ALL : $(EXEC)
 
-main : main.o Makefile
-	$(LD) $(LDFLAGS) -o main main.o
+client : client.o Makefile
+	$(LD) $(LDFLAGS) -o client client.o
 
-test : test.o Makefile
-	$(LD) $(LDFLAGS) -o test test.o
+server : server.o task.o Makefile
+	$(LD) $(LDFLAGS) -o server server.o task.o
 
 #$(EXEC) : $(OBJS) Makefile
 #	$(LD) $(LDFLAGS) $(GDB) -o $@ $(OBJS)

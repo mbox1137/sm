@@ -1,17 +1,16 @@
-#!/usr/bin/python3
-import sys, os, time, builtins, shutil
-import subprocess as sbp
-import socket
+#include <stdio.h>
+#include <sys/socket.h>
 
-def print(*args, **kwargs):
-    builtins.print("main:", *args, **kwargs)
-
-def main():
+int main(int argc, char** argv) {
+/*
 # create an INET, STREAMing socket
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # now connect to the web server on port 80 - the normal http port
-    s.connect(("www.python.org", 80))
-    print(s)
-
-if __name__ == '__main__':
-    main()
+#    s.connect(("www.python.org", 80))
+#    print(s)
+*/
+    int s;
+    s=socket(AF_INET, SOCK_STREAM, 0);
+    printf("%d\n", s);
+    return(0);
+}
