@@ -10,7 +10,9 @@
 
 #include <string.h>
 
-void task (int sock) {
+#include "server.h"
+
+void task (int sock, int serial) {
    int n;
    char buffer[256];
    bzero(buffer,256);

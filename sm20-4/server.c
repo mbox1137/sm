@@ -22,7 +22,7 @@ https://www.opennet.ru/openforum/vsluhforumID1/77819.html
 #include <netdb.h>
 #include <netinet/in.h>
 
-void task (int sock);
+#include "server.h"
 
 int main( int argc, char *argv[] ) {
    int sockfd, newsockfd, port, clilen;
@@ -31,6 +31,9 @@ int main( int argc, char *argv[] ) {
    int pid;
    int wstatus;
    char key[80];
+   int serial;
+   
+   serial=0;
 
    if(   (argc!=3)
       || (sscanf(argv[1],"%d",&port)!=1)
@@ -91,7 +94,8 @@ int main( int argc, char *argv[] ) {
       if (pid == 0) {
          /* This is the client process */
          close(sockfd);
-         task(newsockfd);
+         serial++;
+         task(newsockfd, serial);
          exit(0);
       }
       else {

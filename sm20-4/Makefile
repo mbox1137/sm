@@ -46,7 +46,7 @@ server : server.o task.o Makefile
 %.o: %.cpp
 #	$(CC) $(CFLAGS) $(GDB) -c -o $@ $<
 
-%.s: %.c Makefile
+%.s: %.c Makefile server.h
 	$(CC) $(CFLAGS) $(GDB) -S -o $@ $<
 
 %.s: %.cpp Makefile
