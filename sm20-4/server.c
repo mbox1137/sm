@@ -95,7 +95,7 @@ int main( int argc, char *argv[] ) {
       if (pid == 0) {
          /* This is the client process */
          close(sockfd);
-         task(newsockfd, serial);
+         task(newsockfd, serial, key);
          exit(0);
       }
       else {
