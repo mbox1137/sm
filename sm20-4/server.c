@@ -83,8 +83,7 @@ int main( int argc, char *argv[] ) {
          exit(1);
       }
       
-      /* Create child process */
-      pid = fork();
+      serial++;
 		
       if (pid < 0) {
          perror("ERROR on fork");
@@ -94,7 +93,6 @@ int main( int argc, char *argv[] ) {
       if (pid == 0) {
          /* This is the client process */
          close(sockfd);
-         serial++;
          task(newsockfd, serial);
          exit(0);
       }
