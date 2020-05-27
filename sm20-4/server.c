@@ -1,14 +1,26 @@
+#define DEBUG 1
+
 //Unix Socket - Server Examples
 //https://www.tutorialspoint.com/unix_sockets/socket_server_example.htm
-
+/*
+https://www.opennet.ru/openforum/vsluhforumID1/77819.html
+...
+Если все процессы вменяемые, то посылка TERM(но не KILL) родителському должна 
+привести к схлопыванию всего дерева. Если же по каким-либо причинам корректного 
+завершения по TERM не происходит, то после убийства корневого через KILL все 
+остальные останутся зомбями и init их сам придушит, а если не придушит, то 
+просто грепаем по Zz вывод ps и отдаем KILL всем зомбям. Альтернативно можно 
+конечно написать простенький скрипт, который будет проходить по дереву процессов 
+начиная от какого-то PID и посылать KILL всем потомкам.
+*/
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 #include <netdb.h>
 #include <netinet/in.h>
-
-#include <string.h>
 
 void task (int sock);
 
@@ -17,6 +29,7 @@ int main( int argc, char *argv[] ) {
 //   char buffer[256];
    struct sockaddr_in serv_addr, cli_addr;
    int pid;
+   int wstatus;
    
    /* First call to socket() function */
    sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -72,6 +85,12 @@ int main( int argc, char *argv[] ) {
       }
       else {
          close(newsockfd);
+         while((pid=wait(&wstatus))>0) {
+#if DEBUG
+            printf("****\n");
+            usleep(300000);
+#endif
+         }
       }
 		
    } /* end of while */
