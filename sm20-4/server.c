@@ -28,11 +28,12 @@ int main( int argc, char *argv[] ) {
    int sockfd, newsockfd, port, clilen;
 //   char buffer[256];
    struct sockaddr_in serv_addr, cli_addr;
-   int pid;
-   int wstatus;
+   pid_t pid, w;
+//   int wstatus;
    char key[80];
    int serial;
-   
+   siginfo_t infop;
+
    serial=0;
 
    if(   (argc!=3)
@@ -100,12 +101,30 @@ int main( int argc, char *argv[] ) {
       }
       else {
          close(newsockfd);
-         while((pid=wait(&wstatus))>0) {
+         for(;;) {
+            infop.si_pid = 0;
+            w = waitid(P_ALL, -1, &infop, WNOHANG|WEXITED);
+            if (w == -1) {
+               perror("waitid");
+               break;
+            }
+            if(!infop.si_pid) {
+               break;
+            }
+            switch(infop.si_code) {
+               case CLD_EXITED:
+               case CLD_KILLED:
+               case CLD_DUMPED:
+               case CLD_STOPPED:
+               case CLD_TRAPPED:
+               case CLD_CONTINUED:
+                  break;
+            }
+         }
 #if DEBUG
             printf("****\n");
-            usleep(300000);
+            usleep(999);
 #endif
-         }
       }
 		
    } /* end of while */

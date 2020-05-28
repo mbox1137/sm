@@ -15,63 +15,81 @@
 #include "server.h"
 
 void task (int sock, int serial, char* key) {
-   int n, nn, max;
+   int n, nn, max, num;
    char buf[256];
+   char str[80];
+   pid_t mypid;
 
+   mypid=getpid();
    bzero(buf,256);
-
+//------------------------------------------ -> KEY SERIAL
    sprintf(buf,"%s\r\n",key);
    nn=strlen(buf);
    n = write(sock,buf,nn);
    if (n < 0) {
-      perror("ERROR writing to socket");
+      sprintf(str, "%d(%d): ERROR writing to socket", serial, mypid);
+      perror(str);
       exit(1);
    }
-
    sprintf(buf,"%d\r\n",serial);
    nn=strlen(buf);
    n = write(sock,buf,nn);
    if (n < 0) {
-      perror("ERROR writing to socket");
+      sprintf(str, "%d(%d): ERROR writing to socket", serial, mypid);
+      perror(str);
       exit(1);
    }
-
+//------------------------------------------ <- MAX ->
    n = read(sock,buf,255);
    if (n < 0) {
-      perror("ERROR reading from socket");
+      sprintf(str, "%d(%d): ERROR reading MAX", serial, mypid);
+      perror(str);
       exit(1);
    }
 #if DEBUG
-   fprintf(stderr, "buf=%s\n", buf);
+   fprintf(stderr, "%d(%d): buf(MAX)=%s\n", serial, mypid, buf);
 #endif
    if(sscanf(buf, "%d", &max)!=1) {
-      perror("Invalid max");
+      sprintf(str, "%d(%d): Invalid max", serial, mypid);
+      perror(str);
       exit(1);
    }
 #if DEBUG
-   fprintf(stderr, "max=%d\n", max);
+   fprintf(stderr, "%d(%d): max=%d\n", serial, mypid, max);
 #endif
    sprintf(buf,"%d\r\n",max);
    nn=strlen(buf);
    n = write(sock,buf,nn);
    if (n < 0) {
-      perror("ERROR writing to socket");
+      sprintf(str, "%d(%d): ERROR writing to socket", serial, mypid);
+      perror(str);
       exit(1);
    }
-
+//------------------------------------------ NUM
+   for(;;) {
+      n = read(sock,buf,255);
+      if (n < 0) {
+         sprintf(str, "%d(%d): ERROR reading NUM", serial, mypid);
+         perror(str);
+         close(sock);
+         exit(1);
+      }
+      if (n == 0) {
+         break;
+      }
+#if DEBUG
+      fprintf(stderr, "%d(%d): buf(NUM)=%s\n", serial, mypid, buf);
+#endif
+      if(sscanf(buf, "%d", &num)!=1) {
+         sprintf(str, "%d(%d): Invalid num", serial, mypid);
+         perror(str);
+         close(sock);
+         exit(1);
+      }
+#if DEBUG
+      fprintf(stderr, "%d(%d): num=%d\n", serial, mypid, num);
+#endif
+   }
+   close(sock);
    return;
-
-   n = read(sock,buf,255);
-   if (n < 0) {
-      perror("ERROR reading from socket");
-      exit(1);
-   }
-
-   printf("Here is the message: %s\n",buf);
-   n = write(sock,"I got your message",18);
-   if (n < 0) {
-      perror("ERROR writing to socket");
-      exit(1);
-   }
-	
 }
