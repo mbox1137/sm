@@ -21,6 +21,7 @@ https://www.opennet.ru/openforum/vsluhforumID1/77819.html
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <errno.h>
 
 #include <netdb.h>
 #include <netinet/in.h>
@@ -28,12 +29,21 @@ https://www.opennet.ru/openforum/vsluhforumID1/77819.html
 #include "server.h"
 
 void clean_up_child_process(int signal_number) {
- int status;
- wait(&status);
+   int status;
+   wait(&status);
+}
+
+static int newsockfd, sockfd;
+
+void sigINT_TERM(int signal_number) {
+   close(sockfd);
+   close(newsockfd);
+   kill(getpid(), SIGTERM);
 }
 
 int main( int argc, char *argv[] ) {
-   int sockfd, newsockfd, port, clilen;
+//   int sockfd, newsockfd, port, clilen;
+   int port, clilen;
 //   char buffer[256];
    struct sockaddr_in serv_addr, cli_addr;
    pid_t pid;
@@ -60,14 +70,19 @@ int main( int argc, char *argv[] ) {
    memset(&sigchld_action, 0, sizeof(sigchld_action));
    sigchld_action.sa_handler = &clean_up_child_process;
    sigaction(SIGCHLD, &sigchld_action, NULL);
+   sigchld_action.sa_handler = &sigINT_TERM;
+   sigaction(SIGINT, &sigchld_action, NULL);
    
    /* First call to socket() function */
-   sockfd = socket(AF_INET, SOCK_STREAM, 0);
+   sockfd = socket(AF_INET, SOCK_STREAM /*| SOCK_CLOEXEC*/ , 0);
    
    if (sockfd < 0) {
       perror("ERROR opening socket");
       exit(1);
    }
+
+   if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR|SO_REUSEPORT, &(int){1}, sizeof(int)) < 0)
+      perror("setsockopt(SO_REUSE{ADDR,PORT}) failed");
    
    /* Initialize socket structure */
    bzero((char *) &serv_addr, sizeof(serv_addr));
@@ -91,8 +106,10 @@ int main( int argc, char *argv[] ) {
    clilen = sizeof(cli_addr);
    
    while (1) {
-      newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-		
+//      newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
+      while ((newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen)) == -1 
+         && errno == EINTR)
+          continue;
       if (newsockfd < 0) {
          perror("ERROR on accept");
          exit(1);
