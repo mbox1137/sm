@@ -2,6 +2,9 @@
 
 //Unix Socket - Server Examples
 //https://www.tutorialspoint.com/unix_sockets/socket_server_example.htm
+
+//Antizombie: Асинхронное удаление дочерних процессов
+//https://it.wikireading.ru/34213
 /*
 https://www.opennet.ru/openforum/vsluhforumID1/77819.html
 ...
@@ -24,6 +27,11 @@ https://www.opennet.ru/openforum/vsluhforumID1/77819.html
 
 #include "server.h"
 
+void clean_up_child_process(int signal_number) {
+ int status;
+ wait(&status);
+}
+
 int main( int argc, char *argv[] ) {
    int sockfd, newsockfd, port, clilen;
 //   char buffer[256];
@@ -34,6 +42,7 @@ int main( int argc, char *argv[] ) {
    char key[80];
    int serial;
 //   siginfo_t infop;
+ struct sigaction sigchld_action;
 
    serial=0;
 
@@ -48,6 +57,10 @@ int main( int argc, char *argv[] ) {
 #if DEBUG
             printf("PORT=%d KEY=%s\n", port, key);
 #endif
+   memset(&sigchld_action, 0, sizeof(sigchld_action));
+   sigchld_action.sa_handler = &clean_up_child_process;
+   sigaction(SIGCHLD, &sigchld_action, NULL);
+   
    /* First call to socket() function */
    sockfd = socket(AF_INET, SOCK_STREAM, 0);
    
@@ -78,11 +91,6 @@ int main( int argc, char *argv[] ) {
    clilen = sizeof(cli_addr);
    
    while (1) {
-      for(;;) {
-         if(waitpid(-1, NULL, WNOHANG) > 0) {
-            continue;
-         }
-      }
       newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
 		
       if (newsockfd < 0) {
