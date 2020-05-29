@@ -19,6 +19,7 @@ void task (int sock, int serial, char* key) {
    char buf[256];
    char str[80];
    pid_t mypid;
+   int numplusserial;
 
    mypid=getpid();
    bzero(buf,256);
@@ -89,6 +90,27 @@ void task (int sock, int serial, char* key) {
 #if DEBUG
       fprintf(stderr, "%d(%d): num=%d\n", serial, mypid, num);
 #endif
+      if(num > max || __builtin_add_overflow(num, serial, &numplusserial)) {
+         sprintf(buf,"%d\r\n",-1);
+         nn=strlen(buf);
+         n = write(sock,buf,nn);
+         if (n < 0) {
+            sprintf(str, "%d(%d): ERROR writing to socket", serial, mypid);
+            perror(str);
+            exit(1);
+         }
+         close(sock);
+         exit(1);
+      } else {
+         sprintf(buf,"%d\r\n",numplusserial);
+         nn=strlen(buf);
+         n = write(sock,buf,nn);
+         if (n < 0) {
+            sprintf(str, "%d(%d): ERROR writing to socket", serial, mypid);
+            perror(str);
+            exit(1);
+         }
+      }
    }
    close(sock);
    return;
