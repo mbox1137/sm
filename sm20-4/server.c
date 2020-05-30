@@ -1,4 +1,4 @@
-#define DEBUG 1
+#define DEBUG 0
 
 //Unix Socket - Server Examples
 //https://www.tutorialspoint.com/unix_sockets/socket_server_example.htm
@@ -41,12 +41,19 @@ void sigINT_TERM(int signal_number) {
    kill(getpid(), SIGTERM);
 }
 
+void sigTERM(int signal_number) {
+//   close(sockfd);
+//   close(newsockfd);
+   kill(0, SIGTERM);
+   exit(0);
+}
+
 int main( int argc, char *argv[] ) {
 //   int sockfd, newsockfd, port, clilen;
    int port, clilen;
 //   char buffer[256];
    struct sockaddr_in serv_addr, cli_addr;
-   pid_t pid;
+   pid_t pid, pgid;
 //   int w;
 //   int wstatus;
    char key[80];
@@ -72,6 +79,8 @@ int main( int argc, char *argv[] ) {
    sigaction(SIGCHLD, &sigchld_action, NULL);
    sigchld_action.sa_handler = &sigINT_TERM;
    sigaction(SIGINT, &sigchld_action, NULL);
+   sigchld_action.sa_handler = &sigTERM;
+   sigaction(SIGTERM, &sigchld_action, NULL);
    
    /* First call to socket() function */
    sockfd = socket(AF_INET, SOCK_STREAM /*| SOCK_CLOEXEC*/ , 0);
@@ -126,11 +135,13 @@ int main( int argc, char *argv[] ) {
       
       if (pid == 0) {
          /* This is the client process */
+         pgid = setpgid(getpid(), getpgid(getppid()));
          close(sockfd);
          task(newsockfd, serial, key);
          exit(0);
       }
       else {
+         pgid = setpgid(getpid(), getpid());
          close(newsockfd);
 #if DEBUG
             printf("****\n");

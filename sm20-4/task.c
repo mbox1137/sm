@@ -1,4 +1,4 @@
-#define DEBUG 1
+#define DEBUG 0
 
 //Unix Socket - Server Examples
 //https://www.tutorialspoint.com/unix_sockets/socket_server_example.htm
