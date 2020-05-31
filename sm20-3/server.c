@@ -65,7 +65,7 @@ int main( int argc, char *argv[] ) {
          exit(1);
       }
       
-      close(sockfd);
+//      close(sockfd);
       num=task(newsockfd);
       if(!num) break;
       sum+=num;
@@ -75,4 +75,5 @@ int main( int argc, char *argv[] ) {
       usleep(999);
 #endif
    } /* end of while */
+   printf("%d\n", sum);
 }
