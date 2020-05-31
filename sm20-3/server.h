@@ -1,1 +1,1 @@
-void task (int sock);
+int task (int sock);

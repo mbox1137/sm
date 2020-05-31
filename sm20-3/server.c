@@ -20,6 +20,7 @@ void clean_up_child_process(int signal_number) {
 int main( int argc, char *argv[] ) {
    int sockfd, newsockfd, port, clilen;
    struct sockaddr_in serv_addr, cli_addr;
+   int sum, num;
 
    if(   (argc!=2)
       || (sscanf(argv[1],"%d",&port)!=1)
@@ -53,7 +54,8 @@ int main( int argc, char *argv[] ) {
    
    listen(sockfd,5);
    clilen = sizeof(cli_addr);
-   
+   sum=0;
+
    while (1) {
       while ((newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen)) == -1 
          && errno == EINTR)
@@ -64,7 +66,9 @@ int main( int argc, char *argv[] ) {
       }
       
       close(sockfd);
-      task(newsockfd);
+      num=task(newsockfd);
+      if(!num) break;
+      sum+=num;
       close(newsockfd);
 #if DEBUG
       printf("****\n");
