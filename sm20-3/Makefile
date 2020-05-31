@@ -24,9 +24,9 @@ LDFLAGS	= -no-pie -m32 $(GDB)
 #LDFLAGS	= -m elf_i386
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
-EXEC	= client server
-OBJS	= client.o server.o task.o
-SCDRY	= client.s server.s task.s
+EXEC	= server
+OBJS	= server.o task.o
+SCDRY	= server.s task.s
 
 .SECONDARY: $(SCDRY)
 ALL : $(EXEC)

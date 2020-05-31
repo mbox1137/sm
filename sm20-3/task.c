@@ -14,7 +14,7 @@
 
 #include "server.h"
 
-void task (int sock, int serial, char* key) {
+void task (int sock) {
    int n, nn, max, num;
    char buf[256];
    char str[80];
@@ -23,35 +23,18 @@ void task (int sock, int serial, char* key) {
 
    mypid=getpid();
    bzero(buf,256);
-//------------------------------------------ -> KEY SERIAL
-   sprintf(buf,"%s\r\n",key);
-   nn=strlen(buf);
-   n = write(sock,buf,nn);
-   if (n < 0) {
-      sprintf(str, "%d(%d): ERROR writing to socket", serial, mypid);
-      perror(str);
-      exit(1);
-   }
-   sprintf(buf,"%d\r\n",serial);
-   nn=strlen(buf);
-   n = write(sock,buf,nn);
-   if (n < 0) {
-      sprintf(str, "%d(%d): ERROR writing to socket", serial, mypid);
-      perror(str);
-      exit(1);
-   }
 //------------------------------------------ <- MAX ->
    n = read(sock,buf,255);
    if (n < 0) {
-      sprintf(str, "%d(%d): ERROR reading MAX", serial, mypid);
+      sprintf(str, "%d: ERROR reading MAX",  mypid);
       perror(str);
       exit(1);
    }
 #if DEBUG
-   fprintf(stderr, "%d(%d): buf(MAX)=%s\n", serial, mypid, buf);
+   fprintf(stderr, "%d: buf(MAX)=%s\n", mypid, buf);
 #endif
    if(sscanf(buf, "%d", &max)!=1) {
-      sprintf(str, "%d(%d): Invalid max", serial, mypid);
+      sprintf(str, "%d: Invalid max", mypid);
       perror(str);
       exit(1);
    }
@@ -62,7 +45,7 @@ void task (int sock, int serial, char* key) {
    nn=strlen(buf);
    n = write(sock,buf,nn);
    if (n < 0) {
-      sprintf(str, "%d(%d): ERROR writing to socket", serial, mypid);
+      sprintf(str, "%d: ERROR writing to socket", mypid);
       perror(str);
       exit(1);
    }
@@ -70,7 +53,7 @@ void task (int sock, int serial, char* key) {
    for(;;) {
       n = read(sock,buf,255);
       if (n < 0) {
-         sprintf(str, "%d(%d): ERROR reading NUM", serial, mypid);
+         sprintf(str, "%d: ERROR reading NUM", mypid);
          perror(str);
          close(sock);
          exit(1);
@@ -79,23 +62,23 @@ void task (int sock, int serial, char* key) {
          break;
       }
 #if DEBUG
-      fprintf(stderr, "%d(%d): buf(NUM)=%s\n", serial, mypid, buf);
+      fprintf(stderr, "%d(%d): buf(NUM)=%s\n", mypid, buf);
 #endif
       if(sscanf(buf, "%d", &num)!=1) {
-         sprintf(str, "%d(%d): Invalid num", serial, mypid);
+         sprintf(str, "%d: Invalid num", mypid);
          perror(str);
          close(sock);
          exit(1);
       }
 #if DEBUG
-      fprintf(stderr, "%d(%d): num=%d\n", serial, mypid, num);
+      fprintf(stderr, "%d: num=%d\n", mypid, num);
 #endif
-      if(num > max || __builtin_add_overflow(num, serial, &numplusserial)) {
+      if(num > max || __builtin_add_overflow(num, 0, &numplusserial)) {
          sprintf(buf,"%d\r\n",-1);
          nn=strlen(buf);
          n = write(sock,buf,nn);
          if (n < 0) {
-            sprintf(str, "%d(%d): ERROR writing to socket", serial, mypid);
+            sprintf(str, "%d: ERROR writing to socket", mypid);
             perror(str);
             exit(1);
          }
@@ -106,7 +89,7 @@ void task (int sock, int serial, char* key) {
          nn=strlen(buf);
          n = write(sock,buf,nn);
          if (n < 0) {
-            sprintf(str, "%d(%d): ERROR writing to socket", serial, mypid);
+            sprintf(str, "%d: ERROR writing to socket", mypid);
             perror(str);
             exit(1);
          }
