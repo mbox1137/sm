@@ -4,7 +4,7 @@ GDB	= -g
 
 CC	= gcc
 #clang
-CFLAGS	= -m32 -fverbose-asm -Wunused-variable -Werror=return-type -Werror=dangling-else
+CFLAGS	= -m32 -fverbose-asm -Wunused-variable -Werror=return-type -Werror=dangling-else -Werror=pointer-sign -Werror=unused-but-set-variable
 #CFLAGS	= -m32 -fverbose-asm -msse3 -nostdlib
 # -std=c99
 
@@ -25,8 +25,8 @@ LDFLAGS	= -no-pie -m32 $(GDB)
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
 EXEC	= client server
-OBJS	= client.o server.o task.o
-SCDRY	= client.s server.s task.s
+OBJS	= client.o server.o
+SCDRY	= client.s server.s
 
 .SECONDARY: $(SCDRY)
 ALL : $(EXEC)
@@ -34,8 +34,8 @@ ALL : $(EXEC)
 client : client.o Makefile
 	$(LD) $(LDFLAGS) -o client client.o
 
-server : server.o task.o Makefile
-	$(LD) $(LDFLAGS) -o server server.o task.o
+server : server.o Makefile
+	$(LD) $(LDFLAGS) -o server server.o
 
 #$(EXEC) : $(OBJS) Makefile
 #	$(LD) $(LDFLAGS) $(GDB) -o $@ $(OBJS)
