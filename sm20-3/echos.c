@@ -1,3 +1,4 @@
+//man getaddrinfo
 //   Server program
 
        #include <sys/types.h>
