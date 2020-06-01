@@ -13,7 +13,8 @@
 #include "server.h"
 
 int main( int argc, char *argv[] ) {
-   int sockfd, newsockfd, port, clilen;
+   int sockfd, newsockfd, port;
+   socklen_t clilen;
    struct sockaddr_in serv_addr, cli_addr;
    int sum, num;
    char host[132];

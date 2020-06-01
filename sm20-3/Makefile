@@ -4,7 +4,7 @@ GDB	= -g
 
 CC	= gcc
 #clang
-CFLAGS	= -m32 -fverbose-asm -Wunused-variable -Werror=return-type -Werror=dangling-else
+CFLAGS	= -m32 -fverbose-asm -Wunused-variable -Werror=return-type -Werror=dangling-else -Werror=pointer-sign -Werror=unused-but-set-variable
 #CFLAGS	= -m32 -fverbose-asm -msse3 -nostdlib
 # -std=c99
 
