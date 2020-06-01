@@ -25,8 +25,8 @@ LDFLAGS	= -no-pie -m32 $(GDB)
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
 EXEC	= server client echoc echos
-OBJS	= server.o task.o client.o echoc.o echos.o
-SCDRY	= server.s task.s client.s echoc.s echos.s
+OBJS	= server.o client.o echoc.o echos.o
+SCDRY	= server.s client.s echoc.s echos.s
 
 .SECONDARY: $(SCDRY)
 ALL : $(EXEC)
@@ -40,8 +40,8 @@ echos : echos.o Makefile
 client : client.o Makefile
 	$(LD) $(LDFLAGS) -o client client.o
 
-server : server.o task.o Makefile
-	$(LD) $(LDFLAGS) -o server server.o task.o
+server : server.o Makefile
+	$(LD) $(LDFLAGS) -o server server.o
 
 #$(EXEC) : $(OBJS) Makefile
 #	$(LD) $(LDFLAGS) $(GDB) -o $@ $(OBJS)
