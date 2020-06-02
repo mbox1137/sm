@@ -13,14 +13,11 @@
 
 //#include "server.h"
 
-int task (int sock)
+static int task (int sfd, int argc, char** argv)
 {
-    int n, nn, num;
+    int nn, num, j, len;
     char buf[256];
-    char str[80];
-    pid_t mypid;
 
-    mypid = getpid();
     bzero(buf,256);
 
 #if ASCII
@@ -46,48 +43,46 @@ int task (int sock)
     }
     fprintf(stderr, "%d: num=%d\n", mypid, num);
 #else
-    nn = 4;
-//    n = read(sock,buf,nn);
-    n = recv(sock,buf,nn, 0);
-    if (n != nn)
-    {
-        sprintf(str, "%d: ERROR reading NUM", mypid);
-        perror(str);
-        close(sock);
-        exit(1);
-    }
-
-    if (n == 0)
-        return 0;
-
-    num = ntohl(*((int*)buf));
+           for (j = 3; j < argc; j++) {
+               printf("argv[%d] = %s\n", j, argv[j]);
+               sscanf(argv[j], "%d", &num);
+               num = htonl(num);
+               printf("num = %d\n", ntohl(num));
+               len = 4;
+               nn=write(sfd, &num, len);
+//               nn=send(sfd, (const void *)(&num), len, 0);
+               fprintf(stderr, "len=%d nn=%d\n",len,nn);
+               if (nn != len) {
+                   perror("write");
+                   exit(EXIT_FAILURE);
+               }
+//               fsync(sfd);
+           }
+           exit(EXIT_SUCCESS);
 #endif
-
-    close(sock);
-    return num;
-}
-
-void clean_up_child_process(int signal_number)
-{
-    int status;
-    wait(&status);
+    close(sfd);
+    return(0);
 }
 
 int main(int argc, char *argv[])
 {
-    int sockfd, newsockfd, port;
+    int sockfd, fd, port;
     socklen_t clilen;
     struct sockaddr_in serv_addr, cli_addr;
     int sum, num;
+    char host[132];
 
-    if ((argc != 2) || (sscanf(argv[1], "%d", &port) != 1))
+    if ((argc > 2)
+        || (sscanf(argv[1], "%s", host) != 1)
+        || (sscanf(argv[2], "%d", &port) != 1)
+        )
     {
         fprintf(stderr, "%s 5001\n", argv[0]);
         return 1;
     }
 
 #if DEBUG
-    printf("PORT=%d\n", port);
+    printf("%s:%d\n", host, port);
 #endif
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -112,35 +107,29 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    listen(sockfd, 5);
     clilen = sizeof(cli_addr);
     sum = 0;
 
-    while (1)
+    for(;;)
     {
-        while ((newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen)) == -1 && errno == EINTR)
-            continue;
-        if (newsockfd < 0)
+        fd=connect(sockfd, (struct sockaddr *) &cli_addr, clilen);
+        if (fd < 0)
         {
-            perror("ERROR on accept");
+            perror("ERROR on connect");
             exit(1);
         }
-
-        num=task(newsockfd);
-
+#if DEBUG
+        printf("task\n");
+#endif
+        num = task(sockfd, argc, argv);
         if (!num)
             break;
-
         sum += num;
-        close(newsockfd);
-
+        close(sockfd);
 #if DEBUG
-      printf("****\n");
-      usleep(999);
+        printf("****\n");
 #endif
-
     }
-
     printf("%d\n", sum);
 }
 

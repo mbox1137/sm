@@ -1,4 +1,4 @@
-#define DEBUG 1
+#define DEBUG 0
 #define ASCII 0
 
 #include <stdio.h>
@@ -47,8 +47,8 @@ int task (int sock)
     fprintf(stderr, "%d: num=%d\n", mypid, num);
 #else
     nn = 4;
-//    n = read(sock,buf,nn);
-    n = recv(sock,buf,nn, 0);
+    n = read(sock,buf,nn);
+//    n = recv(sock,buf,nn, 0);
     if (n != nn)
     {
         sprintf(str, "%d: ERROR reading NUM", mypid);
