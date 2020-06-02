@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
     }
 
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR|SO_REUSEPORT, &(int){1}, sizeof(int)) < 0)
-      perror("setsockopt(SO_REUSE{ADDR,PORT}) failed");
+        perror("setsockopt(SO_REUSE{ADDR,PORT}) failed");
 
     bzero((char *) &serv_addr, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
@@ -133,8 +133,8 @@ int main(int argc, char *argv[])
         close(newsockfd);
 
 #if DEBUG
-      printf("****\n");
-      usleep(999);
+        printf("****\n");
+        usleep(999);
 #endif
 
     }
