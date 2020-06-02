@@ -1,104 +1,148 @@
-//man getaddrinfo
-//   Client program
+#define DEBUG 1
+#define ASCII 0
 
-       #include <sys/types.h>
-       #include <sys/socket.h>
-       #include <netdb.h>
-       #include <stdio.h>
-       #include <stdlib.h>
-       #include <unistd.h>
-       #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <errno.h>
 
-       #define BUF_SIZE 500
+#include <netdb.h>
+#include <netinet/in.h>
 
-       int
-       main(int argc, char *argv[])
-       {
-           struct addrinfo hints;
-           struct addrinfo *result, *rp;
-           int sfd, s, j, num;
-           size_t len;
-/*
-           ssize_t nread;
-           char buf[BUF_SIZE];
-*/
-           if (argc < 3) {
-               fprintf(stderr, "Usage: %s host port msg...\n", argv[0]);
-               exit(EXIT_FAILURE);
-           }
+//#include "server.h"
 
-           /* Obtain address(es) matching host/port */
+int task (int sock)
+{
+    int n, nn, num;
+    char buf[256];
+    char str[80];
+    pid_t mypid;
 
-           memset(&hints, 0, sizeof(struct addrinfo));
-           hints.ai_family = AF_UNSPEC;    /* Allow IPv4 or IPv6 */
-           hints.ai_socktype = SOCK_DGRAM; /* Datagram socket */
-           hints.ai_flags = 0;
-           hints.ai_protocol = 0;          /* Any protocol */
+    mypid = getpid();
+    bzero(buf,256);
 
-           s = getaddrinfo(argv[1], argv[2], &hints, &result);
-           if (s != 0) {
-               fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
-               exit(EXIT_FAILURE);
-           }
+#if ASCII
+    nn = 255;
+    n = read(sock,buf,nn);
+    if (n == 0)
+        return 0;
 
-           /* getaddrinfo() returns a list of address structures.
-              Try each address until we successfully connect(2).
-              If socket(2) (or connect(2)) fails, we (close the socket
-              and) try the next address. */
+    if (n < 0)
+    {
+        sprintf(str, "%d: ERROR reading NUM", mypid);
+        perror(str);
+        close(sock);
+        exit(1);
+    }
 
-           for (rp = result; rp != NULL; rp = rp->ai_next) {
-               sfd = socket(rp->ai_family, rp->ai_socktype,
-                            rp->ai_protocol);
-               if (sfd == -1)
-                   continue;
+    if (sscanf(buf, "%d", &num) != 1)
+    {
+        sprintf(str, "%d: Invalid num", mypid);
+        perror(str);
+        close(sock);
+        exit(1);
+    }
+    fprintf(stderr, "%d: num=%d\n", mypid, num);
+#else
+    nn = 4;
+//    n = read(sock,buf,nn);
+    n = recv(sock,buf,nn, 0);
+    if (n != nn)
+    {
+        sprintf(str, "%d: ERROR reading NUM", mypid);
+        perror(str);
+        close(sock);
+        exit(1);
+    }
 
-               if (connect(sfd, rp->ai_addr, rp->ai_addrlen) != -1)
-                   break;                  /* Success */
+    if (n == 0)
+        return 0;
 
-               close(sfd);
-           }
+    num = ntohl(*((int*)buf));
+#endif
 
-           if (rp == NULL) {               /* No address succeeded */
-               fprintf(stderr, "Could not connect\n");
-               exit(EXIT_FAILURE);
-           }
+    close(sock);
+    return num;
+}
 
-           freeaddrinfo(result);           /* No longer needed */
+void clean_up_child_process(int signal_number)
+{
+    int status;
+    wait(&status);
+}
 
-           /* Send remaining command-line arguments as separate
-              datagrams, and read responses from server */
+int main(int argc, char *argv[])
+{
+    int sockfd, newsockfd, port;
+    socklen_t clilen;
+    struct sockaddr_in serv_addr, cli_addr;
+    int sum, num;
 
+    if ((argc != 2) || (sscanf(argv[1], "%d", &port) != 1))
+    {
+        fprintf(stderr, "%s 5001\n", argv[0]);
+        return 1;
+    }
 
-           for (j = 3; j < argc; j++) {
-/*               len = strlen(argv[j]) + 1;
-                        +1 for terminating null byte
+#if DEBUG
+    printf("PORT=%d\n", port);
+#endif
 
-               if (len > BUF_SIZE) {
-                   fprintf(stderr,
-                           "Ignoring long message in argument %d\n", j);
-                   continue;
-               }
-*/
-               printf("argv[%d] = %s\n", j, argv[j]);
-               sscanf(argv[j], "%d", &num);
-               num = htonl(num);
-               printf("num = %d\n", ntohl(num));
-               len = 4;
-               if (write(sfd, &num, len) != len) {
-                   fprintf(stderr, "partial/failed write\n");
-                   exit(EXIT_FAILURE);
-               }
-               fsync(sfd);
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
-/*               nread = read(sfd, buf, BUF_SIZE);
-               if (nread == -1) {
-                   perror("read");
-                   exit(EXIT_FAILURE);
-               }
+    if (sockfd < 0)
+    {
+        perror("ERROR opening socket");
+        exit(1);
+    }
 
-               printf("Received %zd bytes: %s\n", nread, buf);
-*/
-           }
+    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR|SO_REUSEPORT, &(int){1}, sizeof(int)) < 0)
+      perror("setsockopt(SO_REUSE{ADDR,PORT}) failed");
 
-           exit(EXIT_SUCCESS);
-       }
+    bzero((char *) &serv_addr, sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_addr.s_addr = INADDR_ANY;
+    serv_addr.sin_port = htons(port);
+
+    if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
+    {
+        perror("ERROR on binding");
+        exit(1);
+    }
+
+    listen(sockfd, 5);
+    clilen = sizeof(cli_addr);
+    sum = 0;
+
+    while (1)
+    {
+        while ((newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen)) == -1 && errno == EINTR)
+            continue;
+        if (newsockfd < 0)
+        {
+            perror("ERROR on accept");
+            exit(1);
+        }
+
+        num=task(newsockfd);
+
+        if (!num)
+            break;
+
+        sum += num;
+        close(newsockfd);
+
+#if DEBUG
+      printf("****\n");
+      usleep(999);
+#endif
+
+    }
+
+    printf("%d\n", sum);
+}
+
+//https://www.tutorialspoint.com/unix_sockets/socket_server_example.htm
+
