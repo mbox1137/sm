@@ -1,5 +1,6 @@
 #include <string.h>
 #include <sys/wait.h>
+#include <stdlib.h>
 
 #include <sys/signalfd.h>
 #include <sys/timerfd.h>
@@ -31,7 +32,7 @@ int run(const char* cmd,
     memset(&sigchld_action, 0, sizeof(sigchld_action));
     sigchld_action.sa_handler = &clean_up_child_process;
     sigaction(SIGCHLD, &sigchld_action, NULL);
-    *poutput=malloc(1);
-    *perror=malloc(1);
+    *poutput=calloc(1,1);
+    *perror=calloc(1,1);
     return(retval);
 }

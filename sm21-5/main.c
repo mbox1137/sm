@@ -11,8 +11,8 @@ int main(int argc, char** argv) {
     int tout;
 
     tout=1000;
-    printf("cmd=%s\n",out);
-    printf("inp=%s\n",out);
+    printf("cmd=%s\n",cmd);
+    printf("inp=%s\n",inp);
     rv=run(cmd, inp, &out, &err, tout);
     printf("rv=%d\n",rv);
     printf("out=%s\n",out);
