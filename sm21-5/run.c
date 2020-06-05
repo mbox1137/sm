@@ -1,6 +1,6 @@
 #include <string.h>
-#include <sys/wait.h>
 #include <stdlib.h>
+#include <sys/wait.h>
 
 #include <sys/signalfd.h>
 #include <sys/timerfd.h>
