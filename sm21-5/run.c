@@ -31,5 +31,7 @@ int run(const char* cmd,
     memset(&sigchld_action, 0, sizeof(sigchld_action));
     sigchld_action.sa_handler = &clean_up_child_process;
     sigaction(SIGCHLD, &sigchld_action, NULL);
+    *poutput=malloc(1);
+    *perror=malloc(1);
     return(retval);
 }
