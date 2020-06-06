@@ -30,10 +30,11 @@ void* tfun(void *args) {
 int main(int argc, char** argv) {
     pthread_t *threads;
     int status;
-    int status_addr;
     int k,n;
     int sum;
-    
+    args_t *pa;
+    void *out_void;
+
     if(argc!=2 || sscanf(argv[1],"%d",&n)!=1) {
         fprintf(stderr,"%s 3\n",argv[0]);
         return(1);
@@ -55,12 +56,13 @@ int main(int argc, char** argv) {
     }
     sum=0;
     for(k=0; k<n; k++) {
-        status = pthread_join(threads[k], (void**)&status_addr);
+        status = pthread_join(threads[k], &out_void);
         if (status) {
             printf("main error: can't join thread, status = %d\n", status);
             exit(-12);
         }
-        sum+=((args_t*)status_addr)->n;
+        pa=out_void;
+        sum+=pa->n;
     }
     printf("%d\n",sum);
     free(threads);
