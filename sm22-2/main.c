@@ -11,14 +11,12 @@ void* tfun(void *args) {
     pthread_t thread;
     int status;
     int status_addr;
-    args_t a;
-    a=*((args_t*)args);
+    int n;
 
-    printf("%d\n",a.n);
-    a.n++;
-    if(a.n>9)
+    if(scanf("%d",&n)!=1)
         return(NULL);
-    status = pthread_create(&thread, NULL, tfun, &a);
+
+    status = pthread_create(&thread, NULL, tfun, NULL);
     if (status != 0) {
         printf("main error: can't create thread, status = %d\n", status);
         exit(-11);
@@ -30,6 +28,7 @@ void* tfun(void *args) {
         exit(-12);
     }
 
+    printf("%d\n",n);
     return(NULL);
 }
 

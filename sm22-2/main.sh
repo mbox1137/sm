@@ -1,3 +1,3 @@
 #!/bin/bash
 
-./main
+echo 1 2 3 4 |./main
