@@ -1,3 +1,5 @@
+//https://sodocumentation.net/ru/pthreads
+
 #define DEBUG 1
 
 #include <stdio.h>
