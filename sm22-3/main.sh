@@ -8,3 +8,7 @@
 ./sum.py <main.dat
 ./main 3 <main.dat
 
+echo {1..9999} >main.dat
+./sum.py <main.dat
+./main 500 <main.dat
+
