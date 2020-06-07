@@ -1,6 +1,6 @@
 //https://sodocumentation.net/ru/pthreads
 
-#define DEBUG 1
+#define DEBUG 0
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,7 +21,7 @@ void* tfun(void *args) {
         exit(-14);
     }
     sum=0;
-    while(scanf("d", &num)==1) {
+    while(scanf("%d", &num)==1) {
         sum+=num;
         sched_yield();
     }
