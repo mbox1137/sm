@@ -5,7 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include <sched.h>
+//#include <sched.h>
+#include <sys/eventfd.h>
+#include <unistd.h>
 //pthread_create pthread_join
 
 typedef struct {
@@ -14,15 +16,22 @@ typedef struct {
 
 static pthread_t *threads;
 static int nn;
+static eventfd_t ev;
 
 void* tfun(void *args) {
     int n;
+    uint64_t x;
     if(((args_t*)args)->n >=0) {
         n=((args_t*)args)->n;
         return(args);
     }
-    if(n!=nn)
-        return(args);
+    for(;;) {
+        if(read(ev, &x, sizeof(uint64_t)) != sizeof(uint64_t)){
+            continue;
+        }
+        if(n!=nn)
+            continue;
+        }
     return(args);
 }
 
@@ -43,6 +52,8 @@ int main(int argc, char** argv) {
 #if DEBUG
     printf("n=%d\n",n);
 #endif    
+    ev=eventfd(0, 0);
+    nn=0;
     for(k=0; k<n; k++) {
         status = pthread_create(&threads[k], NULL, tfun, NULL);
         if (status != 0) {
@@ -58,5 +69,6 @@ int main(int argc, char** argv) {
         }
     }
     free(threads);
+    close(ev);
     return(0);
 }
