@@ -32,10 +32,7 @@ void* tfun(void *args) {
     struct pollfd fds[1];
     int nse;
 
-    if(((args_t*)args)->n >=0) {
-        n=((args_t*)args)->n;
-        return(args);
-    }
+    n=((args_t*)args)->n;
     for(;;) {
         fds[0].fd=ev;
         fds[0].events=POLLIN;
@@ -55,6 +52,7 @@ void* tfun(void *args) {
             }
 /*
 */
+            x=1;
             if(write(ev, &x, sizeof(uint64_t)) != sizeof(uint64_t)){
                 perror("write(ev,...");
                 exit(-18);
@@ -69,6 +67,7 @@ int main(int argc, char** argv) {
     int k,n;
     void *out_void;
     uint64_t x;
+    args_t args;
 
     if(argc!=2 || sscanf(argv[1],"%d",&n)!=1) {
         fprintf(stderr,"%s 3 <stdin.txt\n",argv[0]);
@@ -90,7 +89,9 @@ int main(int argc, char** argv) {
         exit(-14);
     }
     for(k=0; k<n; k++) {
-        status = pthread_create(&threads[k], NULL, tfun, NULL);
+        args.n=k;
+/* ? */
+        status = pthread_create(&threads[k], NULL, tfun, &args);
         if (status != 0) {
             printf("main error: can't create thread, status = %d\n", status);
             exit(-11);
