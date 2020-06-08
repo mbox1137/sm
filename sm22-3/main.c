@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <sched.h>
+#include <unistd.h>
 
 typedef struct
 {
@@ -62,9 +63,13 @@ int main(int argc, char* argv[])
     printf("n=%d\n", n);
 #endif
 
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setstacksize(&attr, sysconf(_SC_THREAD_STACK_MIN));
+
     for(k = 0; k < n; k++)
     {
-        status = pthread_create(&threads[k], NULL, tfun, NULL);
+        status = pthread_create(&threads[k], &attr, tfun, NULL);
         if (status != 0)
         {
             printf("main error: can't create thread, status = %d\n", status);
