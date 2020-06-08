@@ -1,4 +1,5 @@
 //https://sodocumentation.net/ru/pthreads
+//https://learnc.info/c/pthreads_mutex_introduction.html
 
 #define DEBUG 0
 
