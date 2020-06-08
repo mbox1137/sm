@@ -19,7 +19,7 @@ ASFLAGS	= -c --32
 #ASFLAGS	= -m32 -c
 
 LD	= $(CXX)
-LDFLAGS	= -no-pie -m32 $(GDB) -lpthread
+LDFLAGS	= -no-pie -m32 $(GDB) -lpthread -pthread
 #LD	= ld
 #LDFLAGS	= -m elf_i386
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
