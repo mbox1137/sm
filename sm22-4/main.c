@@ -34,6 +34,9 @@ void* tfun(void *args) {
     int val;
 
     n=((args_t*)args)->n;
+#if DEBUG
+    printf("n=%d\n",n);
+#endif    
     for(;;) {
         fds[0].fd=ev;
         fds[0].events=POLLIN;
@@ -72,7 +75,7 @@ int main(int argc, char** argv) {
     int k;
     void *out_void;
     uint64_t x;
-    args_t args;
+    args_t *args;
 
     if(argc!=2 || sscanf(argv[1],"%d",&nn)!=1) {
         fprintf(stderr,"%s 3 <stdin.txt\n",argv[0]);
@@ -80,7 +83,12 @@ int main(int argc, char** argv) {
     }
     threads=malloc(nn*sizeof(pthread_t));
     if(threads==NULL) {
-        perror("malloc");
+        perror("malloc threads");
+        exit(-13);
+    }
+    args=malloc(nn*sizeof(args_t));
+    if(threads==NULL) {
+        perror("malloc args");
         exit(-13);
     }
 #if DEBUG
@@ -94,14 +102,17 @@ int main(int argc, char** argv) {
         exit(-14);
     }
     for(k=0; k<nn; k++) {
-        args.n=k;
+        args[k].n=k;
 /* ? */
-        status = pthread_create(&threads[k], NULL, tfun, &args);
+        status = pthread_create(&threads[k], NULL, tfun, &args[k]);
         if (status != 0) {
             printf("main error: can't create thread, status = %d\n", status);
             exit(-11);
         }
     }
+#if DEBUG
+    printf("started...\n",nn);
+#endif    
     for(k=0; k<nn; k++) {
         status = pthread_join(threads[k], &out_void);
         if (status) {
@@ -110,6 +121,7 @@ int main(int argc, char** argv) {
         }
     }
     free(threads);
+    free(args);
     close(ev);
     return(0);
 }
