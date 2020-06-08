@@ -1,6 +1,6 @@
 //https://sodocumentation.net/ru/pthreads
 
-#define DEBUG 1
+#define DEBUG 0
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,7 +27,7 @@ static int ncur, nn;
 static eventfd_t ev;
 
 void* tfun(void *args) {
-    int n;
+    int n, k;
     uint64_t x;
     struct pollfd fds[1];
     int nse;
@@ -66,6 +66,11 @@ void* tfun(void *args) {
                 exit(-18);
             }
         }
+    }
+    for(k=0; k<nn; k++) {
+        if(k==ncur)
+            continue;
+        pthread_cancel(threads[k]);
     }
     return(args);
 }
