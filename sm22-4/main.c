@@ -53,6 +53,7 @@ void* tfun(void *args) {
             }
             if(scanf("%d", &val)==1) {
                 printf("%d %d\n", n, val);
+                ncur=val%nn;
             } else {
                 break;
             }
