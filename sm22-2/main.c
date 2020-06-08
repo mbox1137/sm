@@ -2,16 +2,10 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-typedef struct
-{
-    int num;
-} Argst;
-
 void* tfun(void *args)
 {
     pthread_t thread;
     int status;
-    int status_addr;
     int n;
 
     if (scanf("%d", &n) != 1)
@@ -25,7 +19,7 @@ void* tfun(void *args)
         exit(-1);
     }
 
-    status = pthread_join(thread, (void**)&status_addr);
+    status = pthread_join(thread, NULL);
 
     if (status)
     {
@@ -40,8 +34,7 @@ void* tfun(void *args)
 
 int main(int argc, char* argv[])
 {
-    Argst args;
-    tfun(&args);
+    tfun(NULL);
 
     return 0;
 }
