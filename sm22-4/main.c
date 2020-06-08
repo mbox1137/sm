@@ -44,23 +44,23 @@ void* tfun(void *args) {
         if(nse<0) {
             perror("poll");
             exit(-15);
-            } else if(nse==0) {
+        } else if(nse==0) {
+            continue;
+        } else if(fds[0].revents == POLLIN) {
+            if(n!=nn)
                 continue;
-            } else if(fds[0].revents == POLLIN) {
-                if(n!=nn)
-                    continue;
-                if(read(ev, &x, sizeof(uint64_t)) != sizeof(uint64_t)){
-                    perror("read(ev,...");
-                    exit(-17);
-                }
+             if(read(ev, &x, sizeof(uint64_t)) != sizeof(uint64_t)){
+                perror("read(ev,...");
+                exit(-17);
+            }
 /*
 */
-                if(write(ev, &x, sizeof(uint64_t)) != sizeof(uint64_t)){
-                    perror("write(ev,...");
-                    exit(-18);
-                }
+            if(write(ev, &x, sizeof(uint64_t)) != sizeof(uint64_t)){
+                perror("write(ev,...");
+                exit(-18);
             }
         }
+    }
     return(args);
 }
 
