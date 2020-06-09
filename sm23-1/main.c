@@ -13,6 +13,9 @@
 #include <poll.h>
 //pthread_create pthread_join
 
+static const int nn=3;
+static const int ni=1000000;
+
 typedef struct use_mutex_tag {
     pthread_mutex_t mutex;
 } use_mutex_t;
@@ -24,16 +27,10 @@ void* tfun(void *args) {
 }
 
 int main(int argc, char** argv) {
-    int k, nn;
+    int k;
     int status;
     use_mutex_t um;
     pthread_t thread;
-
-    status=pthread_mutex_init(&(um.mutex), NULL);
-    if(argc!=2 || sscanf(argv[1],"%d",&nn)!=1) {
-        fprintf(stderr,"%s 3 <stdin.txt\n",argv[0]);
-        return(1);
-    }
 
     for(k=0; k<nn; k++) {
         status = pthread_create(&thread, NULL, tfun, &um);
