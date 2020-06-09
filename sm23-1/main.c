@@ -12,13 +12,7 @@
 //#include <sys/select.h>
 #include <poll.h>
 //pthread_create pthread_join
-/*
-typedef struct {
-    int   fd;         // file descriptor
-    short events;     // requested events
-    short revents;    // returned events
-    } pollfd_t;
-*/
+
 typedef struct {
     int n;
 } args_t;
@@ -26,6 +20,7 @@ typedef struct {
 static pthread_t *threads;
 static int ncur, nn;
 static eventfd_t ev;
+static pthread_mutex_t mut;
 
 void* tfun(void *args) {
     int n, k;
@@ -83,6 +78,10 @@ int main(int argc, char** argv) {
     uint64_t x;
     args_t *args;
 
+    status=pthread_mutex_init(&mut, NULL);
+    pthread_mutex_lock(&mut);
+    pthread_mutex_unlock(&mut);
+
     if(argc!=2 || sscanf(argv[1],"%d",&nn)!=1) {
         fprintf(stderr,"%s 3 <stdin.txt\n",argv[0]);
         return(1);
@@ -129,5 +128,6 @@ int main(int argc, char** argv) {
     free(threads);
     free(args);
     close(ev);
+    pthread_mutex_destroy(&mut);
     return(0);
 }
