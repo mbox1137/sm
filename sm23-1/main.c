@@ -13,103 +13,30 @@
 #include <poll.h>
 //pthread_create pthread_join
 
-typedef struct {
-    int n;
-} args_t;
-
-static pthread_t *threads;
-static int ncur, nn;
-static eventfd_t ev;
-static pthread_mutex_t mut;
+typedef struct use_mutex_tag {
+    pthread_mutex_t mutex;
+} use_mutex_t;
 
 void* tfun(void *args) {
-    int n, k;
-    uint64_t x;
-    struct pollfd fds[1];
-    int nse;
-    int val;
-
-    n=((args_t*)args)->n;
-#if DEBUG
-    printf("n=%d\n",n);
-#endif    
-    for(;;) {
-        fds[0].fd=ev;
-        fds[0].events=POLLIN;
-        fds[0].revents=0;
-        nse=poll(fds, 1, 999);	//999 mS
-        if(nse<0) {
-            perror("poll");
-            exit(-15);
-        } else if(nse==0) {
-            continue;
-        } else if(fds[0].revents == POLLIN) {
-            if(n!=ncur)
-                continue;
-            if(read(ev, &x, sizeof(uint64_t)) != sizeof(uint64_t)){
-                perror("read(ev,...");
-                exit(-17);
-            }
-            if(scanf("%d", &val)==1) {
-                printf("%d %d\n", n, val);
-                ncur=val%nn;
-            } else {
-                break;
-            }
-            x=1;
-            if(write(ev, &x, sizeof(uint64_t)) != sizeof(uint64_t)){
-                perror("write(ev,...");
-                exit(-18);
-            }
-        }
-    }
-    for(k=0; k<nn; k++) {
-        if(k==ncur)
-            continue;
-        pthread_cancel(threads[k]);
-    }
+    pthread_mutex_lock(  &(((use_mutex_t*)args)->mutex));
+    pthread_mutex_unlock(&(((use_mutex_t*)args)->mutex));
     return(args);
 }
 
 int main(int argc, char** argv) {
+    int k, nn;
     int status;
-    int k;
-    void *out_void;
-    uint64_t x;
-    args_t *args;
+    use_mutex_t um;
+    pthread_t thread;
 
-    status=pthread_mutex_init(&mut, NULL);
-    pthread_mutex_lock(&mut);
-    pthread_mutex_unlock(&mut);
-
+    status=pthread_mutex_init(&(um.mutex), NULL);
     if(argc!=2 || sscanf(argv[1],"%d",&nn)!=1) {
         fprintf(stderr,"%s 3 <stdin.txt\n",argv[0]);
         return(1);
     }
-    threads=malloc(nn*sizeof(pthread_t));
-    if(threads==NULL) {
-        perror("malloc threads");
-        exit(-13);
-    }
-    args=malloc(nn*sizeof(args_t));
-    if(threads==NULL) {
-        perror("malloc args");
-        exit(-13);
-    }
-#if DEBUG
-    printf("nn=%d\n",nn);
-#endif    
-    ev=eventfd(0, 0);
-    ncur=0;
-    x=1;
-    if(write(ev, &x, sizeof(uint64_t)) != sizeof(uint64_t)){
-        perror("initial eventfd write");
-        exit(-14);
-    }
+
     for(k=0; k<nn; k++) {
-        args[k].n=k;
-/* ? */
-        status = pthread_create(&threads[k], NULL, tfun, &args[k]);
+        status = pthread_create(&thread, NULL, tfun, &um);
         if (status != 0) {
             printf("main error: can't create thread, status = %d\n", status);
             exit(-11);
@@ -118,16 +45,6 @@ int main(int argc, char** argv) {
 #if DEBUG
     printf("started...\n",nn);
 #endif    
-    for(k=0; k<nn; k++) {
-        status = pthread_join(threads[k], &out_void);
-        if (status) {
-            printf("main error: can't join thread, status = %d\n", status);
-            exit(-12);
-        }
-    }
-    free(threads);
-    free(args);
-    close(ev);
-    pthread_mutex_destroy(&mut);
+    pthread_mutex_destroy(&(um.mutex));
     return(0);
 }
