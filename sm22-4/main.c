@@ -3,12 +3,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-//#include <sched.h>
 #include <sys/eventfd.h>
 #include <unistd.h>
-//#include <sys/select.h>
 #include <poll.h>
-//pthread_create pthread_join
+#include <math.h>
 
 /*
 typedef struct {
@@ -18,7 +16,8 @@ typedef struct {
     } pollfd_t;
 */
 
-typedef struct {
+typedef struct
+{
     int n;
 } Argst;
 
@@ -45,27 +44,29 @@ void* tfun(void *args)
         fds[0].fd = ev;
         fds[0].events = POLLIN;
         fds[0].revents = 0;
-        nse = poll(fds, 1, 999); //999 mS
+        nse = poll(fds, 1, 10); // 10 ms
 
-        if(nse < 0)
+        if (nse < 0)
         {
             perror("poll");
-            exit(-15);
+            exit(-1);
         } else if (nse == 0)
             continue;
         else if (fds[0].revents == POLLIN)
         {
             if (n != ncur)
                 continue;
+
             if (read(ev, &x, sizeof(uint64_t)) != sizeof(uint64_t))
             {
                 perror("read(ev,...");
-                exit(-17);
+                exit(-1);
             }
+
             if (scanf("%d", &val) == 1)
             {
                 printf("%d %d\n", n, val);
-                ncur = val % nn;
+                ncur = abs(val) % nn;
             } else
                 break;
 
@@ -74,20 +75,23 @@ void* tfun(void *args)
             if (write(ev, &x, sizeof(uint64_t)) != sizeof(uint64_t))
             {
                 perror("write(ev,...");
-                exit(-18);
+                exit(-1);
             }
         }
     }
+
     for(k = 0; k < nn; k++)
     {
-        if(k == ncur)
+        if (k == ncur)
             continue;
+
         pthread_cancel(threads[k]);
     }
+
     return(args);
 }
 
-int main(int argc, char** argv)
+int main(int argc, char* argv[])
 {
     int status;
     int k;
@@ -95,7 +99,7 @@ int main(int argc, char** argv)
     uint64_t x;
     Argst *args;
 
-    if (argc!=2 || sscanf(argv[1], "%d", &nn) != 1)
+    if (argc != 2 || sscanf(argv[1], "%d", &nn) != 1)
     {
         fprintf(stderr, "%s 3 <stdin.txt\n", argv[0]);
         return(1);
@@ -106,19 +110,19 @@ int main(int argc, char** argv)
     if (threads == NULL)
     {
         perror("malloc threads");
-        exit(-13);
+        exit(-1);
     }
 
     args = malloc(nn * sizeof(Argst));
 
-    if(threads == NULL)
+    if (threads == NULL)
     {
         perror("malloc args");
-        exit(-13);
+        exit(-1);
     }
 
 #if DEBUG
-    printf("nn=%d\n",nn);
+    printf("nn=%d\n", nn);
 #endif
 
     ev = eventfd(0, 0);
@@ -128,24 +132,24 @@ int main(int argc, char** argv)
     if (write(ev, &x, sizeof(uint64_t)) != sizeof(uint64_t))
     {
         perror("initial eventfd write");
-        exit(-14);
+        exit(-1);
     }
 
     for(k = 0; k < nn; k++)
     {
         args[k].n = k;
-/* ? */
+
         status = pthread_create(&threads[k], NULL, tfun, &args[k]);
 
         if (status != 0)
         {
             printf("main error: can't create thread, status = %d\n", status);
-            exit(-11);
+            exit(-1);
         }
     }
 
 #if DEBUG
-    printf("started...\n",nn);
+    printf("started...\n", nn);
 #endif
 
     for(k = 0; k < nn; k++)
@@ -155,14 +159,16 @@ int main(int argc, char** argv)
         if (status)
         {
             printf("main error: can't join thread, status = %d\n", status);
-            exit(-12);
+            exit(-1);
         }
     }
 
     free(threads);
     free(args);
+
     close(ev);
-    return(0);
+
+    return 0;
 }
 
 // https://sodocumentation.net/ru/pthreads
