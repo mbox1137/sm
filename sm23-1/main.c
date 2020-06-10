@@ -16,24 +16,39 @@
 static const int nn=3;
 static const int ni=1000000;
 
-typedef struct use_mutex_tag {
-    pthread_mutex_t mutex;
-} use_mutex_t;
+typedef struct args_tag {
+    int n;
+    pthread_mutex_t *pmutex;
+} args_t;
 
 void* tfun(void *args) {
-    pthread_mutex_lock(  &(((use_mutex_t*)args)->mutex));
-    pthread_mutex_unlock(&(((use_mutex_t*)args)->mutex));
+    pthread_mutex_lock(  (((args_t*)args)->pmutex));
+    pthread_mutex_unlock((((args_t*)args)->pmutex));
     return(args);
 }
 
 int main(int argc, char** argv) {
     int k;
     int status;
-    use_mutex_t um;
-    pthread_t thread;
+    args_t *ums;
+    pthread_t *threads;
+    pthread_mutex_t mutex;
 
+    threads=malloc(nn*sizeof(pthread_t));
+    if(threads==NULL) {
+        perror("malloc threads");
+        exit(-13);
+    }
+    ums=malloc(nn*sizeof(args_t));
+    if(ums==NULL) {
+        perror("malloc args");
+        exit(-12);
+    }
+    pthread_mutex_init(&mutex, NULL);
     for(k=0; k<nn; k++) {
-        status = pthread_create(&thread, NULL, tfun, &um);
+        ums[k].n=k;
+        ums[k].pmutex=&mutex;
+        status = pthread_create(&threads[k], NULL, tfun, &ums[k]);
         if (status != 0) {
             printf("main error: can't create thread, status = %d\n", status);
             exit(-11);
@@ -42,6 +57,8 @@ int main(int argc, char** argv) {
 #if DEBUG
     printf("started...\n",nn);
 #endif    
-    pthread_mutex_destroy(&(um.mutex));
+    pthread_mutex_destroy(&mutex);
+    free(ums);
+    free(threads);
     return(0);
 }
