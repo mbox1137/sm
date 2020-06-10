@@ -13,8 +13,10 @@
 #include <poll.h>
 //pthread_create pthread_join
 
-static const int nn=3;
-static const int ni=1000000;
+#define nn 3
+#define ni 1000000
+
+static double x[nn];
 
 typedef struct args_tag {
     int n;
@@ -22,8 +24,15 @@ typedef struct args_tag {
 } args_t;
 
 void* tfun(void *args) {
-    pthread_mutex_lock(  (((args_t*)args)->pmutex));
-    pthread_mutex_unlock((((args_t*)args)->pmutex));
+    args_t *a=args;
+    int i, k;
+    k=a->n;
+    for(i=0; i<ni; i++) {
+        pthread_mutex_lock(  (((args_t*)args)->pmutex));
+        x[k]+=(k+1)*100;
+        x[(k+1)%nn]-=(k+1)*100+1;
+        pthread_mutex_unlock((((args_t*)args)->pmutex));
+    }
     return(args);
 }
 
@@ -33,7 +42,10 @@ int main(int argc, char** argv) {
     args_t *ums;
     pthread_t *threads;
     pthread_mutex_t mutex;
+    void* result;
 
+    for(k=0; k<nn; k++)
+        x[k]=0.0;
     threads=malloc(nn*sizeof(pthread_t));
     if(threads==NULL) {
         perror("malloc threads");
@@ -57,8 +69,17 @@ int main(int argc, char** argv) {
 #if DEBUG
     printf("started...\n",nn);
 #endif    
+    for(k=0; k<nn; k++) {
+        status = pthread_join(threads[k], &result);
+        if (status) {
+            printf("main error: can't join thread, status = %d\n", status);
+            exit(-12);
+        }
+    }
     pthread_mutex_destroy(&mutex);
     free(ums);
     free(threads);
+    for(k=0; k<nn; k++)
+        printf("%.10lg\n", x[k]);
     return(0);
 }
