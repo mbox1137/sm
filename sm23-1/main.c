@@ -46,6 +46,7 @@ int main(int argc, char** argv) {
 
     for(k=0; k<nn; k++)
         x[k]=0.0;
+
     threads=malloc(nn*sizeof(pthread_t));
     if(threads==NULL) {
         perror("malloc threads");
