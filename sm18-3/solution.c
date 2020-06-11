@@ -42,14 +42,14 @@ int main(int argc, char *argv[])
             close(pipefd[0]);
             dup2(pipefd[1], 1);
             close(pipefd[1]);
-            execlp("/bin/sh", "sh", "-c", cmd1, NULL);
+            execlp(cmd1, cmd1, NULL);
             _exit(1);
         }
         close(pipefd[0]);
         dup2(pipefd[1], 1);
         close(pipefd[1]);
         waitpid(pid1, 0, 0);
-        execlp("/bin/sh", "sh", "-c", cmd2, NULL);
+        execlp(cmd2, cmd2, NULL);
         _exit(1);
     }
 
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
         dup2(fd, 1);
         close(pipefd[0]);
         close(pipefd[1]);
-        execlp("/bin/sh", "sh", "-c", cmd3, NULL);
+        execlp(cmd3, cmd3, NULL);
         _exit(1);
     }
 

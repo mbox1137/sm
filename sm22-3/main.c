@@ -5,6 +5,7 @@
 #include <pthread.h>
 #include <sched.h>
 #include <unistd.h>
+#include <limits.h>
 
 typedef struct
 {
@@ -65,7 +66,7 @@ int main(int argc, char* argv[])
 
     pthread_attr_t attr;
     pthread_attr_init(&attr);
-    pthread_attr_setstacksize(&attr, sysconf(_SC_THREAD_STACK_MIN));
+    pthread_attr_setstacksize(&attr, PTHREAD_STACK_MIN);
 
     for(k = 0; k < n; k++)
     {

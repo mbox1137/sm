@@ -1,16 +1,13 @@
-//https://sodocumentation.net/ru/pthreads
-
 #define DEBUG 0
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-//#include <sched.h>
 #include <sys/eventfd.h>
 #include <unistd.h>
-//#include <sys/select.h>
 #include <poll.h>
-//pthread_create pthread_join
+#include <math.h>
+
 /*
 typedef struct {
     int   fd;         // file descriptor
@@ -18,115 +15,161 @@ typedef struct {
     short revents;    // returned events
     } pollfd_t;
 */
-typedef struct {
+
+typedef struct
+{
     int n;
-} args_t;
+} Argst;
 
 static pthread_t *threads;
 static int ncur, nn;
 static eventfd_t ev;
 
-void* tfun(void *args) {
+void* tfun(void *args)
+{
     int n, k;
     uint64_t x;
     struct pollfd fds[1];
     int nse;
     int val;
 
-    n=((args_t*)args)->n;
+    n = ((Argst *) args)->n;
+
 #if DEBUG
     printf("n=%d\n",n);
-#endif    
-    for(;;) {
-        fds[0].fd=ev;
-        fds[0].events=POLLIN;
-        fds[0].revents=0;
-        nse=poll(fds, 1, 999);	//999 mS
-        if(nse<0) {
+#endif
+
+    while(1)
+    {
+        fds[0].fd = ev;
+        fds[0].events = POLLIN;
+        fds[0].revents = 0;
+        nse = poll(fds, 1, 10); // 10 ms
+
+        if (nse < 0)
+        {
             perror("poll");
-            exit(-15);
-        } else if(nse==0) {
+            exit(-1);
+        } else if (nse == 0)
             continue;
-        } else if(fds[0].revents == POLLIN) {
-            if(n!=ncur)
+        else if (fds[0].revents == POLLIN)
+        {
+            if (n != ncur)
                 continue;
-            if(read(ev, &x, sizeof(uint64_t)) != sizeof(uint64_t)){
+
+            if (read(ev, &x, sizeof(uint64_t)) != sizeof(uint64_t))
+            {
                 perror("read(ev,...");
-                exit(-17);
+                exit(-1);
             }
-            if(scanf("%d", &val)==1) {
+
+            if (scanf("%d", &val) == 1)
+            {
                 printf("%d %d\n", n, val);
-                ncur=val%nn;
-            } else {
+                ncur = abs(val) % nn;
+            } else
                 break;
-            }
-            x=1;
-            if(write(ev, &x, sizeof(uint64_t)) != sizeof(uint64_t)){
+
+            x = 1;
+
+            if (write(ev, &x, sizeof(uint64_t)) != sizeof(uint64_t))
+            {
                 perror("write(ev,...");
-                exit(-18);
+                exit(-1);
             }
         }
     }
-    for(k=0; k<nn; k++) {
-        if(k==ncur)
+
+    for(k = 0; k < nn; k++)
+    {
+        if (k == ncur)
             continue;
+
         pthread_cancel(threads[k]);
     }
+
     return(args);
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char* argv[])
+{
     int status;
     int k;
     void *out_void;
     uint64_t x;
-    args_t *args;
+    Argst *args;
 
-    if(argc!=2 || sscanf(argv[1],"%d",&nn)!=1) {
-        fprintf(stderr,"%s 3 <stdin.txt\n",argv[0]);
+    if (argc != 2 || sscanf(argv[1], "%d", &nn) != 1)
+    {
+        fprintf(stderr, "%s 3 <stdin.txt\n", argv[0]);
         return(1);
     }
-    threads=malloc(nn*sizeof(pthread_t));
-    if(threads==NULL) {
+
+    threads = malloc(nn * sizeof(pthread_t));
+
+    if (threads == NULL)
+    {
         perror("malloc threads");
-        exit(-13);
+        exit(-1);
     }
-    args=malloc(nn*sizeof(args_t));
-    if(threads==NULL) {
+
+    args = malloc(nn * sizeof(Argst));
+
+    if (threads == NULL)
+    {
         perror("malloc args");
-        exit(-13);
+        exit(-1);
     }
+
 #if DEBUG
-    printf("nn=%d\n",nn);
-#endif    
-    ev=eventfd(0, 0);
-    ncur=0;
-    x=1;
-    if(write(ev, &x, sizeof(uint64_t)) != sizeof(uint64_t)){
+    printf("nn=%d\n", nn);
+#endif
+
+    ev = eventfd(0, 0);
+    ncur = 0;
+    x = 1;
+
+    if (write(ev, &x, sizeof(uint64_t)) != sizeof(uint64_t))
+    {
         perror("initial eventfd write");
-        exit(-14);
+        exit(-1);
     }
-    for(k=0; k<nn; k++) {
-        args[k].n=k;
-/* ? */
+
+    for(k = 0; k < nn; k++)
+    {
+        args[k].n = k;
+
         status = pthread_create(&threads[k], NULL, tfun, &args[k]);
-        if (status != 0) {
+
+        if (status != 0)
+        {
             printf("main error: can't create thread, status = %d\n", status);
-            exit(-11);
+            exit(-1);
         }
     }
+
 #if DEBUG
-    printf("started...\n",nn);
-#endif    
-    for(k=0; k<nn; k++) {
+    printf("started...\n", nn);
+#endif
+
+    for(k = 0; k < nn; k++)
+    {
         status = pthread_join(threads[k], &out_void);
-        if (status) {
+
+        if (status)
+        {
             printf("main error: can't join thread, status = %d\n", status);
-            exit(-12);
+            exit(-1);
         }
     }
+
     free(threads);
     free(args);
+
     close(ev);
-    return(0);
+
+    return 0;
 }
+
+// https://sodocumentation.net/ru/pthreads
+

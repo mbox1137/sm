@@ -53,12 +53,12 @@ void addname(CTRLN *z, char *name)
             z->nn = 1<<13;
             z->names = malloc(z->nn);
             if(z->names == NULL)
-                z->names = NULL;
+                exit(-1);
         } else {
             z->nn *= 2;
             z->names = realloc(z->names, z->nn);
             if (z->names == NULL)
-                z->names = NULL;
+                exit(-1);
         }
     }
     if ((z->kpn) >= (z->npn)) {
@@ -66,12 +66,12 @@ void addname(CTRLN *z, char *name)
             z->npn = 1<<10;
             z->pnames = malloc((z->npn) * sizeof(int));
             if (z->pnames == NULL)
-                z->pnames = NULL;
+                exit(-1);
         } else {
             z->npn *= 2;
             z->pnames = realloc(z->pnames, z->npn*sizeof(int));
             if (z->pnames == NULL)
-                z->pnames = NULL;
+                exit(-1);
         }
     }
     (z->pnames)[z->kpn] = z->kn;
