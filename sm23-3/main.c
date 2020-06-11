@@ -1,4 +1,4 @@
-#define DEBUG 1
+#define DEBUG 0
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,11 +42,15 @@ void *tfun(void *args)
 
         pthread_mutex_lock(((Argst*)args)->pmutex);
         if(!first)
+        {
             first=item;
+            last=item;
+        }
         last->next=item;
         item->prev=last;
         last=item;
         pthread_mutex_unlock(((Argst*)args)->pmutex);
+
         sched_yield();
     }
 
@@ -115,10 +119,9 @@ int main(int argc, char* argv[])
     free(ums);
     free(threads);
 
-#if DEBUG
     for(item = first; item != NULL; item=item->next)
         printf("%lld\n", item->value);
-#endif
+
     for(item = last; item != first; item=item->prev)
         free(item->next);
     free(first);
