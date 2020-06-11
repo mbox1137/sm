@@ -1,3 +1,5 @@
+//man pthread_cond_wait
+
 #define DEBUG 0
 
 #include <stdio.h>
