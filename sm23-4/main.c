@@ -8,9 +8,6 @@
 #include <sys/eventfd.h>
 #include <unistd.h>
 
-#define NN 3
-#define NI 1000000
-
 typedef struct
 {
     double sum;
@@ -20,6 +17,7 @@ typedef struct
 typedef struct Argstag
 {
     pthread_mutex_t *pmutex;
+    acc_t *accs;
     int num;
     int iters;
     int acc1;
@@ -32,11 +30,17 @@ void* tfun(void *args)
 {
     Argst *a = args;
     int i;
+    pthread_cond_t cond;
 
     for(i = 0; i < a->iters; i++)
     {
         pthread_mutex_lock(a->pmutex);
+        while(a->accs[a->acc1].locked || a->accs[a->acc2].locked)
+        {
+            pthread_cond_wait(&cond, a->pmutex); //wait for the condition
+        }
         pthread_mutex_unlock(a->pmutex);
+        pthread_cond_signal(&cond);
     }
 
     return(args);
@@ -115,6 +119,8 @@ int main(int argc, char* argv[])
     {
         ums[k].num = k;
         ums[k].pmutex = &mutex;
+        ums[k].accs = accs;
+
         status = pthread_create(&threads[k], NULL, tfun, &ums[k]);
 
         if (status != 0)
@@ -125,7 +131,7 @@ int main(int argc, char* argv[])
     }
 
 #if DEBUG
-    printf("started...\n", NN);
+    printf("started...\n");
 #endif
 
     for(k = 0; k < thr_count; k++)
