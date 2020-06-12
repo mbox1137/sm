@@ -11,8 +11,6 @@
 #define NN 3
 #define NI 1000000
 
-static double x[NN];
-
 typedef struct
 {
     double sum;
@@ -33,15 +31,12 @@ typedef struct Argstag
 void* tfun(void *args)
 {
     Argst *a = args;
-    int i, k;
-    k = a->num;
+    int i;
 
-    for(i = 0; i < NI; i++)
+    for(i = 0; i < a->iters; i++)
     {
-        pthread_mutex_lock(((Argst*)args)->pmutex);
-        x[k] += (k + 1) * 100;
-        x[(k + 1) % NN] -= (k + 1) * 100 + 1;
-        pthread_mutex_unlock(((Argst*)args)->pmutex);
+        pthread_mutex_lock(a->pmutex);
+        pthread_mutex_unlock(a->pmutex);
     }
 
     return(args);
