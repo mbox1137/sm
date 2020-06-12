@@ -106,7 +106,6 @@ int main(int argc, char* argv[])
     }
 
     threads = malloc(nn * sizeof(pthread_t));
-
     if (threads == NULL)
     {
         perror("malloc threads");
@@ -114,7 +113,6 @@ int main(int argc, char* argv[])
     }
 
     args = malloc(nn * sizeof(Argst));
-
     if (args == NULL)
     {
         perror("malloc args");
@@ -126,7 +124,7 @@ int main(int argc, char* argv[])
 #endif
 
     ev = eventfd(0, 0);
-    if(ev==-1)
+    if (ev == -1)
     {
         perror("eventfd");
         exit(-1);
