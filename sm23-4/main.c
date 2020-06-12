@@ -139,13 +139,13 @@ int main(int argc, char* argv[])
         }
     }
 
+    for(k = 0; k < acc_count; k++)
+        printf("%.10lg\n", accs[k].sum);
+
     pthread_mutex_destroy(&mutex);
     free(accs);
     free(ums);
     free(threads);
-
-//    for(k = 0; k < NN; k++)
-//        printf("%.10lg\n", x[k]);
 
     return 0;
 }
