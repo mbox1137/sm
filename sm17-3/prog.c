@@ -21,7 +21,7 @@ int process(char *cmd)
 
     if (!proc)
     {
-        execlp("/bin/sh", "sh", "-c", cmd, NULL);
+        execlp(cmd, cmd, NULL);
         return 0;
     }
 
@@ -35,6 +35,7 @@ int process(char *cmd)
 
 int main(int argc, char *argv[])
 {
+
 #if DEBUG
     printf("%d\n", argc);
 #endif
