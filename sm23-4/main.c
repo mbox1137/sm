@@ -1,6 +1,6 @@
 //man pthread_cond_wait
 
-#define DEBUG 1
+#define DEBUG 0
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,6 +39,12 @@ void* tfun(void *args)
         {
             pthread_cond_wait(&cond, a->pmutex); //wait for the condition
         }
+        a->accs[a->acc1].locked=1;
+        a->accs[a->acc2].locked=1;
+        a->accs[a->acc1].sum += a->ds1;
+        a->accs[a->acc2].sum += a->ds2;
+        a->accs[a->acc1].locked=0;
+        a->accs[a->acc2].locked=0;
         pthread_mutex_unlock(a->pmutex);
         pthread_cond_signal(&cond);
     }
