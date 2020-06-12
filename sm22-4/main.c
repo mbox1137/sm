@@ -115,7 +115,7 @@ int main(int argc, char* argv[])
 
     args = malloc(nn * sizeof(Argst));
 
-    if (threads == NULL)
+    if (args == NULL)
     {
         perror("malloc args");
         exit(-1);
@@ -126,6 +126,11 @@ int main(int argc, char* argv[])
 #endif
 
     ev = eventfd(0, 0);
+    if(ev==-1)
+    {
+        perror("eventfd");
+        exit(-1);
+    }
     ncur = 0;
     x = 1;
 
