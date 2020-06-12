@@ -34,6 +34,7 @@ void* tfun(void *args)
 
     for(i = 0; i < a->iters; i++)
     {
+        pthread_cond_init(&cond,0);
         pthread_mutex_lock(a->pmutex);
         while(a->accs[a->acc1].locked || a->accs[a->acc2].locked)
         {
@@ -41,12 +42,14 @@ void* tfun(void *args)
         }
         a->accs[a->acc1].locked=1;
         a->accs[a->acc2].locked=1;
+//        pthread_mutex_unlock(a->pmutex);
         a->accs[a->acc1].sum += a->ds1;
         a->accs[a->acc2].sum += a->ds2;
         a->accs[a->acc1].locked=0;
         a->accs[a->acc2].locked=0;
         pthread_mutex_unlock(a->pmutex);
         pthread_cond_signal(&cond);
+        pthread_cond_destroy(&cond);
     }
 
     return(args);
