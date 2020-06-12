@@ -1,4 +1,3 @@
-//man pthread_cond_wait
 //https://ru.wikipedia.org/wiki/%D0%A3%D1%81%D0%BB%D0%BE%D0%B2%D0%BD%D0%B0%D1%8F_%D0%BF%D0%B5%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D0%B0%D1%8F
 
 #define DEBUG 0
@@ -8,18 +7,19 @@
 #include <pthread.h>
 #include <sys/eventfd.h>
 #include <unistd.h>
+#include <limits.h>
 
 typedef struct
 {
     double sum;
     int locked;
-} acc_t;
+} Acct;
 
 typedef struct Argstag
 {
     pthread_mutex_t *pmutex;
     pthread_cond_t *cond;
-    acc_t *accs;
+    Acct *accs;
     int num;
     int iters;
     int acc1;
@@ -40,13 +40,14 @@ void* tfun(void *args)
         {
             pthread_cond_wait(a->cond, a->pmutex);
         }
-        a->accs[a->acc1].locked=1;
-        a->accs[a->acc2].locked=1;
+        a->accs[a->acc1].locked = 1;
+        a->accs[a->acc2].locked = 1;
         pthread_mutex_unlock(a->pmutex);
+
         a->accs[a->acc1].sum += a->ds1;
         a->accs[a->acc2].sum += a->ds2;
-        a->accs[a->acc1].locked=0;
-        a->accs[a->acc2].locked=0;
+        a->accs[a->acc1].locked = 0;
+        a->accs[a->acc2].locked = 0;
         pthread_cond_signal(a->cond);
     }
 
@@ -58,21 +59,17 @@ int main(int argc, char* argv[])
     int k;
     int status;
     Argst *ums;
-    acc_t *accs;
+    Acct *accs;
     pthread_t *threads;
     pthread_mutex_t mutex;
     pthread_cond_t condition;
     void* result;
     int acc_count, thr_count;
 
-    if(
-        (scanf("%d", &acc_count)!=1)
-     || (scanf("%d", &thr_count)!=1)
-    )
+    if (scanf("%d%d", &acc_count, &thr_count) != 2)
         exit(-1);
 
     threads = malloc(thr_count * sizeof(pthread_t));
-
     if (threads == NULL)
     {
         perror("malloc threads");
@@ -80,15 +77,13 @@ int main(int argc, char* argv[])
     }
 
     ums = (Argst*)malloc(thr_count * sizeof(Argst));
-
     if (ums == NULL)
     {
         perror("malloc args");
         exit(-1);
     }
 
-    accs = (acc_t*)malloc(acc_count * sizeof(acc_t));
-
+    accs = (Acct*)malloc(acc_count * sizeof(Acct));
     if (accs == NULL)
     {
         perror("malloc accs");
@@ -96,28 +91,21 @@ int main(int argc, char* argv[])
     }
 
     for(k = 0; k < thr_count; k++)
-        if(scanf("%d%d%lg%d%lg",
-                        &ums[k].iters, 
-                        &ums[k].acc1, 
-                        &ums[k].ds1, 
-                        &ums[k].acc2, 
-                        &ums[k].ds2) != 5 )
+        if(scanf("%d%d%lg%d%lg", &ums[k].iters, &ums[k].acc1, &ums[k].ds1, &ums[k].acc2, &ums[k].ds2) != 5)
             exit(-1);
+
 #if DEBUG
     printf("acc_count=%d\n", acc_count);
     printf("thr_count=%d\n", thr_count);
     for(k = 0; k < thr_count; k++)
         printf("iters=%d acc1=%d ds1=%lg acc2=%d ds2=%lg\n",
-                        ums[k].iters, 
-                        ums[k].acc1, 
-                        ums[k].ds1, 
-                        ums[k].acc2, 
-                        ums[k].ds2);
+        ums[k].iters, ums[k].acc1, ums[k].ds1, ums[k].acc2, ums[k].ds2);
 #endif
+
     for(k = 0; k < acc_count; k++)
     {
-        accs[k].sum=0.0;
-        accs[k].locked=0;
+        accs[k].sum = 0.0;
+        accs[k].locked = 0;
     }
 
     if (pthread_mutex_init(&mutex, NULL) != 0)
@@ -126,6 +114,10 @@ int main(int argc, char* argv[])
     if(pthread_cond_init(&condition,0) !=0)
         exit(1);
 
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setstacksize(&attr, PTHREAD_STACK_MIN);
+
     for(k = 0; k < thr_count; k++)
     {
         ums[k].num = k;
@@ -133,7 +125,7 @@ int main(int argc, char* argv[])
         ums[k].cond = &condition;
         ums[k].accs = accs;
 
-        status = pthread_create(&threads[k], NULL, tfun, &ums[k]);
+        status = pthread_create(&threads[k], &attr, tfun, &ums[k]);
 
         if (status != 0)
         {
