@@ -1,6 +1,6 @@
 //man pthread_cond_wait
 
-#define DEBUG 0
+#define DEBUG 1
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,15 +15,20 @@ static double x[NN];
 
 typedef struct Argstag
 {
-    int n;
     pthread_mutex_t *pmutex;
+    int num;
+    int iters;
+    int acc1;
+    double ds1;
+    int acc2;
+    double ds2;
 } Argst;
 
 void* tfun(void *args)
 {
     Argst *a = args;
     int i, k;
-    k = a->n;
+    k = a->num;
 
     for(i = 0; i < NI; i++)
     {
@@ -44,11 +49,15 @@ int main(int argc, char* argv[])
     pthread_t *threads;
     pthread_mutex_t mutex;
     void* result;
+    int acc_count, thr_count;
 
-    for(k = 0; k < NN; k++)
-        x[k] = 0.0;
+    if(
+        (scanf("%d", &acc_count)!=1)
+     || (scanf("%d", &thr_count)!=1)
+    )
+        exit(-1);
 
-    threads = malloc(NN * sizeof(pthread_t));
+    threads = malloc(thr_count * sizeof(pthread_t));
 
     if (threads == NULL)
     {
@@ -56,7 +65,7 @@ int main(int argc, char* argv[])
         exit(-1);
     }
 
-    ums = malloc(NN * sizeof(Argst));
+    ums = (Argst*)malloc(thr_count * sizeof(Argst));
 
     if (ums == NULL)
     {
@@ -64,6 +73,26 @@ int main(int argc, char* argv[])
         exit(-1);
     }
 
+    for(k = 0; k < thr_count; k++)
+        if(scanf("%d%d%lg%d%lg",
+                        &ums[k].iters, 
+                        &ums[k].acc1, 
+                        &ums[k].ds1, 
+                        &ums[k].acc2, 
+                        &ums[k].ds2) != 5 )
+            exit(-1);
+#if DEBUG
+    printf("acc_count=%d\n", acc_count);
+    printf("thr_count=%d\n", thr_count);
+    for(k = 0; k < thr_count; k++)
+        printf("iters=%d acc1=%d ds1=%lg acc2=%d ds2=%lg\n",
+                        ums[k].iters, 
+                        ums[k].acc1, 
+                        ums[k].ds1, 
+                        ums[k].acc2, 
+                        ums[k].ds2);
+#endif
+#if 0
     if (pthread_mutex_init(&mutex, NULL) != 0)
         exit(1);
 
@@ -96,12 +125,12 @@ int main(int argc, char* argv[])
     }
 
     pthread_mutex_destroy(&mutex);
-
+#endif
     free(ums);
     free(threads);
 
-    for(k = 0; k < NN; k++)
-        printf("%.10lg\n", x[k]);
+//    for(k = 0; k < NN; k++)
+//        printf("%.10lg\n", x[k]);
 
     return 0;
 }
