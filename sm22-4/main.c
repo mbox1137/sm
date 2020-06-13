@@ -37,31 +37,34 @@ void* tfun(void *args)
     printf("n=%d\n",n);
 #endif
 
-    if (read(evs[n], &x, sizeof(uint64_t)) != sizeof(uint64_t))
-    {
-        perror("read(ev,...");
-        exit(-1);
-    }
-
-    if (scanf("%d", &val) == 1)
-    {
-        printf("%d %d\n", n, val);
-    } else
-    {
-        for(k = 0; k < nn; k++)
+    for(;;)
         {
-            if (k == n)
-                continue;
-            pthread_cancel(threads[k]);
+        if (read(evs[n], &x, sizeof(uint64_t)) != sizeof(uint64_t))
+        {
+            perror("read(ev,...");
+            exit(-1);
         }
-        exit(1);
-    }
 
-    x = 1;
-    if (write(evs[abs(val) % nn], &x, sizeof(uint64_t)) != sizeof(uint64_t))
+        if (scanf("%d", &val) == 1)
+        {
+            printf("%d %d\n", n, val);
+        } else
+        {
+            break;
+        }
+
+        x = 1;
+        if (write(evs[abs(val) % nn], &x, sizeof(uint64_t)) != sizeof(uint64_t))
+        {
+            perror("write(ev,...");
+            exit(-1);
+        }
+    }
+    for(k = 0; k < nn; k++)
     {
-        perror("write(ev,...");
-        exit(-1);
+        if (k == n)
+            continue;
+        pthread_cancel(threads[k]);
     }
     return(args);
 }
