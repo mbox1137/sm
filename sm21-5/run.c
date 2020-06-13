@@ -5,11 +5,55 @@
 #include <sys/signalfd.h>
 #include <sys/timerfd.h>
 #include <sys/epoll.h>
+#include <unistd.h>
 #include "run.h"
 
 static int retval;
 
-void clean_up_child_process(int signal_number)
+char* readpipe(int fd)
+{
+    int n, nr, k;
+    char *buf;
+    n=0;
+    buf=NULL;
+    k=0;
+    for(;;)
+    {
+        if(k>=n)
+        {
+            if(n==0)
+                n=1<<16;
+            else
+                n<<=1;
+            buf=realloc(buf, n);
+            if(buf==NULL)
+                exit(1);
+        }
+        nr=read(fd, &buf[k], n-k);
+        if(nr<0)
+            exit(1);
+        else if(nr==0)
+            break;
+        k+=nr;
+    }
+    buf[k]=0;
+    return(buf);
+}
+
+void writepipe(int fd, char* s)
+{
+    int n, nw, k;
+    k=0;
+    n=strlen(s)+1;
+    while(n>0) {
+        nw=write(fd, &s[k], n);
+        k+=nw;
+        n-=nw;
+    }
+    return;
+}
+
+static void clean_up_child_process(int signal_number)
 {
     int status;
     retval=0;

@@ -3,3 +3,5 @@ int run(const char* cmd,
         char** poutput, 
         char** perror, 
         int timeot);
+char* readpipe(int fd);
+void writepipe(int fd, char* s);
