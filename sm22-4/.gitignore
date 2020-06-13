@@ -1,3 +1,5 @@
 main
 main.s
+main_poll_efd
+main_poll_efd.s
 *.dat

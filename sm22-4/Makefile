@@ -24,15 +24,18 @@ LDFLAGS	= -no-pie -m32 $(GDB) -lpthread -pthread
 #LDFLAGS	= -m elf_i386
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
-EXEC	= main
-OBJS	= main.o
-SCDRY	= main.s
+EXEC	= main main_poll_efd
+OBJS	= main.o main_poll_efd.o
+SCDRY	= main.s main_poll_efd.s
 
 .SECONDARY: $(SCDRY)
 ALL : $(EXEC)
 
 main : main.o Makefile
 	$(LD) $(LDFLAGS) -o main main.o
+
+main_poll_efd : main_poll_efd.o Makefile
+	$(LD) $(LDFLAGS) -o main_poll_efd main_poll_efd.o
 
 #$(EXEC) : $(OBJS) Makefile
 #	$(LD) $(LDFLAGS) $(GDB) -o $@ $(OBJS)
