@@ -69,13 +69,51 @@ int run(const char* cmd,
         const char* input, 
         char** poutput, 
         char** perror, 
-        int timeot) {
+        int timeout) {
+    int pipein[2], pipeout[2], pipeerr[2];
+    pid_t pid;
 
     struct sigaction sigchld_action;
     retval=0;
     memset(&sigchld_action, 0, sizeof(sigchld_action));
     sigchld_action.sa_handler = &clean_up_child_process;
     sigaction(SIGCHLD, &sigchld_action, NULL);
+
+    if (pipe(pipein) == -1)
+        exit(-1);
+    if (pipe(pipeout) == -1)
+        exit(-1);
+    if (pipe(pipeerr) == -1)
+        exit(-1);
+
+    pid = fork();
+
+    if (pid == -1)
+        exit(-1);
+
+    if (!pid)
+    {
+/*
+        dup2(pipein[0], 0);
+        close(pipein[0]);
+        close(pipein[1]);
+
+        dup2(pipeout[1], 1);
+        close(pipeout[0]);
+        close(pipeout[1]);
+
+        dup2(pipeerr[1], 2);
+        close(pipeerr[0]);
+        close(pipeerr[1]);
+*/
+        execlp(cmd, cmd, NULL);
+        _exit(1);
+    }
+/*
+    close(pipein[0]);
+    close(pipeout[1]);
+    close(pipeerr[1]);
+*/
     *poutput=calloc(1,1);
     *perror=calloc(1,1);
     return(retval);
