@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <poll.h>
 #include <math.h>
+#include <limits.h>
 
 /*
 typedef struct {
@@ -38,7 +39,7 @@ void* tfun(void *args)
 #endif
 
     for(;;)
-        {
+    {
         if (read(evs[n], &x, sizeof(uint64_t)) != sizeof(uint64_t))
         {
             perror("read(ev,...");
@@ -46,12 +47,9 @@ void* tfun(void *args)
         }
 
         if (scanf("%d", &val) == 1)
-        {
             printf("%d %d\n", n, val);
-        } else
-        {
+        else
             break;
-        }
 
         x = 1;
         if (write(evs[abs(val) % nn], &x, sizeof(uint64_t)) != sizeof(uint64_t))
@@ -60,12 +58,14 @@ void* tfun(void *args)
             exit(-1);
         }
     }
+
     for(k = 0; k < nn; k++)
     {
         if (k == n)
             continue;
         pthread_cancel(threads[k]);
     }
+
     return(args);
 }
 
@@ -108,6 +108,10 @@ int main(int argc, char* argv[])
     printf("nn=%d\n", nn);
 #endif
 
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setstacksize(&attr, PTHREAD_STACK_MIN);
+
     for(k = 0; k < nn; k++)
     {
         args[k].n = k;
@@ -119,8 +123,7 @@ int main(int argc, char* argv[])
             exit(-1);
         }
 
-        status = pthread_create(&threads[k], NULL, tfun, &args[k]);
-
+        status = pthread_create(&threads[k], &attr, tfun, &args[k]);
         if (status != 0)
         {
             printf("main error: can't create thread, status = %d\n", status);
@@ -142,7 +145,6 @@ int main(int argc, char* argv[])
     for(k = 0; k < nn; k++)
     {
         status = pthread_join(threads[k], &out_void);
-
         if (status)
         {
             printf("main error: can't join thread, status = %d\n", status);
@@ -152,6 +154,7 @@ int main(int argc, char* argv[])
 
     for(k = 0; k < nn; k++)
         close(evs[k]);
+
     free(evs);
     free(threads);
     free(args);
