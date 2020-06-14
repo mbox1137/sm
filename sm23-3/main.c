@@ -1,55 +1,37 @@
-#define DEBUG 0
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include <sys/eventfd.h>
-#include <unistd.h>
+#include <stdint.h>
 #include <sched.h>
+#include <stdatomic.h>
+#include <unistd.h>
+#include <limits.h>
 
 #define NN 100
 #define NI 1000
 
 struct Item
 {
-    struct Item *prev;
     struct Item *next;
     long long value;
 };
 
-static struct Item *first=NULL;
-static struct Item *last=NULL;
+typedef struct Item Item;
+Item *_Atomic root = NULL;
 
-typedef struct Argstag
+void* tfun(void *args)
 {
-    int n;
-    pthread_mutex_t *pmutex;
-} Argst;
-
-void *tfun(void *args)
-{
-    Argst *a = args;
+    long num = (long) args;
     int i;
-    struct Item *item;
 
-    for(i = 0; i < NI; i++)
+    for (i = 0; i < NI; ++i)
     {
-        item=(struct Item*) malloc(sizeof(struct Item));
-        if(item==NULL)
+        Item *temp = malloc(sizeof(Item));
+        if (temp == NULL)
             exit(-1);
-        item->next=NULL;
-        item->value=(a->n)*NI+i;
 
-        pthread_mutex_lock(((Argst*)args)->pmutex);
-        if(!first)
-        {
-            first=item;
-            last=item;
-        }
-        last->next=item;
-        item->prev=last;
-        last=item;
-        pthread_mutex_unlock(((Argst*)args)->pmutex);
+        temp->next = atomic_exchange_explicit(&root, temp, memory_order_relaxed);
+        temp->value = num + i;
 
         sched_yield();
     }
@@ -57,41 +39,38 @@ void *tfun(void *args)
     return(args);
 }
 
-int main(int argc, char* argv[])
+void print_del_list()
 {
-    int k;
-    int status;
-    Argst *ums;
+    Item *temp;
+    while(root)
+    {
+        temp = root;
+        printf("%lld\n", root->value);
+        root = root->next;
+        free(temp);
+    }
+}
+
+int main(int argc, char *argv[])
+{
     pthread_t *threads;
-    pthread_mutex_t mutex;
-    void* result;
-    struct Item *item;
+    int status, i;
+    void *result;
 
     threads = malloc(NN * sizeof(pthread_t));
-
     if (threads == NULL)
     {
         perror("malloc threads");
         exit(-1);
     }
 
-    ums = malloc(NN * sizeof(Argst));
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setstacksize(&attr, PTHREAD_STACK_MIN);
 
-    if (ums == NULL)
+    for (i = 0; i < NN; ++i)
     {
-        perror("malloc args");
-        exit(-1);
-    }
-
-    if (pthread_mutex_init(&mutex, NULL) != 0)
-        exit(1);
-
-    for(k = 0; k < NN; k++)
-    {
-        ums[k].n = k;
-        ums[k].pmutex = &mutex;
-        status = pthread_create(&threads[k], NULL, tfun, &ums[k]);
-
+        status = pthread_create(&threads[i], &attr, tfun, (void *) ((long) i * NI));
         if (status != 0)
         {
             printf("main error: can't create thread, status = %d\n", status);
@@ -99,35 +78,20 @@ int main(int argc, char* argv[])
         }
     }
 
-#if DEBUG
-    printf("started...\n", NN);
-#endif
 
-    for(k = 0; k < NN; k++)
+    for (i = 0; i < NN; ++i)
     {
-        status = pthread_join(threads[k], &result);
-
-        if (status)
+        status = pthread_join(threads[i], &result);
+        if (status != 0)
         {
             printf("main error: can't join thread, status = %d\n", status);
             exit(-1);
         }
     }
 
-    pthread_mutex_destroy(&mutex);
+    print_del_list();
 
-    free(ums);
     free(threads);
 
-    for(item = first; item != NULL; item=item->next)
-        printf("%lld\n", item->value);
-
-    for(item = last; item != first; item=item->prev)
-        free(item->next);
-    free(first);
     return 0;
 }
-
-// https://sodocumentation.net/ru/pthreads
-// https://learnc.info/c/pthreads_mutex_introduction.html
-
