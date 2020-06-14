@@ -40,7 +40,7 @@ char* readpipe(int fd)
     return(buf);
 }
 
-void writepipe(int fd, char* s)
+void writepipe(int fd, const char* s)
 {
     int n, nw, k;
     k=0;
@@ -93,7 +93,6 @@ int run(const char* cmd,
 
     if (!pid)
     {
-/*
         dup2(pipein[0], 0);
         close(pipein[0]);
         close(pipein[1]);
@@ -105,16 +104,24 @@ int run(const char* cmd,
         dup2(pipeerr[1], 2);
         close(pipeerr[0]);
         close(pipeerr[1]);
-*/
+
         execlp(cmd, cmd, NULL);
         _exit(1);
     }
-/*
+
     close(pipein[0]);
     close(pipeout[1]);
     close(pipeerr[1]);
-*/
-    *poutput=calloc(1,1);
-    *perror=calloc(1,1);
+
+    writepipe(pipein[0], input);
+    *poutput=readpipe(pipeout[1]);
+    *perror=readpipe(pipeerr[1]);
+
+    close(pipein[1]);
+    close(pipeout[0]);
+    close(pipeerr[0]);
+
+    waitpid(pid, NULL, 0);
+
     return(retval);
 }

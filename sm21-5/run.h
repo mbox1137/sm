@@ -4,4 +4,4 @@ int run(const char* cmd,
         char** perror, 
         int timeot);
 char* readpipe(int fd);
-void writepipe(int fd, char* s);
+void writepipe(int fd, const char* s);
