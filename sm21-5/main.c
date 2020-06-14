@@ -3,7 +3,7 @@
 #include "run.h"
 
 int main(int argc, char** argv) {
-    char cmd[]="bc";
+    char cmd[]="ls";	//bc
     char inp[]="2+2*2";
     char* out;
     char* err;
@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
     rv=run(cmd, inp, &out, &err, tout);
 //    str=readpipe(fileno(stdin));
     printf("str=%s\n", str);
-    printf("rv=%d\n",rv);
+    printf("rv=%d(%d,%d)\n",rv,rv/256,rv%256);
     printf("out=%s\n",out);
     printf("err=%s\n",out);
     free(str);

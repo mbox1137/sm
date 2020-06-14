@@ -1,3 +1,6 @@
+#define DEBUG 1
+
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <sys/wait.h>
@@ -8,6 +11,7 @@
 #include "run.h"
 
 static int retval;
+static int cld;
 
 char* readpipe(int fd)
 {
@@ -62,6 +66,7 @@ void writepipe(int fd, const char* s)
 static void clean_up_child_process(int signal_number)
 {
     int status;
+    cld=1;
     retval = 0;
     wait(&status);
 
@@ -100,8 +105,14 @@ int run(const char* cmd, const char* input, char** poutput, char** perror, int t
     if (pid == -1)
         exit(-1);
 
+    cld=0;
+
     if (!pid)
     {
+#if DEBUG
+        printf("child\n");
+#endif
+/*
         dup2(pipein[0], 0);
         close(pipein[0]);
         close(pipein[1]);
@@ -113,24 +124,33 @@ int run(const char* cmd, const char* input, char** poutput, char** perror, int t
         dup2(pipeerr[1], 2);
         close(pipeerr[0]);
         close(pipeerr[1]);
-
+*/
+#if DEBUG
+        printf("execlp\n");
+#endif
         execlp(cmd, cmd, NULL);
         _exit(1);
     }
+#if DEBUG
+        printf("parent\n");
+#endif
 
     close(pipein[0]);
     close(pipeout[1]);
     close(pipeerr[1]);
-
+    *poutput = NULL;
+    *perror = NULL;
+/*
     writepipe(pipein[0], input);
     *poutput = readpipe(pipeout[1]);
     *perror = readpipe(pipeerr[1]);
-
+*/
     close(pipein[1]);
     close(pipeout[0]);
     close(pipeerr[0]);
 
-    waitpid(pid, NULL, 0);
+//    waitpid(pid, NULL, 0);
+    while(!cld);
 
     return(retval);
 }
