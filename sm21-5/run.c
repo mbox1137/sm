@@ -50,7 +50,6 @@ void writepipe(int fd, const char* s, int n)
 {
     int nw, k;
     k = 0;
-
 #if DEBUG
     printf("writepipe: %s\n",s);
 #endif
@@ -66,11 +65,13 @@ void writepipe(int fd, const char* s, int n)
 
 static void myalarm(int signal_number)
 {
+    int sig;
+    sig=SIGKILL;
+//    sig=SIGINT;
 #if DEBUG
-        fprintf(stderr, "pid=%d\n", pid);
+        fprintf(stderr, "sig(%d): %d -> %d\n", sig, getpid(), pid);
 #endif
-//    kill(SIGKILL, pid);
-    kill(SIGTERM, pid);
+    kill(pid, sig);
     return;
 }
 
@@ -115,14 +116,17 @@ int run(const char* cmd, const char* input, char** poutput, char** perror, int t
 #if DEBUG
         printf("parent\n");
 #endif
+    if(timeout>0)
+    {
+        ualarm(timeout,0);
+//        alarm(timeout);
+        struct sigaction sigchld_action;
+        memset(&sigchld_action, 0, sizeof(sigchld_action));
+        sigchld_action.sa_handler = &myalarm;
+        sigaction(SIGALRM, &sigchld_action, NULL);
+    }
 
-    ualarm(timeout*1000,0);
-    struct sigaction sigchld_action;
     retval = 0;
-    memset(&sigchld_action, 0, sizeof(sigchld_action));
-    sigchld_action.sa_handler = &myalarm;
-    sigaction(SIGALRM, &sigchld_action, NULL);
-
     close(pipein[0]);
     close(pipeout[1]);
     close(pipeerr[1]);
