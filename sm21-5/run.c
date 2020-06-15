@@ -116,9 +116,9 @@ int run(const char* cmd, const char* input, char** poutput, char** perror, int t
     *perror = NULL;
 
     writepipe(pipein[1], input);
+    close(pipein[1]);
     *poutput = readpipe(pipeout[0]);
     *perror = readpipe(pipeerr[0]);
-    close(pipein[1]);
     close(pipeout[0]);
     close(pipeerr[0]);
 
