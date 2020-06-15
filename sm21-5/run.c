@@ -90,7 +90,6 @@ int run(const char* cmd, const char* input, char** poutput, char** perror, int t
 #if DEBUG
         printf("child\n");
 #endif
-/*
         dup2(pipein[0], 0);
         close(pipein[0]);
         close(pipein[1]);
@@ -102,7 +101,6 @@ int run(const char* cmd, const char* input, char** poutput, char** perror, int t
         dup2(pipeerr[1], 2);
         close(pipeerr[0]);
         close(pipeerr[1]);
-*/
 #if DEBUG
         printf("execlp\n");
 #endif
@@ -118,16 +116,14 @@ int run(const char* cmd, const char* input, char** poutput, char** perror, int t
     close(pipeerr[1]);
     *poutput = NULL;
     *perror = NULL;
-/*
-    writepipe(pipein[0], input);
-    *poutput = readpipe(pipeout[1]);
-    *perror = readpipe(pipeerr[1]);
-*/
+
+    writepipe(pipein[1], input);
+    *poutput = readpipe(pipeout[0]);
+    *perror = readpipe(pipeerr[0]);
     close(pipein[1]);
     close(pipeout[0]);
     close(pipeerr[0]);
 
-//    waitpid(pid, NULL, 0);
     retval = 0;
     wait(&status);
 

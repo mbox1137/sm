@@ -3,7 +3,7 @@
 #include "run.h"
 
 int main(int argc, char** argv) {
-    char cmd[]="ls";	//bc
+    char cmd[]="./ls.sh";
     char inp[]="2+2*2";
     char* out;
     char* err;
