@@ -1,4 +1,4 @@
-#define DEBUG 0
+#define DEBUG 1
 
 #include <stdio.h>
 #include <string.h>
@@ -11,12 +11,6 @@
 #include "run.h"
 
 static pid_t pid;
-
-static void myalarm(int signal_number)
-{
-    kill(SIGKILL, pid);
-    return;
-}
 
 char* readpipe(int fd)
 {
@@ -70,6 +64,16 @@ void writepipe(int fd, const char* s, int n)
     return;
 }
 
+static void myalarm(int signal_number)
+{
+#if DEBUG
+        fprintf(stderr, "pid=%d\n", pid);
+#endif
+//    kill(SIGKILL, pid);
+    kill(SIGTERM, pid);
+    return;
+}
+
 int run(const char* cmd, const char* input, char** poutput, char** perror, int timeout)
 {
     int pipein[2], pipeout[2], pipeerr[2];
@@ -112,12 +116,12 @@ int run(const char* cmd, const char* input, char** poutput, char** perror, int t
         printf("parent\n");
 #endif
 
+    ualarm(timeout*1000,0);
     struct sigaction sigchld_action;
     retval = 0;
     memset(&sigchld_action, 0, sizeof(sigchld_action));
     sigchld_action.sa_handler = &myalarm;
     sigaction(SIGALRM, &sigchld_action, NULL);
-    ualarm(timeout*1000,0);
 
     close(pipein[0]);
     close(pipeout[1]);
@@ -128,8 +132,8 @@ int run(const char* cmd, const char* input, char** poutput, char** perror, int t
     writepipe(pipein[1], input, strlen(input));
     close(pipein[1]);
     *poutput = readpipe(pipeout[0]);
-    *perror = readpipe(pipeerr[0]);
     close(pipeout[0]);
+    *perror = readpipe(pipeerr[0]);
     close(pipeerr[0]);
 
     retval = 0;
