@@ -44,12 +44,12 @@ char* readpipe(int fd)
     return(buf);
 }
 
-void writepipe(int fd, const char* s)
+void writepipe(int fd, const char* s, int n)
 {
-    int n, nw, k;
+    int nw, k;
     k = 0;
-    n = strlen(s) + 1;
 
+    printf("s=%s\n",s);
     while(n > 0)
     {
         nw = write(fd, &s[k], n);
@@ -115,7 +115,7 @@ int run(const char* cmd, const char* input, char** poutput, char** perror, int t
     *poutput = NULL;
     *perror = NULL;
 
-    writepipe(pipein[1], input);
+    writepipe(pipein[1], input, strlen(input));
     close(pipein[1]);
     *poutput = readpipe(pipeout[0]);
     *perror = readpipe(pipeerr[0]);

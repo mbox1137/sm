@@ -4,7 +4,7 @@
 
 int main(int argc, char** argv) {
     char cmd[]="bc";
-    char inp[]="2+2*2";
+    char inp[]="2+2*2\n";
     char* out;
     char* err;
     int rv;
