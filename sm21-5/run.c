@@ -10,9 +10,6 @@
 #include <unistd.h>
 #include "run.h"
 
-static int retval;
-static int cld;
-
 char* readpipe(int fd)
 {
     int n, nr, k;
@@ -63,36 +60,19 @@ void writepipe(int fd, const char* s)
     return;
 }
 
-static void clean_up_child_process(int signal_number)
-{
-    int status;
-    cld=1;
-    retval = 0;
-    wait(&status);
-
-    if (WIFEXITED(status))
-        retval = (WEXITSTATUS(status));
-    else if (WIFSIGNALED(status))
-        retval = (1024 + WTERMSIG(status));
-    else if (WIFSTOPPED(status))
-        retval = (1024 + WSTOPSIG(status));
-    else if (WIFCONTINUED(status))
-        retval = (1024 + SIGCONT);
-
-    return;
-}
-
 int run(const char* cmd, const char* input, char** poutput, char** perror, int timeout)
 {
     int pipein[2], pipeout[2], pipeerr[2];
     pid_t pid;
-
+    int retval;
+    int status;
+/*
     struct sigaction sigchld_action;
     retval = 0;
     memset(&sigchld_action, 0, sizeof(sigchld_action));
     sigchld_action.sa_handler = &clean_up_child_process;
     sigaction(SIGCHLD, &sigchld_action, NULL);
-
+*/
     if (pipe(pipein) == -1)
         exit(-1);
     if (pipe(pipeout) == -1)
@@ -104,8 +84,6 @@ int run(const char* cmd, const char* input, char** poutput, char** perror, int t
 
     if (pid == -1)
         exit(-1);
-
-    cld=0;
 
     if (!pid)
     {
@@ -150,7 +128,44 @@ int run(const char* cmd, const char* input, char** poutput, char** perror, int t
     close(pipeerr[0]);
 
 //    waitpid(pid, NULL, 0);
-    while(!cld);
+    retval = 0;
+    wait(&status);
+
+    if (WIFEXITED(status))
+        retval = (WEXITSTATUS(status));
+    else if (WIFSIGNALED(status))
+        retval = (1024 + WTERMSIG(status));
+    else if (WIFSTOPPED(status))
+        retval = (1024 + WSTOPSIG(status));
+    else if (WIFCONTINUED(status))
+        retval = (1024 + SIGCONT);
 
     return(retval);
 }
+
+/*
+    struct sigaction sigchld_action;
+    retval = 0;
+    memset(&sigchld_action, 0, sizeof(sigchld_action));
+    sigchld_action.sa_handler = &clean_up_child_process;
+    sigaction(SIGCHLD, &sigchld_action, NULL);
+
+static void clean_up_child_process(int signal_number)
+{
+    int status;
+    cld=1;
+    retval = 0;
+    wait(&status);
+
+    if (WIFEXITED(status))
+        retval = (WEXITSTATUS(status));
+    else if (WIFSIGNALED(status))
+        retval = (1024 + WTERMSIG(status));
+    else if (WIFSTOPPED(status))
+        retval = (1024 + WSTOPSIG(status));
+    else if (WIFCONTINUED(status))
+        retval = (1024 + SIGCONT);
+
+    return;
+}
+*/
