@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
     printf("str=%s\n", str);
     printf("rv=%d(%d,%d)\n",rv,rv/256,rv%256);
     printf("out=%s\n",out);
-    printf("err=%s\n",out);
+    printf("err=%s\n",err);
     free(str);
     free(out);
     free(err);
