@@ -1,4 +1,4 @@
-#define DEBUG 1
+#define DEBUG 0
 
 #include <stdio.h>
 #include <string.h>
@@ -9,6 +9,14 @@
 #include <sys/epoll.h>
 #include <unistd.h>
 #include "run.h"
+
+static pid_t pid;
+
+static void myalarm(int signal_number)
+{
+    kill(SIGKILL, pid);
+    return;
+}
 
 char* readpipe(int fd)
 {
@@ -49,7 +57,9 @@ void writepipe(int fd, const char* s, int n)
     int nw, k;
     k = 0;
 
-    printf("s=%s\n",s);
+#if DEBUG
+    printf("writepipe: %s\n",s);
+#endif
     while(n > 0)
     {
         nw = write(fd, &s[k], n);
@@ -63,16 +73,9 @@ void writepipe(int fd, const char* s, int n)
 int run(const char* cmd, const char* input, char** poutput, char** perror, int timeout)
 {
     int pipein[2], pipeout[2], pipeerr[2];
-    pid_t pid;
     int retval;
     int status;
-/*
-    struct sigaction sigchld_action;
-    retval = 0;
-    memset(&sigchld_action, 0, sizeof(sigchld_action));
-    sigchld_action.sa_handler = &clean_up_child_process;
-    sigaction(SIGCHLD, &sigchld_action, NULL);
-*/
+
     if (pipe(pipein) == -1)
         exit(-1);
     if (pipe(pipeout) == -1)
@@ -109,6 +112,13 @@ int run(const char* cmd, const char* input, char** poutput, char** perror, int t
         printf("parent\n");
 #endif
 
+    struct sigaction sigchld_action;
+    retval = 0;
+    memset(&sigchld_action, 0, sizeof(sigchld_action));
+    sigchld_action.sa_handler = &myalarm;
+    sigaction(SIGALRM, &sigchld_action, NULL);
+    ualarm(timeout*1000,0);
+
     close(pipein[0]);
     close(pipeout[1]);
     close(pipeerr[1]);
@@ -136,30 +146,3 @@ int run(const char* cmd, const char* input, char** poutput, char** perror, int t
 
     return(retval);
 }
-
-/*
-    struct sigaction sigchld_action;
-    retval = 0;
-    memset(&sigchld_action, 0, sizeof(sigchld_action));
-    sigchld_action.sa_handler = &clean_up_child_process;
-    sigaction(SIGCHLD, &sigchld_action, NULL);
-
-static void clean_up_child_process(int signal_number)
-{
-    int status;
-    cld=1;
-    retval = 0;
-    wait(&status);
-
-    if (WIFEXITED(status))
-        retval = (WEXITSTATUS(status));
-    else if (WIFSIGNALED(status))
-        retval = (1024 + WTERMSIG(status));
-    else if (WIFSTOPPED(status))
-        retval = (1024 + WSTOPSIG(status));
-    else if (WIFCONTINUED(status))
-        retval = (1024 + SIGCONT);
-
-    return;
-}
-*/
