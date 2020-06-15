@@ -101,9 +101,7 @@ int run(const char* cmd, const char* input, char** poutput, char** perror, int t
         dup2(pipeerr[1], 2);
         close(pipeerr[0]);
         close(pipeerr[1]);
-#if DEBUG
-        printf("execlp\n");
-#endif
+
         execlp(cmd, cmd, NULL);
         _exit(1);
     }
