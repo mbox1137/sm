@@ -1,9 +1,19 @@
 #!/bin/bash
 
+wdir=$(pwd)
 pushd ~
 echo "Waiting for 1 Sec..."
-~/BP/P/C/Andrew/cod/sm21-5/main find "2+2*2" 999 |head; echo $?
+$wdir/main find "2+2*2" 1000| head; echo $?
 popd
+
 echo
 echo "Waiting for 1 Sec..."
-~/BP/P/C/Andrew/cod/sm21-5/main find "2+2*2" 999 |head; echo $?
+./main find "2+2*2" 1000 | head; echo $?
+
+echo
+echo "Waiting for 1 Sec..."
+./main ./sleep.sh "2+2*2" 1000 | head; echo $?
+
+echo
+echo "Waiting for 3 Sec..."
+./main ./sleep.sh "2+2*2" 3000 | head; echo $?

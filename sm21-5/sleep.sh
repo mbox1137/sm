@@ -1,3 +1,2 @@
 #!/bin/bash
-
-ls *.c
+sleep 2
