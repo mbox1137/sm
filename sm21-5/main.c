@@ -23,13 +23,13 @@ int main(int argc, char** argv) {
     }
     strcpy(tmp, inp);
 //    strcat(tmp, "\n");
-    printf("cmd=%s\n",cmd);
-    printf("inp=%s\n",inp);
-    printf("tout=%d\n", tout);
+    fprintf(stdout,"cmd=%s\n",cmd);
+    fprintf(stdout,"inp=%s\n",inp);
+    fprintf(stdout,"tout=%d\n", tout);
     rv=run(cmd, tmp, &out, &err, tout);
-    printf("rv=%d(%02X:%02X)\n",rv,rv/256,rv%256);
-    printf("out=%s\n",out);
-    printf("err=%s\n",err);
+    fprintf(stderr,"rv=%d(%02X:%02X)\n",rv,rv/256,rv%256);
+    fprintf(stdout,"out=%s\n",out);
+    fprintf(stderr,"err=%s\n",err);
     free(out);
     free(err);
     return(rv);
