@@ -190,6 +190,7 @@ int start (const char* cmd, int *fd)
         close(pipeerr[0]);
         close(pipeerr[1]);
 #endif
+        fprintf(stderr, "execlp\n");
         execlp(cmd, cmd, NULL);
         perror("execlp");
         _exit(1);
