@@ -1,4 +1,5 @@
-#define DEBUG 0
+#define DEBUG 1
+#define LINE 0
 
 #include <stdio.h>
 #include <string.h>
@@ -15,6 +16,19 @@
 
 int start (const char* cmd, int *fd);
 
+int getnum(FILE *f) {
+    int x;
+    char lin[NN];
+    x=-1;
+    for(;;) {
+        if(!fgets(lin,NN,f))
+            break;
+        if(sscanf(lin,"%d", &x)==1)
+            break;
+    }
+    return(x);
+}
+
 int main(int argc, char** argv) {
     char *p1, *p2;
     pid_t pid[2];
@@ -24,7 +38,7 @@ int main(int argc, char** argv) {
     int status;
     int x,y;
     int k;
-#if DEBUG
+#if LINE
     char lin[NN];
 #endif
     if(argc==3)
@@ -44,10 +58,12 @@ int main(int argc, char** argv) {
     p2stdin=fdopen(p2fd[0], "w");
     p2stdout=fdopen(p2fd[1], "r");
     p2stderr=fdopen(p2fd[2], "r");
-    
+#if DEBUG    
+    sleep(1);
+#endif
     while(!feof(stdin))
     {
-#if DEBUG
+#if LINE
         if(fgets(lin,NN,stdin)) {
             fputs(lin,p1stdin);
             fflush(p1stdin);
@@ -62,21 +78,24 @@ int main(int argc, char** argv) {
             }
         }
 #else
-        if(scanf("%d",&x)==1)
+        if(!feof(stdin))
         {
+            x=getnum(stdin);
+#if DEBUG    
+            fprintf(stderr, "x(stdin)=%d\n", x);
+#endif
             fprintf(p1stdin, "%d\n", x);
             fflush(p1stdin);
-            fscanf(p1stdout,"%d", &y);
+            y=getnum(p1stdout);
             if(!y&1)
             {
                 x=y;
                 fprintf(p2stdin, "%d\n", x);
                 fflush(p2stdin);
-                fscanf(p2stdout,"%d", &y);
+                y=getnum(p2stdout);
             }
             printf("%d\n", y);
-        } else
-            fgetc(stdin);
+        }
 #endif
     }
     for(k=0; k<3; k++)
