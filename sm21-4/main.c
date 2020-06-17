@@ -11,6 +11,8 @@
 #include <sys/time.h>
 #include <malloc.h>
 
+#define NN 132
+
 int start (const char* cmd, int *fd);
 
 int main(int argc, char** argv) {
@@ -22,13 +24,15 @@ int main(int argc, char** argv) {
     int status;
     int x,y;
     int k;
-
+#if DEBUG
+    char lin[NN];
+#endif
     if(argc==3)
     {
         p1=argv[1];
         p2=argv[2];
     } else {
-        fprintf(stderr, "%s bc p1.py p2.py\n", argv[0]);
+        fprintf(stderr, "%s p1.py p2.py\n", argv[0]);
         return(1);
     }
 
@@ -43,19 +47,37 @@ int main(int argc, char** argv) {
     
     while(!feof(stdin))
     {
+#if DEBUG
+        if(fgets(lin,NN,stdin)) {
+            fputs(lin,p1stdin);
+            fflush(p1stdin);
+            if(fgets(lin,NN,p1stdout))
+            {
+                fputs(lin,p2stdin);
+                fflush(p2stdin);
+                if(fgets(lin,NN,p2stdout))
+                {
+                    fputs(lin,stdout);
+                }
+            }
+        }
+#else
         if(scanf("%d",&x)==1)
         {
             fprintf(p1stdin, "%d\n", x);
+            fflush(p1stdin);
             fscanf(p1stdout,"%d", &y);
             if(!y&1)
             {
                 x=y;
                 fprintf(p2stdin, "%d\n", x);
+                fflush(p2stdin);
                 fscanf(p2stdout,"%d", &y);
             }
             printf("%d\n", y);
         } else
             fgetc(stdin);
+#endif
     }
     for(k=0; k<3; k++)
     {
