@@ -43,7 +43,7 @@ main : main.o Makefile
 %.o: %.cpp
 #	$(CC) $(CFLAGS) $(GDB) -c -o $@ $<
 
-%.s: %.c Makefile run.h
+%.s: %.c Makefile
 	$(CC) $(CFLAGS) $(GDB) -S -o $@ $<
 
 %.s: %.cpp Makefile

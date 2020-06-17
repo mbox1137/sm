@@ -1,51 +1,3 @@
-#include <stdio.h>
-#include <string.h>
-#include <malloc.h>
-#include "run.h"
-
-int main(int argc, char** argv) {
-    char *cmd;
-    char *inp;
-    char* out;
-    char* err;
-    int rv;
-    int tout;
-    char tmp[132];
-
-    if(argc==4)
-    {
-        cmd=argv[1];
-        inp=argv[2];
-        sscanf(argv[3], "%d", &tout);
-    } else {
-        fprintf(stderr, "%s bc \"2+2*2\" 10\n", argv[0]);
-        return(1);
-    }
-    strcpy(tmp, inp);
-//    strcat(tmp, "\n");
-    fprintf(stdout,"cmd=%s\n",cmd);
-    fprintf(stdout,"inp=%s\n",inp);
-    fprintf(stdout,"tout=%d\n", tout);
-    rv=run(cmd, tmp, &out, &err, tout);
-    fprintf(stderr,"rv=%d(%02X:%02X)\n",rv,rv/256,rv%256);
-    fprintf(stdout,"out=%s\n",out);
-    fprintf(stderr,"err=%s\n",err);
-    free(out);
-    free(err);
-    return(rv);
-}
-
-//-------------------------------------
-int run(const char* cmd, 
-        const char* input, 
-        char** poutput, 
-        char** perror, 
-        int timeot);
-char* readpipe(int fd);
-void writepipe(int fd, const char* s, int n);
-
-//https://www.informit.com/articles/article.aspx?p=23618&seqNum=14
-
 #define DEBUG 0
 
 #include <stdio.h>
@@ -57,113 +9,89 @@ void writepipe(int fd, const char* s, int n);
 #include <sys/epoll.h>
 #include <unistd.h>
 #include <sys/time.h>
-#include "run.h"
+#include <malloc.h>
 
-static pid_t pid;
+int start (const char* cmd, int *fd);
 
-char* readpipe(int fd)
-{
-    int n, nr, k;
-    char *buf;
-    n = 0;
-    buf = NULL;
-    k = 0;
-    for(;;)
+int main(int argc, char** argv) {
+    char *p1, *p2;
+    pid_t pid[2];
+    int p1fd[3], p2fd[3];
+    FILE *p1stdin, *p1stdout, *p1stderr;
+    FILE *p2stdin, *p2stdout, *p2stderr;
+    int status;
+    int x,y;
+    int k;
+
+    if(argc==3)
     {
-        if (k >= n)
-        {
-            if (n == 0)
-                n = 1<<16;
-            else
-                n <<= 1;
+        p1=argv[1];
+        p2=argv[2];
+    } else {
+        fprintf(stderr, "%s bc p1.py p2.py\n", argv[0]);
+        return(1);
+    }
 
-            buf = realloc(buf, n);
-            if (buf == NULL)
+    pid[0]=start(p1, p1fd);
+    pid[1]=start(p2, p2fd);
+    p1stdin=fdopen(p1fd[0], "w");
+    p1stdout=fdopen(p1fd[1], "r");
+    p1stderr=fdopen(p1fd[2], "r");
+    p2stdin=fdopen(p2fd[0], "w");
+    p2stdout=fdopen(p2fd[1], "r");
+    p2stderr=fdopen(p2fd[2], "r");
+    
+    while(!feof(stdin))
+    {
+        if(scanf("%d",&x)==1)
+        {
+            fprintf(p1stdin, "%d\n", x);
+            fscanf(p1stdout,"%d", &y);
+            if(!y&1)
             {
-                perror("readpipe");
-                exit(-1);
+                x=y;
+                fprintf(p2stdin, "%d\n", x);
+                fscanf(p2stdout,"%d", &y);
             }
-        }
-
-        nr = read(fd, &buf[k], n - k);
-        if (nr < 0)
-        {
-                perror("readpipe, read");
-                break;
-        }
-        else if (nr == 0)
-            break;
-        k += nr;
+            printf("%d\n", y);
+        } else
+            fgetc(stdin);
     }
-
-    buf[k] = 0;
-
-    return(buf);
-}
-
-void writepipe(int fd, const char* s, int n)
-{
-    int nw, k;
-    k = 0;
-#if DEBUG
-    printf("writepipe: %s\n",s);
-#endif
-    while(n > 0)
+    for(k=0; k<3; k++)
     {
-        nw = write(fd, &s[k], n);
-        if (nw < 0)
-        {
-                perror("writepipe, write");
-                break;
-        }
-        else if (nw == 0)
-            break;
-        k += nw;
-        n -= nw;
+        close(p1fd[k]); 
+        close(p2fd[k]); 
     }
-
-    return;
-}
-
-static void myalarm(int signal_number)
-{
-    int sig;
-    sig=SIGKILL;
-//    sig=SIGINT;
-#if DEBUG
-        fprintf(stderr, "sig(%d): %d -> %d\n", sig, getpid(), pid);
-#endif
-    kill(pid, sig);
-    return;
-}
-
-int malarm(int msec) {
-    double s;
-    time_t sec;
-    suseconds_t usec;
-    struct itimerval timer;
-
-    s=msec/1000.0;
-    sec=s;
-    usec=(s-sec)*1E6;
-    timer.it_value.tv_sec = sec;
-    timer.it_value.tv_usec = usec;
-    timer.it_interval.tv_sec = sec;
-    timer.it_interval.tv_usec = usec;
-    if(setitimer(ITIMER_REAL, &timer, NULL))
+    fclose(p1stdin);
+    fclose(p1stdout);
+    fclose(p1stderr);
+    fclose(p2stdin);
+    fclose(p2stdout);
+    fclose(p2stderr);
+    
+    for(k=0; k<2; k++)
     {
-        perror("setitimer");
-        exit(-1);
+        waitpid(pid[k], &status, 0);
+/*
+        if (WIFEXITED(status))
+            retval = (WEXITSTATUS(status));
+        else if (WIFSIGNALED(status))
+            retval = (1024 + WTERMSIG(status));
+        else if (WIFSTOPPED(status))
+            retval = (1024 + WSTOPSIG(status));
+        else if (WIFCONTINUED(status))
+            retval = (1024 + SIGCONT);
+*/
     }
-    return((int)(s*1000));
+
+    return(0);
 }
 
-int run(const char* cmd, const char* input, char** poutput, char** perr, int timeout)
+//-------------------------------------
+int start (const char* cmd, int *fd)
 {
     int pipein[2], pipeout[2], pipeerr[2];
-    int retval;
-    int status;
-    struct sigaction sa;
+    pid_t pid;
 
     if (pipe(pipein) == -1)
     {
@@ -191,9 +119,6 @@ int run(const char* cmd, const char* input, char** poutput, char** perr, int tim
 
     if (!pid)
     {
-#if DEBUG
-        printf("child\n");
-#endif
         dup2(pipein[0], 0);
         close(pipein[0]);
         close(pipein[1]);
@@ -210,41 +135,13 @@ int run(const char* cmd, const char* input, char** poutput, char** perr, int tim
         perror("execlp");
         _exit(1);
     }
-#if DEBUG
-        printf("parent\n");
-#endif
-    if(timeout>0)
-    {
-        memset(&sa, 0, sizeof(sa));
-        sa.sa_handler = &myalarm;
-        sigaction(SIGALRM, &sa, NULL);
-        malarm(timeout);
-    }
 
     close(pipein[0]);
     close(pipeout[1]);
     close(pipeerr[1]);
-    *poutput = NULL;
-    *perr = NULL;
+    fd[0]=pipein[1];
+    fd[1]=pipeout[0];
+    fd[2]=pipeerr[0];
 
-    writepipe(pipein[1], input, strlen(input));
-    close(pipein[1]);
-    *poutput = readpipe(pipeout[0]);
-    close(pipeout[0]);
-    *perr = readpipe(pipeerr[0]);
-    close(pipeerr[0]);
-
-    retval = 0;
-    wait(&status);
-
-    if (WIFEXITED(status))
-        retval = (WEXITSTATUS(status));
-    else if (WIFSIGNALED(status))
-        retval = (1024 + WTERMSIG(status));
-    else if (WIFSTOPPED(status))
-        retval = (1024 + WSTOPSIG(status));
-    else if (WIFCONTINUED(status))
-        retval = (1024 + SIGCONT);
-
-    return(retval);
+    return(pid);
 }
