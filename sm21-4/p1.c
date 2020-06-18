@@ -1,12 +1,15 @@
-#define STDERR 1
+#define STDERR 0
 #define NN 132
 
 #include <unistd.h>
 #include <stdio.h>
 
 void main() {
-    int x, nc;
+    int x;
+    int nc;
+#if STDERR
     char lin[NN];
+#endif
     while(!feof(stdin)) {
         if(scanf("%d",&x)==1) {
             nc=printf("%d\n", x+1);
@@ -22,5 +25,6 @@ void main() {
         } else {
             fgetc(stdin);
         }
+    nc=nc;
     }
 }

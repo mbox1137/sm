@@ -1,6 +1,6 @@
-#define DEBUG 1
+#define DEBUG 0
 #define LINE 0
-#define STDERR 1
+#define STDERR 0
 
 #include <stdio.h>
 #include <string.h>
@@ -34,8 +34,12 @@ int main(int argc, char** argv) {
     char *p1, *p2;
     pid_t pid[2];
     int p1fd[3], p2fd[3];
-    FILE *p1stdin, *p1stdout, *p1stderr;
-    FILE *p2stdin, *p2stdout, *p2stderr;
+    FILE *p1stdin, *p1stdout;
+    FILE *p2stdin, *p2stdout;
+#if STDERR
+#else
+    FILE *p1stderr, *p2stderr;
+#endif
     int status;
     int x,y;
     int k;
@@ -55,10 +59,13 @@ int main(int argc, char** argv) {
     pid[1]=start(p2, p2fd);
     p1stdin=fdopen(p1fd[0], "w");
     p1stdout=fdopen(p1fd[1], "r");
-    p1stderr=fdopen(p1fd[2], "r");
     p2stdin=fdopen(p2fd[0], "w");
     p2stdout=fdopen(p2fd[1], "r");
+#if STDERR
+#else
+    p1stderr=fdopen(p1fd[2], "r");
     p2stderr=fdopen(p2fd[2], "r");
+#endif
 #if DEBUG    
     sleep(1);
 #endif
@@ -99,17 +106,20 @@ int main(int argc, char** argv) {
         }
 #endif
     }
+    fclose(p1stdin);
+    fclose(p1stdout);
+    fclose(p2stdin);
+    fclose(p2stdout);
+#if STDERR
+#else
+    fclose(p1stderr);
+    fclose(p2stderr);
+#endif
     for(k=0; k<3; k++)
     {
         close(p1fd[k]); 
         close(p2fd[k]); 
     }
-    fclose(p1stdin);
-    fclose(p1stdout);
-    fclose(p1stderr);
-    fclose(p2stdin);
-    fclose(p2stdout);
-    fclose(p2stderr);
     
     for(k=0; k<2; k++)
     {
@@ -189,7 +199,10 @@ int start (const char* cmd, int *fd)
         close(pipeerr[0]);
         close(pipeerr[1]);
 #endif
+#if DEBUG
         fprintf(stderr, "execlp\n");
+#endif
+        dp2=dp2;
         execlp(cmd, cmd, NULL);
         perror("execlp");
         _exit(1);
