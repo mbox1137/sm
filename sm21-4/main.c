@@ -17,17 +17,16 @@
 
 int start (const char* cmd, int *fd);
 
-int getnum(FILE *f) {
-    int x;
+int getnum(FILE *f, int *px) {
     char lin[NN];
-    x=-1;
     for(;;) {
         if(!fgets(lin,NN,f))
             break;
-        if(sscanf(lin,"%d", &x)==1)
-            break;
+        if(sscanf(lin,"%d", px)==1) {
+            return(0);
+        }
     }
-    return(x);
+    return(-1);
 }
 
 int main(int argc, char** argv) {
@@ -88,19 +87,22 @@ int main(int argc, char** argv) {
 #else
         if(!feof(stdin))
         {
-            x=getnum(stdin);
+            if(getnum(stdin, &x))
+                break;
 #if DEBUG    
             fprintf(stderr, "x(stdin)=%d\n", x);
 #endif
             fprintf(p1stdin, "%d\n", x);
             fflush(p1stdin);
-            y=getnum(p1stdout);
-            if(!y&1)
+            if(getnum(p1stdout, &y))
+                break;
+            if(!(y&1))
             {
                 x=y;
                 fprintf(p2stdin, "%d\n", x);
                 fflush(p2stdin);
-                y=getnum(p2stdout);
+                if(getnum(p2stdout, &y))
+                    break;
             }
             printf("%d\n", y);
         }

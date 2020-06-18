@@ -1,3 +1,5 @@
 #!/bin/bash
 
-echo 1 2 3 |./main ./p1.py ./p2.py
+cat main.tst
+echo ----
+./main ./p1 ./p2 <main.tst
