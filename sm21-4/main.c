@@ -1,6 +1,6 @@
 #define DEBUG 1
 #define LINE 0
-#define STDERR 0
+#define STDERR 1
 
 #include <stdio.h>
 #include <string.h>
@@ -164,7 +164,6 @@ int start (const char* cmd, int *fd)
     {
         dp2 = dup2(pipein[0], 0);
 #if STDERR
-#else
         if ( dp2 == -1)
         {
             perror("dp2(0)");
@@ -176,7 +175,6 @@ int start (const char* cmd, int *fd)
 
         dp2=dup2(pipeout[1], 1);
 #if STDERR
-#else
         if ( dp2 == -1)
         {
             perror("dp2(1)");
@@ -186,6 +184,7 @@ int start (const char* cmd, int *fd)
         close(pipeout[0]);
         close(pipeout[1]);
 #if STDERR
+#else
         dup2(pipeerr[1], 2);
         close(pipeerr[0]);
         close(pipeerr[1]);
@@ -202,9 +201,9 @@ int start (const char* cmd, int *fd)
     fd[0]=pipein[1];
     fd[1]=pipeout[0];
 #if STDERR
-    fd[2]=pipeerr[0];
-#else
     close(pipeerr[0]);
+#else
+    fd[2]=pipeerr[0];
 #endif
 
     return(pid);
