@@ -1,4 +1,4 @@
-#define STDERR 0
+#define STDERR 1
 #define NN 132
 
 #include <unistd.h>

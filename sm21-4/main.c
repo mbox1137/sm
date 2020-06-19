@@ -1,6 +1,7 @@
-#define DEBUG 0
+#define _GNU_SOURCE
+#define DEBUG 1
 #define LINE 0
-#define STDERR 0
+#define STDERR 1
 
 #include <stdio.h>
 #include <string.h>
@@ -9,6 +10,7 @@
 #include <sys/signalfd.h>
 #include <sys/timerfd.h>
 #include <sys/epoll.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include <sys/time.h>
 #include <malloc.h>
@@ -25,6 +27,7 @@ int getnum(FILE *f, int *px) {
         if(sscanf(lin,"%d", px)==1) {
             return(-1);
         }
+        break;
     }
     return(0);
 }
@@ -68,9 +71,9 @@ int main(int argc, char** argv) {
 #if DEBUG    
     sleep(1);
 #endif
+#if LINE
     while(!feof(stdin))
     {
-#if LINE
         if(fgets(lin,NN,stdin)) {
             fputs(lin,p1stdin);
             fflush(p1stdin);
@@ -84,6 +87,7 @@ int main(int argc, char** argv) {
                 }
             }
         }
+    }
 #else
         while(!feof(stdin))
         {
@@ -93,22 +97,23 @@ int main(int argc, char** argv) {
             fprintf(stderr, "x(stdin)=%d\n", x);
 #endif
             fprintf(p1stdin, "%d\n", x);
-            fflush(p1stdin);
+//            fflush(p1stdin);
         }
+        fclose(p1stdin);
+        close(p1fd[0]); 
         getnum(p1stdout, &y);
         if(!(y&1))
         {
             x=y;
             fprintf(p2stdin, "%d\n", x);
             fflush(p2stdin);
+            fclose(p2stdin);
+            close(p2fd[0]); 
             getnum(p2stdout, &y);
         }
         printf("%d\n", y);
 #endif
-    }
-    fclose(p1stdin);
     fclose(p1stdout);
-    fclose(p2stdin);
     fclose(p2stdout);
 #if STDERR
 #else
@@ -146,17 +151,17 @@ int start (const char* cmd, int *fd)
     pid_t pid;
     int dp2;
 
-    if (pipe(pipein) == -1)
+    if (pipe2(pipein, O_CLOEXEC) == -1)
     {
         perror("pipein");
         exit(-1);
     }
-    if (pipe(pipeout) == -1)
+    if (pipe2(pipeout, O_CLOEXEC) == -1)
     {
         perror("pipeout");
         exit(-1);
     }
-    if (pipe(pipeerr) == -1)
+    if (pipe2(pipeerr, O_CLOEXEC) == -1)
     {
         perror("pipeerr");
         exit(-1);
