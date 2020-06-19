@@ -6,25 +6,27 @@
 
 void main() {
     int x;
-    int nc;
+    int nc, s;
 #if STDERR
     char lin[NN];
 #endif
+    s=0;
     while(!feof(stdin)) {
         if(scanf("%d",&x)==1) {
-            nc=printf("%d\n", x+1);
-            fflush(stdout);
-#if STDERR
-            if(nc<0) {
-                sprintf(lin, "%d: printf(%d)", getpid(),x-1);
-                perror(lin);
-            }
-            sprintf(lin, "%d: x=%d", getpid(), x);
-            fprintf(stderr,"%s",lin);
-#endif
+            s+=x;
         } else {
             fgetc(stdin);
         }
-    nc=nc;
     }
+    nc=printf("%d\n", s);
+    fflush(stdout);
+#if STDERR
+    if(nc<0) {
+        sprintf(lin, "%d: printf(%d)", getpid(),x-1);
+        perror(lin);
+    }
+    sprintf(lin, "%d: x=%d", getpid(), x);
+    fprintf(stderr,"%s",lin);
+#endif
+    nc=nc;
 }

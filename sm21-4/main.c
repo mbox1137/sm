@@ -23,10 +23,10 @@ int getnum(FILE *f, int *px) {
         if(!fgets(lin,NN,f))
             break;
         if(sscanf(lin,"%d", px)==1) {
-            return(0);
+            return(-1);
         }
     }
-    return(-1);
+    return(0);
 }
 
 int main(int argc, char** argv) {
@@ -85,27 +85,25 @@ int main(int argc, char** argv) {
             }
         }
 #else
-        if(!feof(stdin))
+        while(!feof(stdin))
         {
-            if(getnum(stdin, &x))
+            if(!getnum(stdin, &x))
                 break;
 #if DEBUG    
             fprintf(stderr, "x(stdin)=%d\n", x);
 #endif
             fprintf(p1stdin, "%d\n", x);
             fflush(p1stdin);
-            if(getnum(p1stdout, &y))
-                break;
-            if(!(y&1))
-            {
-                x=y;
-                fprintf(p2stdin, "%d\n", x);
-                fflush(p2stdin);
-                if(getnum(p2stdout, &y))
-                    break;
-            }
-            printf("%d\n", y);
         }
+        getnum(p1stdout, &y);
+        if(!(y&1))
+        {
+            x=y;
+            fprintf(p2stdin, "%d\n", x);
+            fflush(p2stdin);
+            getnum(p2stdout, &y);
+        }
+        printf("%d\n", y);
 #endif
     }
     fclose(p1stdin);
