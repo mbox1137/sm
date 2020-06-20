@@ -20,7 +20,7 @@ void main() {
                 perror(lin);
             }
             sprintf(lin, "%d: x=%d", getpid(), x);
-            fprintf(stderr,"%s",lin);
+            fprintf(stderr,"%s\n",lin);
 #endif
         } else {
             fgetc(stdin);

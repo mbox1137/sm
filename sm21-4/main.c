@@ -20,15 +20,8 @@
 int start (const char* cmd, int *fd);
 
 int getnum(FILE *f, int *px) {
-    char lin[NN];
-    for(;;) {
-        if(!fgets(lin,NN,f))
-            break;
-        if(sscanf(lin,"%d", px)==1) {
-            return(-1);
-        }
-        break;
-    }
+    if(fscanf(f, "%d", px)==1)
+        return(-1);
     return(0);
 }
 
@@ -101,7 +94,14 @@ int main(int argc, char** argv) {
         }
         fclose(p1stdin);
         close(p1fd[0]); 
-        getnum(p1stdout, &y);
+        for(;;) {
+            if(feof(p1stdout))
+                break;
+            if(getnum(p1stdout, &y))
+                break;
+            else
+                fgetc(p1stdout);
+        }
         if(!(y&1))
         {
             x=y;
