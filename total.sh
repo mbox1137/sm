@@ -1,4 +1,9 @@
 #!/bin/bash
+if [ .$1 == . ]
+then
+	echo $0 ..
+	exit -1
+fi
 pushd $1
 echo clean...
 make clean &> /dev/null
