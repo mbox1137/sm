@@ -1,5 +1,6 @@
 //https://www.informit.com/articles/article.aspx?p=23618&seqNum=14
 
+#define _GNU_SOURCE
 #define DEBUG 0
 
 #include <stdio.h>
@@ -9,6 +10,7 @@
 #include <sys/signalfd.h>
 #include <sys/timerfd.h>
 #include <sys/epoll.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include <sys/time.h>
 #include "run.h"
@@ -118,7 +120,7 @@ int run(const char* cmd, const char* input, char** poutput, char** perr, int tim
     int retval;
     int status;
     struct sigaction sa;
-
+/*
     if (pipe(pipein) == -1)
     {
         perror("pipein");
@@ -130,6 +132,22 @@ int run(const char* cmd, const char* input, char** poutput, char** perr, int tim
         exit(-1);
     }
     if (pipe(pipeerr) == -1)
+    {
+        perror("pipeerr");
+        exit(-1);
+    }
+*/
+    if (pipe2(pipein, O_CLOEXEC) == -1)
+    {
+        perror("pipein");
+        exit(-1);
+    }
+    if (pipe2(pipeout, O_CLOEXEC) == -1)
+    {
+        perror("pipeout");
+        exit(-1);
+    }
+    if (pipe2(pipeerr, O_CLOEXEC) == -1)
     {
         perror("pipeerr");
         exit(-1);

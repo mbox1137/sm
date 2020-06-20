@@ -1,8 +1,12 @@
 #!/bin/bash
 
-#cat main.tst
-#echo ----
-#./main ./p1 ./p2 <main.tst
+function myrun
+{
+	echo $@
+	bash -c "$@"
+	echo
+}
 
-echo "echo 1 |./main bc bc"
-echo 1 |./main bc bc
+myrun "echo 1 |./main bc bc"
+myrun "echo 1 2 3|./main ./p1 ./p2"
+myrun "./main ./p1 ./p2 <main.tst"
