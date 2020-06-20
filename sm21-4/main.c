@@ -1,7 +1,7 @@
 #define _GNU_SOURCE
-#define DEBUG 1
+#define DEBUG 0
 #define LINE 0
-#define STDERR 1
+#define STDERR 0
 
 #include <stdio.h>
 #include <string.h>
