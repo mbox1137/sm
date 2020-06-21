@@ -53,13 +53,13 @@ int main(int argc,char *argv[])
     }
 
     char *end_ptr;
-    num_threads=strtoul(argv[1], &end_ptr, 10);
-    number_of_iteration=strtoull(argv[2], &end_ptr, 10);
+    num_threads = strtoul(argv[1], &end_ptr, 10);
+    number_of_iteration = strtoull(argv[2], &end_ptr, 10);
 
     Counter_pi *counters = new Counter_pi [num_threads];
     auto *futures = new future<pair<uint64_t,uint64_t>> [num_threads];
-    for(uint32_t i = 0; i<num_threads; i++)
-        futures[i] = async(counters[i],i + 1 , number_of_iteration);
+    for(uint32_t i = 0; i < num_threads; i++)
+        futures[i] = async(counters[i], i + 1 , number_of_iteration);
 
     double result = 0;
     for(uint32_t i = 0; i < num_threads; i++)
@@ -71,6 +71,9 @@ int main(int argc,char *argv[])
     }
 
     printf("%.10f\n",result * 4.0 / num_threads);
+
+    delete[] counters;
+    delete[] futures;
 
     return 0;
 }
