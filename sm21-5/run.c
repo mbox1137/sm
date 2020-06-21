@@ -1,6 +1,4 @@
-//https://www.informit.com/articles/article.aspx?p=23618&seqNum=14
-
-#define _GNU_SOURCE
+// #define _GNU_SOURCE
 #define DEBUG 0
 
 #include <stdio.h>
@@ -13,7 +11,12 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/time.h>
-#include "run.h"
+//#include "run.h"
+
+
+int run(const char* cmd, const char* input, char** poutput, char** perror, int timeout);
+char* readpipe(int fd);
+void writepipe(int fd, const char* s, int n);
 
 static pid_t pid;
 
@@ -61,9 +64,11 @@ void writepipe(int fd, const char* s, int n)
 {
     int nw, k;
     k = 0;
+
 #if DEBUG
     printf("writepipe: %s\n",s);
 #endif
+
     while(n > 0)
     {
         nw = write(fd, &s[k], n);
@@ -84,33 +89,37 @@ void writepipe(int fd, const char* s, int n)
 static void myalarm(int signal_number)
 {
     int sig;
-    sig=SIGKILL;
-//    sig=SIGINT;
+    sig = SIGKILL;
+
 #if DEBUG
         fprintf(stderr, "sig(%d): %d -> %d\n", sig, getpid(), pid);
 #endif
+
     kill(pid, sig);
     return;
 }
 
-int malarm(int msec) {
+int malarm(int msec)
+{
     double s;
     time_t sec;
     suseconds_t usec;
     struct itimerval timer;
 
-    s=msec/1000.0;
-    sec=s;
-    usec=(s-sec)*1E6;
+    s = msec/1000.0;
+    sec = s;
+    usec = (s - sec) * 1E6;
     timer.it_value.tv_sec = sec;
     timer.it_value.tv_usec = usec;
-    timer.it_interval.tv_sec = sec;
-    timer.it_interval.tv_usec = usec;
-    if(setitimer(ITIMER_REAL, &timer, NULL))
+    timer.it_interval.tv_sec = 0;
+    timer.it_interval.tv_usec = 0;
+
+    if (setitimer(ITIMER_REAL, &timer, NULL))
     {
         perror("setitimer");
         exit(-1);
     }
+
     return((int)(s*1000));
 }
 
@@ -120,23 +129,7 @@ int run(const char* cmd, const char* input, char** poutput, char** perr, int tim
     int retval;
     int status;
     struct sigaction sa;
-/*
-    if (pipe(pipein) == -1)
-    {
-        perror("pipein");
-        exit(-1);
-    }
-    if (pipe(pipeout) == -1)
-    {
-        perror("pipeout");
-        exit(-1);
-    }
-    if (pipe(pipeerr) == -1)
-    {
-        perror("pipeerr");
-        exit(-1);
-    }
-*/
+
     if (pipe2(pipein, O_CLOEXEC) == -1)
     {
         perror("pipein");
@@ -185,7 +178,7 @@ int run(const char* cmd, const char* input, char** poutput, char** perr, int tim
 #if DEBUG
         printf("parent\n");
 #endif
-    if(timeout>0)
+    if(timeout > 0)
     {
         memset(&sa, 0, sizeof(sa));
         sa.sa_handler = &myalarm;
@@ -220,3 +213,5 @@ int run(const char* cmd, const char* input, char** poutput, char** perr, int tim
 
     return(retval);
 }
+
+// https://www.informit.com/articles/article.aspx?p=23618&seqNum=14
