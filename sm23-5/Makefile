@@ -24,15 +24,18 @@ LDFLAGS	= -no-pie -m32 $(GDB) -lpthread -pthread
 #LDFLAGS	= -m elf_i386
 #LDFLAGS	= -m elf_i386_fbsd	#-m32
 
-EXEC	= main
-OBJS	= main.o
-SCDRY	= main.s
+EXEC	= main main_wiki
+OBJS	= main.o main_wiki.o fair.o
+SCDRY	= main.s main_wiki.s fair.s
 
 .SECONDARY: $(SCDRY)
 ALL : $(EXEC)
 
-main : main.o Makefile
-	$(LD) $(LDFLAGS) -o main main.o
+main : main.o fair.o Makefile
+	$(LD) $(LDFLAGS) -o main main.o fair.o
+
+main_wiki : main_wiki.o Makefile
+	$(LD) $(LDFLAGS) -o main_wiki main_wiki.o
 
 #$(EXEC) : $(OBJS) Makefile
 #	$(LD) $(LDFLAGS) $(GDB) -o $@ $(OBJS)
@@ -43,7 +46,7 @@ main : main.o Makefile
 %.o: %.cpp
 #	$(CC) $(CFLAGS) $(GDB) -c -o $@ $<
 
-%.s: %.c Makefile
+%.s: %.c Makefile fair.h
 	$(CC) $(CFLAGS) $(GDB) -S -o $@ $<
 
 %.s: %.cpp Makefile
